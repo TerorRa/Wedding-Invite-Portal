@@ -1,0 +1,18 @@
+Створи admin/guest_create.php.
+
+Форма створення гостя:
+- name
+- phone
+- email
+- telegram
+- guest_group
+- max_plus_one
+- table_number
+
+При збереженні:
+- згенерувати унікальний invite_code
+- status = invited
+- записати гостя в таблицю guests
+- після збереження перенаправити на guests.php
+
+Після створення на сторінці guests.php має бути видно персональне посилання гостя.

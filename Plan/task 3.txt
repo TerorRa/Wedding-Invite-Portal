@@ -1,0 +1,14 @@
+ файл config/db.php створено ы налаштовано.
+
+
+У кожному PHP-файлі, де потрібна база, потрібно підключати RedBeanPHP з libs/rb.php.
+
+Зроби окремий файл bootstrap.php у корені проєкту.
+Він має:
+- підключати rb.php
+- читати config/db.php
+- виконувати R::setup()
+- встановлювати кодування utf8mb4
+- запускати session_start(), якщо сесія ще не запущена
+- містити функцію generateInviteCode()
+- містити функцію logInviteAction($guest_id, $action)

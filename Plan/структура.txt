@@ -1,0 +1,151 @@
+Так, я б розділив цей проєкт на 2 частини:
+
+Адмін-панель для вас — список гостей, генерація персональних запрошень, перегляд відповідей.
+Сторінка для гостя — красиве персональне запрошення, анкета, підтвердження участі, QR-квиток.
+
+Нижче даю план так, щоб ти міг поступово давати завдання Codex.
+
+Назва проєкту
+
+Wedding Invite Portal
+
+Або українською:
+
+Весільне запрошення Ростислава та Катерини
+
+Основна ідея
+
+Кожен гість отримує персональне посилання:
+
+https://site.com/invite/ABCD1234
+
+При відкритті сайт показує персональне звернення:
+
+Олено, ми будемо дуже раді бачити тебе поруч у цей день.
+
+Далі гість підтверджує:
+
+буде чи ні;
+сам чи з +1;
+ім’я супутника;
+що буде пити;
+чи є обмеження по їжі;
+чи потрібен трансфер;
+залишає побажання.
+
+Після підтвердження генерується красивий Wedding Pass з QR-кодом.
+
+Рекомендований стек
+
+Оскільки ти вже працюєш з PHP, MySQL, RedBeanPHP, XAMPP, логічно робити так:
+
+PHP + MySQL + RedBeanPHP + HTML + CSS + JavaScript
+
+Без складних фреймворків. Для такого проєкту цього достатньо.
+
+Структура може бути така:
+
+/wedding
+│
+├── index.php
+├── invite.php
+├── submit_rsvp.php
+├── ticket.php
+│
+├── admin/
+│   ├── login.php
+│   ├── logout.php
+│   ├── dashboard.php
+│   ├── guests.php
+│   ├── guest_edit.php
+│   ├── guest_create.php
+│   ├── guest_delete.php
+│   └── export.php
+│
+├── config/
+│   └── db.php
+│
+├── libs/
+│   └── rb.php
+│
+├── assets/
+│   ├── css/
+│   │   ├── style.css
+│   │   └── admin.css
+│   ├── js/
+│   │   └── invite.js
+│   ├── img/
+│   │   ├── bg.jpg
+│   │   ├── couple.jpg
+│   │   └── logo.png
+│   └── qr/
+│
+└── uploads/
+База даних
+Таблиця guests
+CREATE TABLE guests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    invite_code VARCHAR(64) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(50) NULL,
+    email VARCHAR(255) NULL,
+    telegram VARCHAR(255) NULL,
+
+    guest_group VARCHAR(255) NULL,
+    max_plus_one TINYINT DEFAULT 0,
+
+    status VARCHAR(50) DEFAULT 'invited',
+    -- invited / opened / confirmed / declined
+
+    will_attend TINYINT NULL,
+    plus_one TINYINT DEFAULT 0,
+    plus_one_name VARCHAR(255) NULL,
+
+    drink VARCHAR(255) NULL,
+    food_notes TEXT NULL,
+    need_transfer TINYINT DEFAULT 0,
+    song_request VARCHAR(255) NULL,
+    wish TEXT NULL,
+
+    table_number VARCHAR(50) NULL,
+
+    opened_at DATETIME NULL,
+    answered_at DATETIME NULL,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+Таблиця invite_logs
+CREATE TABLE invite_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    guest_id INT NOT NULL,
+    action VARCHAR(100) NOT NULL,
+    ip VARCHAR(100) NULL,
+    user_agent TEXT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+Тут можна зберігати події:
+
+opened_invite
+submitted_rsvp
+viewed_ticket
+Таблиця admin_users
+CREATE TABLE admin_users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    login VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+/config
+- db.php  вже створений та налаштований 
+/config
+- config.php  вже створений та налаштований 
+
+/libs
+- rb.php створено 
+
+powershell
+cloudflared tunnel --url http://127.0.0.1 --http-host-header wip

@@ -1,0 +1,91 @@
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/bootstrap.php';
+
+$code = trim((string)($_GET['code'] ?? ''));
+$guest = null;
+
+if ($code !== '') {
+    $guest = R::findOne('guests', 'invite_code = ?', [$code]);
+}
+
+if ($guest !== null) {
+    logInviteAction((int)$guest->id, 'viewed_ticket');
+}
+
+function e(?string $value): string
+{
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+}
+
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$path = strtok($_SERVER['REQUEST_URI'] ?? '/ticket.php', '?') ?: '/ticket.php';
+$ticketUrl = $scheme . '://' . $host . $path . '?code=' . urlencode($code);
+$qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($ticketUrl);
+?>
+<!doctype html>
+<html lang="uk" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wedding Pass</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <main class="page-shell">
+        <?php if ($guest === null): ?>
+            <section class="welcome reveal">
+                <p class="eyebrow">Wedding Pass</p>
+                <h1>Квиток не знайдено</h1>
+                <p>Перевірте посилання або зверніться до організаторів.</p>
+            </section>
+        <?php elseif ($guest->status === 'declined' || (int)$guest->will_attend === 0): ?>
+            <section class="welcome reveal">
+                <p class="eyebrow">Дякуємо за відповідь</p>
+                <h1><?= e($guest->name) ?>, нам шкода, що ви не зможете бути з нами.</h1>
+                <p>Ми цінуємо вашу відповідь і будемо думками поруч.</p>
+            </section>
+        <?php else: ?>
+            <section class="wedding-pass reveal">
+                <div class="pass-main">
+                    <p class="eyebrow">Wedding Pass</p>
+                    <h1><?= e($guest->name) ?></h1>
+                    <?php if ((int)$guest->plus_one === 1 && !empty($guest->plus_one_name)): ?>
+                        <p class="pass-plus-one">+1: <?= e($guest->plus_one_name) ?></p>
+                    <?php endif; ?>
+
+                    <dl class="pass-details">
+                        <div>
+                            <dt>Дата</dt>
+                            <dd>01.08.2026</dd>
+                        </div>
+                        <div>
+                            <dt>Місце</dt>
+                            <dd>Petrovskyi Brovar</dd>
+                        </div>
+                        <?php if (!empty($guest->table_number)): ?>
+                            <div>
+                                <dt>Стіл</dt>
+                                <dd><?= e($guest->table_number) ?></dd>
+                            </div>
+                        <?php endif; ?>
+                        <div>
+                            <dt>Статус</dt>
+                            <dd>Confirmed</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <div class="pass-qr">
+                    <img src="<?= e($qrUrl) ?>" alt="QR-код Wedding Pass">
+                    <p>Покажіть цей QR-код при вході.</p>
+                </div>
+            </section>
+        <?php endif; ?>
+    </main>
+    <script src="assets/js/invite.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+Створи submit_rsvp.php.
+
+Логіка:
+1. Прийняти POST-дані з форми RSVP.
+2. Знайти гостя по invite_code.
+3. Якщо не знайдено — показати помилку.
+4. Оновити поля:
+   - will_attend
+   - plus_one
+   - plus_one_name
+   - drink
+   - food_notes
+   - need_transfer
+   - song_request
+   - wish
+   - answered_at = поточна дата
+   - status = confirmed, якщо will_attend = 1
+   - status = declined, якщо will_attend = 0
+
+5. Додати запис в invite_logs з action = submitted_rsvp.
+6. Після збереження перенаправити гостя на ticket.php?code=XXXX
+
+Додай базову валідацію:
+- invite_code обов'язковий
+- will_attend обов'язковий
+- якщо plus_one = 1, plus_one_name бажано заповнити

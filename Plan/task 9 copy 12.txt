@@ -1,0 +1,25 @@
+Створи admin/guest_edit.php.
+
+Сторінка редагування гостя по id.
+
+Дозволити редагувати:
+- name
+- phone
+- email
+- telegram
+- guest_group
+- max_plus_one
+- status
+- will_attend
+- plus_one
+- plus_one_name
+- drink
+- food_notes
+- need_transfer
+- song_request
+- wish
+- table_number
+
+Після збереження повернути на guests.php.
+
+Також показати персональне посилання гостя, щоб його можна було скопіювати.
