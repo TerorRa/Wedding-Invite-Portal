@@ -16,7 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login = trim((string)($_POST['login'] ?? ''));
     $password = (string)($_POST['password'] ?? '');
 
-    if ($login === '' || $password === '') {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
+        $error = 'Сесію форми завершено. Оновіть сторінку і спробуйте ще раз.';
+    } elseif ($login === '' || $password === '') {
         $error = 'Введіть логін і пароль.';
     } else {
         $admin = R::findOne('admin_users', 'login = ?', [$login]);
@@ -47,6 +49,7 @@ function e(?string $value): string
 <body>
     <main class="admin-login-shell">
         <form class="admin-login-form" action="login.php" method="post">
+            <?= csrfField() ?>
             <p class="admin-eyebrow">Wedding Invite Portal</p>
             <h1>Вхід в адмін-панель</h1>
 

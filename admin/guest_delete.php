@@ -11,13 +11,20 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
+    http_response_code(400);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo 'Invalid request';
+    exit;
+}
+
 $id = (int)($_POST['id'] ?? 0);
 
 if ($id > 0) {
     $guest = R::load('guests', $id);
 
     if ($guest->id) {
-        R::trashAll(R::findAll('invite_logs', 'guest_id = ?', [$id]));
+        R::trashAll(R::findAll('invitelogs', 'guest_id = ?', [$id]));
         R::trash($guest);
     }
 }

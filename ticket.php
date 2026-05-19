@@ -25,6 +25,8 @@ $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $path = strtok($_SERVER['REQUEST_URI'] ?? '/ticket.php', '?') ?: '/ticket.php';
 $ticketUrl = $scheme . '://' . $host . $path . '?code=' . urlencode($code);
 $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($ticketUrl);
+$invitePath = str_replace('/ticket.php', '/invite.php', $path);
+$inviteUrl = $scheme . '://' . $host . $invitePath . '?code=' . urlencode($code);
 ?>
 <!doctype html>
 <html lang="uk" class="no-js">
@@ -49,7 +51,7 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urle
                 <p>Ми цінуємо вашу відповідь і будемо думками поруч.</p>
             </section>
         <?php else: ?>
-            <section class="wedding-pass reveal">
+            <section class="wedding-pass pass-card reveal">
                 <div class="pass-main">
                     <p class="eyebrow">Wedding Pass</p>
                     <h1><?= e($guest->name) ?></h1>
@@ -82,6 +84,13 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urle
                 <div class="pass-qr">
                     <img src="<?= e($qrUrl) ?>" alt="QR-код Wedding Pass">
                     <p>Покажіть цей QR-код при вході.</p>
+                </div>
+
+                <div class="pass-actions">
+                    <a class="section-action" href="<?= e($inviteUrl) ?>">Повернутися до запрошення</a>
+                    <button type="button" class="section-action pass-copy-button" data-copy-link="<?= e($ticketUrl) ?>">
+                        Скопіювати посилання
+                    </button>
                 </div>
             </section>
         <?php endif; ?>

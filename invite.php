@@ -44,7 +44,7 @@ function e(?string $value): string
     <title>Запрошення на весілля</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="<?= $guest !== null ? 'has-invite-gate' : '' ?>">
     <main class="invite-page">
         <?php if ($guest === null): ?>
             <section class="not-found reveal">
@@ -53,6 +53,13 @@ function e(?string $value): string
                 <p>Перевірте посилання або зверніться до організаторів.</p>
             </section>
         <?php else: ?>
+            <section class="invite-opening" aria-label="Відкрити запрошення">
+                <p class="eyebrow">Персональне запрошення</p>
+                <h1><?= e($guest->name) ?></h1>
+                <button type="button" class="hero-action" data-open-invite>Відкрити</button>
+            </section>
+
+            <div class="invite-content" id="inviteContent">
             <section class="invite-hero reveal">
                 <div class="hero-date">1 серпня 2026</div>
                 <p class="eyebrow">Персональне запрошення</p>
@@ -78,6 +85,7 @@ function e(?string $value): string
                         <dd>Petrovskyi Brovar</dd>
                     </div>
                 </dl>
+                <a class="section-action" href="#rsvp">Перейти до RSVP</a>
             </section>
 
             <section class="invite-section reveal">
@@ -203,6 +211,7 @@ function e(?string $value): string
                 <h2>Дякуємо, що ви є частиною нашої історії.</h2>
                 <p>Вашу відповідь ми отримаємо одразу, а після підтвердження для вас відкриється персональний Wedding Pass.</p>
             </section>
+            </div>
         <?php endif; ?>
     </main>
     <script src="assets/js/invite.js"></script>

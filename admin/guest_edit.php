@@ -9,7 +9,24 @@ $guest = $id > 0 ? R::load('guests', $id) : null;
 
 if ($guest === null || !$guest->id) {
     http_response_code(404);
-    die('Гостя не знайдено.');
+    ?>
+    <!doctype html>
+    <html lang="uk">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Гостя не знайдено</title>
+        <link rel="stylesheet" href="../assets/css/admin.css">
+    </head>
+    <body>
+        <main class="admin-shell">
+            <div class="admin-alert">Гостя не знайдено.</div>
+            <a class="admin-button admin-button-light" href="guests.php">Назад до списку</a>
+        </main>
+    </body>
+    </html>
+    <?php
+    exit;
 }
 
 $errors = [];
@@ -60,6 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $form['max_plus_one'] = isset($_POST['max_plus_one']) ? '1' : '0';
     $form['plus_one'] = isset($_POST['plus_one']) ? '1' : '0';
     $form['need_transfer'] = isset($_POST['need_transfer']) ? '1' : '0';
+
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
+        $errors[] = 'Сесію форми завершено. Оновіть сторінку і спробуйте ще раз.';
+    }
 
     if ($form['name'] === '') {
         $errors[] = 'Вкажіть імʼя гостя.';
@@ -115,6 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <nav class="admin-nav" aria-label="Адмін-меню">
             <a href="dashboard.php">Dashboard</a>
             <a class="is-active" href="guests.php">Гості</a>
+            <a href="import.php">Імпорт</a>
             <a href="export.php">Експорт</a>
             <a href="logout.php">Вийти</a>
         </nav>
@@ -144,6 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form class="admin-form admin-form-wide" action="guest_edit.php" method="post">
+            <?= csrfField() ?>
             <input type="hidden" name="id" value="<?= (int)$guest->id ?>">
 
             <label>

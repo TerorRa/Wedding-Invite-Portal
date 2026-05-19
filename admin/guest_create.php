@@ -36,6 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $form['max_plus_one'] = isset($_POST['max_plus_one']) ? '1' : '0';
 
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
+        $errors[] = 'Сесію форми завершено. Оновіть сторінку і спробуйте ще раз.';
+    }
+
     if ($form['name'] === '') {
         $errors[] = 'Вкажіть імʼя гостя.';
     }
@@ -76,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <nav class="admin-nav" aria-label="Адмін-меню">
             <a href="dashboard.php">Dashboard</a>
             <a class="is-active" href="guests.php">Гості</a>
+            <a href="import.php">Імпорт</a>
             <a href="export.php">Експорт</a>
             <a href="logout.php">Вийти</a>
         </nav>
@@ -97,6 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form class="admin-form" action="guest_create.php" method="post">
+            <?= csrfField() ?>
             <label>
                 Імʼя
                 <input type="text" name="name" value="<?= e($form['name']) ?>" required>

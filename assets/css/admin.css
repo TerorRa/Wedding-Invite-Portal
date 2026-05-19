@@ -109,6 +109,42 @@ body {
     resize: vertical;
 }
 
+.form-hint {
+    margin: 0;
+    color: #68707c;
+    font-size: 14px;
+}
+
+.import-form textarea {
+    font-family: Consolas, "Courier New", monospace;
+    line-height: 1.5;
+}
+
+.import-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 180px));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.import-summary article {
+    display: grid;
+    gap: 8px;
+    padding: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.import-summary span {
+    color: #68707c;
+    font-size: 13px;
+}
+
+.import-summary strong {
+    font-size: 32px;
+}
+
 .admin-login-form button {
     min-height: 44px;
     padding: 0 18px;
@@ -419,6 +455,11 @@ body {
     cursor: pointer;
 }
 
+.table-actions .copy-message-button,
+.table-actions .copy-phone-button {
+    color: var(--accent);
+}
+
 h1 {
     margin: 0;
     font-size: 28px;
@@ -470,6 +511,10 @@ h1 {
     }
 
     .admin-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .import-summary {
         grid-template-columns: 1fr;
     }
 }

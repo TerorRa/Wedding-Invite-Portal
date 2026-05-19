@@ -42,6 +42,27 @@ function inviteUrl(string $scheme, string $host, string $projectPath, string $co
 {
     return $scheme . '://' . $host . $projectPath . '/invite.php?code=' . urlencode($code);
 }
+
+function invitationMessage(string $name, string $link): string
+{
+    return "Привіт, {$name}! ❤️\n"
+        . "Ми підготували для тебе особисте запрошення на наше весілля.\n"
+        . "Будемо дуже раді бачити тебе поруч у цей день.\n\n"
+        . "Відкрити запрошення:\n"
+        . $link . "\n\n"
+        . "Ростислав і Катерина";
+}
+
+function telegramUrl(?string $telegram): ?string
+{
+    $username = ltrim(trim((string)$telegram), '@');
+
+    if ($username === '') {
+        return null;
+    }
+
+    return 'https://t.me/' . rawurlencode($username);
+}
 ?>
 <!doctype html>
 <html lang="uk">
@@ -58,6 +79,7 @@ function inviteUrl(string $scheme, string $host, string $projectPath, string $co
         <nav class="admin-nav" aria-label="Адмін-меню">
             <a href="dashboard.php">Dashboard</a>
             <a class="is-active" href="guests.php">Гості</a>
+            <a href="import.php">Імпорт</a>
             <a href="export.php">Експорт</a>
             <a href="logout.php">Вийти</a>
         </nav>
@@ -69,6 +91,7 @@ function inviteUrl(string $scheme, string $host, string $projectPath, string $co
             </div>
             <div class="admin-actions">
                 <a class="admin-button admin-button-light" href="guest_create.php">Створити гостя</a>
+                <a class="admin-button admin-button-light" href="import.php">Імпорт гостей</a>
                 <a class="admin-button admin-button-light" href="export.php">Експорт CSV</a>
             </div>
         </div>
@@ -122,6 +145,7 @@ function inviteUrl(string $scheme, string $host, string $projectPath, string $co
 
                         <?php foreach ($guests as $guest): ?>
                             <?php $link = inviteUrl($scheme, $host, $projectPath, (string)$guest->invite_code); ?>
+                            <?php $telegramLink = telegramUrl($guest->telegram); ?>
                             <tr>
                                 <td><?= (int)$guest->id ?></td>
                                 <td><?= e($guest->name) ?></td>
@@ -137,7 +161,23 @@ function inviteUrl(string $scheme, string $host, string $projectPath, string $co
                                 <td>
                                     <div class="table-actions">
                                         <a href="guest_edit.php?id=<?= (int)$guest->id ?>">Редагувати</a>
+                                        <button
+                                            type="button"
+                                            class="copy-message-button"
+                                            data-copy-message="<?= e(invitationMessage((string)$guest->name, $link)) ?>"
+                                        >
+                                            Копіювати запрошення
+                                        </button>
+                                        <?php if ($telegramLink !== null): ?>
+                                            <a href="<?= e($telegramLink) ?>" target="_blank" rel="noreferrer">Telegram</a>
+                                        <?php endif; ?>
+                                        <?php if (!empty($guest->phone)): ?>
+                                            <button type="button" class="copy-phone-button" data-copy-phone="<?= e($guest->phone) ?>">
+                                                Copy phone
+                                            </button>
+                                        <?php endif; ?>
                                         <form action="guest_delete.php" method="post" onsubmit="return confirm('Видалити гостя?');">
+                                            <?= csrfField() ?>
                                             <input type="hidden" name="id" value="<?= (int)$guest->id ?>">
                                             <button type="submit">Видалити</button>
                                         </form>
@@ -150,6 +190,7 @@ function inviteUrl(string $scheme, string $host, string $projectPath, string $co
             </div>
         </section>
     </main>
+    <script src="../assets/js/admin.js"></script>
 </body>
 
 </html>
