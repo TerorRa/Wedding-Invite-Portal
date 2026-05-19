@@ -63,6 +63,15 @@ function telegramUrl(?string $telegram): ?string
 
     return 'https://t.me/' . rawurlencode($username);
 }
+
+function invitationTypeLabel(?string $type, int $maxPlusOne): string
+{
+    return match ((string)$type) {
+        'couple' => 'Пара',
+        'single_plus_one' => '1 + можливий +1',
+        default => $maxPlusOne === 1 ? '1 + можливий +1' : '1 без +1',
+    };
+}
 ?>
 <!doctype html>
 <html lang="uk">
@@ -79,6 +88,7 @@ function telegramUrl(?string $telegram): ?string
         <nav class="admin-nav" aria-label="Адмін-меню">
             <a href="dashboard.php">Dashboard</a>
             <a class="is-active" href="guests.php">Гості</a>
+            <a href="program.php">Програма</a>
             <a href="import.php">Імпорт</a>
             <a href="export.php">Експорт</a>
             <a href="logout.php">Вийти</a>
@@ -123,12 +133,15 @@ function telegramUrl(?string $telegram): ?string
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Квиток</th>
                             <th>Ім'я</th>
                             <th>Телефон</th>
                             <th>Група</th>
+                            <th>Тип</th>
                             <th>Статус</th>
                             <th>+1</th>
                             <th>Напій</th>
+                            <th>Напій партнера</th>
                             <th>Стіл</th>
                             <th>Відкриття</th>
                             <th>Відповідь</th>
@@ -139,7 +152,7 @@ function telegramUrl(?string $telegram): ?string
                     <tbody>
                         <?php if ($guests === []): ?>
                             <tr>
-                                <td colspan="12" class="admin-empty">Гостей не знайдено.</td>
+                                <td colspan="15" class="admin-empty">Гостей не знайдено.</td>
                             </tr>
                         <?php endif; ?>
 
@@ -148,12 +161,15 @@ function telegramUrl(?string $telegram): ?string
                             <?php $telegramLink = telegramUrl($guest->telegram); ?>
                             <tr>
                                 <td><?= (int)$guest->id ?></td>
+                                <td><?= e($guest->ticket_number) ?></td>
                                 <td><?= e($guest->name) ?></td>
                                 <td><?= e($guest->phone) ?></td>
                                 <td><?= e($guest->guest_group) ?></td>
+                                <td><?= e(invitationTypeLabel($guest->invitation_type, (int)$guest->max_plus_one)) ?></td>
                                 <td><span class="status-pill"><?= e($guest->status) ?></span></td>
-                                <td><?= (int)$guest->plus_one === 1 ? 'Так' : 'Ні' ?></td>
+                                <td><?= (int)$guest->plus_one === 1 ? e($guest->plus_one_name ?: 'Так') : 'Ні' ?></td>
                                 <td><?= e($guest->drink) ?></td>
+                                <td><?= e($guest->partner_drink) ?></td>
                                 <td><?= e($guest->table_number) ?></td>
                                 <td><?= e($guest->opened_at) ?></td>
                                 <td><?= e($guest->answered_at) ?></td>

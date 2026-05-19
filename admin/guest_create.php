@@ -7,12 +7,20 @@ require_once __DIR__ . '/auth.php';
 $errors = [];
 $form = [
     'name' => '',
+    'personal_greeting' => '',
     'phone' => '',
     'email' => '',
     'telegram' => '',
     'guest_group' => '',
-    'max_plus_one' => '0',
+    'invitation_type' => 'single',
+    'plus_one_name' => '',
     'table_number' => '',
+];
+
+$invitationTypes = [
+    'single' => 'Одна людина без +1',
+    'single_plus_one' => 'Одна людина може взяти +1',
+    'couple' => 'Сімейна пара',
 ];
 
 function e(?string $value): string
@@ -29,12 +37,30 @@ function generateUniqueInviteCode(): string
     return $code;
 }
 
+function generateUniqueTicketNumber(string $inviteCode): string
+{
+    $number = generateTicketNumber($inviteCode);
+
+    while (R::count('guests', 'ticket_number = ?', [$number]) > 0) {
+        $number = generateTicketNumber($inviteCode . random_int(1000, 9999));
+    }
+
+    return $number;
+}
+
+function maxPlusOneForInvitationType(string $type): int
+{
+    return in_array($type, ['single_plus_one', 'couple'], true) ? 1 : 0;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($form as $key => $value) {
         $form[$key] = trim((string)($_POST[$key] ?? $value));
     }
 
-    $form['max_plus_one'] = isset($_POST['max_plus_one']) ? '1' : '0';
+    if (!array_key_exists($form['invitation_type'], $invitationTypes)) {
+        $errors[] = 'Оберіть коректний тип запрошення.';
+    }
 
     if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
         $errors[] = 'Сесію форми завершено. Оновіть сторінку і спробуйте ще раз.';
@@ -48,15 +74,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Вкажіть коректний email.';
     }
 
+    if ($form['invitation_type'] === 'couple' && $form['plus_one_name'] === '') {
+        $errors[] = 'Для сімейної пари вкажіть імʼя партнера.';
+    }
+
     if ($errors === []) {
         $guest = R::dispense('guests');
         $guest->invite_code = generateUniqueInviteCode();
+        $guest->ticket_number = generateUniqueTicketNumber((string)$guest->invite_code);
         $guest->name = $form['name'];
+        $guest->personal_greeting = $form['personal_greeting'] !== '' ? $form['personal_greeting'] : null;
         $guest->phone = $form['phone'] !== '' ? $form['phone'] : null;
         $guest->email = $form['email'] !== '' ? $form['email'] : null;
         $guest->telegram = $form['telegram'] !== '' ? $form['telegram'] : null;
         $guest->guest_group = $form['guest_group'] !== '' ? $form['guest_group'] : null;
-        $guest->max_plus_one = (int)$form['max_plus_one'];
+        $guest->invitation_type = $form['invitation_type'];
+        $guest->max_plus_one = maxPlusOneForInvitationType($form['invitation_type']);
+        $guest->plus_one_name = $form['invitation_type'] === 'couple' ? $form['plus_one_name'] : null;
         $guest->table_number = $form['table_number'] !== '' ? $form['table_number'] : null;
         $guest->status = 'invited';
 
@@ -80,6 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <nav class="admin-nav" aria-label="Адмін-меню">
             <a href="dashboard.php">Dashboard</a>
             <a class="is-active" href="guests.php">Гості</a>
+            <a href="program.php">Програма</a>
             <a href="import.php">Імпорт</a>
             <a href="export.php">Експорт</a>
             <a href="logout.php">Вийти</a>
@@ -108,6 +143,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="text" name="name" value="<?= e($form['name']) ?>" required>
             </label>
 
+            <label class="admin-full">
+                Персональне звернення
+                <textarea name="personal_greeting" rows="3" placeholder="Наприклад: Дорогі друзі, будемо щасливі бачити вас поруч у цей день."><?= e($form['personal_greeting']) ?></textarea>
+            </label>
+
             <label>
                 Телефон
                 <input type="text" name="phone" value="<?= e($form['phone']) ?>">
@@ -129,13 +169,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </label>
 
             <label>
-                Номер столу
-                <input type="text" name="table_number" value="<?= e($form['table_number']) ?>">
+                Тип запрошення
+                <select name="invitation_type">
+                    <?php foreach ($invitationTypes as $value => $label): ?>
+                        <option value="<?= e($value) ?>" <?= $form['invitation_type'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                    <?php endforeach; ?>
+                </select>
             </label>
 
-            <label class="admin-checkbox">
-                <input type="checkbox" name="max_plus_one" value="1" <?= $form['max_plus_one'] === '1' ? 'checked' : '' ?>>
-                Може взяти +1
+            <label>
+                Імʼя партнера
+                <input type="text" name="plus_one_name" value="<?= e($form['plus_one_name']) ?>" placeholder="Для сімейної пари">
+            </label>
+
+            <label>
+                Номер столу
+                <input type="text" name="table_number" value="<?= e($form['table_number']) ?>">
             </label>
 
             <div class="admin-form-actions">

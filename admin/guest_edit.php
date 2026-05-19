@@ -32,7 +32,12 @@ if ($guest === null || !$guest->id) {
 $errors = [];
 $statuses = ['invited', 'opened', 'confirmed', 'declined'];
 $willAttendOptions = ['' => 'Не вказано', '1' => 'Так', '0' => 'Ні'];
-$drinkOptions = ['', 'Вино', 'Шампанське', 'Віскі', 'Безалкогольне', 'Інше'];
+$drinkOptions = ['', 'Вино', 'Шампанське', 'Віскі', 'Горілка', 'Безалкогольне', 'Інше'];
+$invitationTypes = [
+    'single' => 'Одна людина без +1',
+    'single_plus_one' => 'Одна людина може взяти +1',
+    'couple' => 'Сімейна пара',
+];
 
 function e(?string $value): string
 {
@@ -44,6 +49,11 @@ function emptyToNull(string $value): ?string
     return $value === '' ? null : $value;
 }
 
+function maxPlusOneForInvitationType(string $type): int
+{
+    return in_array($type, ['single_plus_one', 'couple'], true) ? 1 : 0;
+}
+
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $projectPath = rtrim(dirname(dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/Wedding-Invite-Portal/admin/guest_edit.php'))), '/\\');
@@ -52,16 +62,19 @@ $inviteLink = $scheme . '://' . $host . $projectPath . '/invite.php?code=' . url
 
 $form = [
     'name' => (string)$guest->name,
+    'personal_greeting' => (string)$guest->personal_greeting,
     'phone' => (string)$guest->phone,
     'email' => (string)$guest->email,
     'telegram' => (string)$guest->telegram,
     'guest_group' => (string)$guest->guest_group,
+    'invitation_type' => (string)($guest->invitation_type ?: ((int)$guest->max_plus_one === 1 ? 'single_plus_one' : 'single')),
     'max_plus_one' => (string)(int)$guest->max_plus_one,
     'status' => (string)$guest->status,
     'will_attend' => $guest->will_attend === null ? '' : (string)(int)$guest->will_attend,
     'plus_one' => (string)(int)$guest->plus_one,
     'plus_one_name' => (string)$guest->plus_one_name,
     'drink' => (string)$guest->drink,
+    'partner_drink' => (string)$guest->partner_drink,
     'food_notes' => (string)$guest->food_notes,
     'need_transfer' => (string)(int)$guest->need_transfer,
     'song_request' => (string)$guest->song_request,
@@ -74,9 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $form[$key] = trim((string)($_POST[$key] ?? ''));
     }
 
-    $form['max_plus_one'] = isset($_POST['max_plus_one']) ? '1' : '0';
     $form['plus_one'] = isset($_POST['plus_one']) ? '1' : '0';
     $form['need_transfer'] = isset($_POST['need_transfer']) ? '1' : '0';
+    $form['max_plus_one'] = (string)maxPlusOneForInvitationType($form['invitation_type']);
 
     if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
         $errors[] = 'Сесію форми завершено. Оновіть сторінку і спробуйте ще раз.';
@@ -94,22 +107,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Оберіть коректний статус.';
     }
 
+    if (!array_key_exists($form['invitation_type'], $invitationTypes)) {
+        $errors[] = 'Оберіть коректний тип запрошення.';
+    }
+
     if (!array_key_exists($form['will_attend'], $willAttendOptions)) {
         $errors[] = 'Оберіть коректне значення участі.';
     }
 
+    if ($form['invitation_type'] === 'couple' && $form['plus_one_name'] === '') {
+        $errors[] = 'Для сімейної пари вкажіть імʼя партнера.';
+    }
+
     if ($errors === []) {
         $guest->name = $form['name'];
+        $guest->personal_greeting = emptyToNull($form['personal_greeting']);
         $guest->phone = emptyToNull($form['phone']);
         $guest->email = emptyToNull($form['email']);
         $guest->telegram = emptyToNull($form['telegram']);
         $guest->guest_group = emptyToNull($form['guest_group']);
+        $guest->invitation_type = $form['invitation_type'];
         $guest->max_plus_one = (int)$form['max_plus_one'];
         $guest->status = $form['status'];
         $guest->will_attend = $form['will_attend'] === '' ? null : (int)$form['will_attend'];
         $guest->plus_one = (int)$form['plus_one'];
         $guest->plus_one_name = emptyToNull($form['plus_one_name']);
         $guest->drink = emptyToNull($form['drink']);
+        $guest->partner_drink = emptyToNull($form['partner_drink']);
         $guest->food_notes = emptyToNull($form['food_notes']);
         $guest->need_transfer = (int)$form['need_transfer'];
         $guest->song_request = emptyToNull($form['song_request']);
@@ -136,6 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <nav class="admin-nav" aria-label="Адмін-меню">
             <a href="dashboard.php">Dashboard</a>
             <a class="is-active" href="guests.php">Гості</a>
+            <a href="program.php">Програма</a>
             <a href="import.php">Імпорт</a>
             <a href="export.php">Експорт</a>
             <a href="logout.php">Вийти</a>
@@ -146,7 +171,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p class="admin-eyebrow">Wedding Invite Portal</p>
                 <h1>Редагування гостя</h1>
             </div>
-            <a class="admin-button admin-button-light" href="guests.php">Назад до списку</a>
+            <div class="admin-actions">
+                <button class="admin-button" type="submit" form="guest-edit-form">Зберегти зміни</button>
+                <a class="admin-button admin-button-light" href="guests.php">Назад до списку</a>
+            </div>
         </div>
 
         <section class="copy-link-box">
@@ -165,13 +193,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         <?php endif; ?>
 
-        <form class="admin-form admin-form-wide" action="guest_edit.php" method="post">
+        <form class="admin-form admin-form-wide" id="guest-edit-form" action="guest_edit.php" method="post">
             <?= csrfField() ?>
             <input type="hidden" name="id" value="<?= (int)$guest->id ?>">
 
             <label>
                 Імʼя
                 <input type="text" name="name" value="<?= e($form['name']) ?>" required>
+            </label>
+
+            <label class="admin-full">
+                Персональне звернення
+                <textarea name="personal_greeting" rows="3"><?= e($form['personal_greeting']) ?></textarea>
             </label>
 
             <label>
@@ -195,6 +228,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </label>
 
             <label>
+                Тип запрошення
+                <select name="invitation_type">
+                    <?php foreach ($invitationTypes as $value => $label): ?>
+                        <option value="<?= e($value) ?>" <?= $form['invitation_type'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <span class="form-hint">Для сімейної пари заповніть поле партнера поруч.</span>
+            </label>
+
+            <label>
+                Імʼя партнера
+                <input type="text" name="plus_one_name" value="<?= e($form['plus_one_name']) ?>" placeholder="Для сімейної пари або +1">
+            </label>
+
+            <label>
                 Статус
                 <select name="status">
                     <?php foreach ($statuses as $status): ?>
@@ -212,16 +260,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </select>
             </label>
 
-            <label>
-                Імʼя супутника
-                <input type="text" name="plus_one_name" value="<?= e($form['plus_one_name']) ?>">
-            </label>
+            <div class="admin-fieldset admin-full">
+                <h2>+1 / партнер</h2>
+                <div class="admin-fieldset-grid">
+                    <label class="admin-checkbox">
+                        <input type="checkbox" name="plus_one" value="1" <?= $form['plus_one'] === '1' ? 'checked' : '' ?>>
+                        Буде з +1
+                    </label>
+                </div>
+            </div>
 
             <label>
                 Напій
                 <select name="drink">
                     <?php foreach ($drinkOptions as $drink): ?>
                         <option value="<?= e($drink) ?>" <?= $form['drink'] === $drink ? 'selected' : '' ?>>
+                            <?= $drink === '' ? 'Не вказано' : e($drink) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+
+            <label>
+                Напій партнера / супутника
+                <select name="partner_drink">
+                    <?php foreach ($drinkOptions as $drink): ?>
+                        <option value="<?= e($drink) ?>" <?= $form['partner_drink'] === $drink ? 'selected' : '' ?>>
                             <?= $drink === '' ? 'Не вказано' : e($drink) ?>
                         </option>
                     <?php endforeach; ?>
@@ -246,16 +310,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label class="admin-full">
                 Побажання
                 <textarea name="wish" rows="4"><?= e($form['wish']) ?></textarea>
-            </label>
-
-            <label class="admin-checkbox">
-                <input type="checkbox" name="max_plus_one" value="1" <?= $form['max_plus_one'] === '1' ? 'checked' : '' ?>>
-                Може взяти +1
-            </label>
-
-            <label class="admin-checkbox">
-                <input type="checkbox" name="plus_one" value="1" <?= $form['plus_one'] === '1' ? 'checked' : '' ?>>
-                Буде з +1
             </label>
 
             <label class="admin-checkbox">

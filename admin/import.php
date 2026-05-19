@@ -23,6 +23,17 @@ function generateImportInviteCode(): string
     return $code;
 }
 
+function generateImportTicketNumber(string $inviteCode): string
+{
+    $number = generateTicketNumber($inviteCode);
+
+    while (R::count('guests', 'ticket_number = ?', [$number]) > 0) {
+        $number = generateTicketNumber($inviteCode . random_int(1000, 9999));
+    }
+
+    return $number;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $rawGuests = (string)($_POST['guests'] ?? '');
 
@@ -65,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $guest = R::dispense('guests');
             $guest->invite_code = generateImportInviteCode();
+            $guest->ticket_number = generateImportTicketNumber((string)$guest->invite_code);
             $guest->name = $name;
             $guest->phone = $phone !== '' ? $phone : null;
             $guest->telegram = $telegram !== '' ? $telegram : null;
@@ -92,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <nav class="admin-nav" aria-label="Адмін-меню">
             <a href="dashboard.php">Dashboard</a>
             <a href="guests.php">Гості</a>
+            <a href="program.php">Програма</a>
             <a class="is-active" href="import.php">Імпорт</a>
             <a href="export.php">Експорт</a>
             <a href="logout.php">Вийти</a>

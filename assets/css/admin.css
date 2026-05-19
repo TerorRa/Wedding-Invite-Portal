@@ -85,6 +85,30 @@ body {
     grid-column: 1 / -1;
 }
 
+.admin-fieldset {
+    display: grid;
+    gap: 14px;
+    padding: 16px;
+    background: #fafbfc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.admin-fieldset h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.admin-fieldset-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.admin-fieldset .admin-checkbox {
+    grid-column: auto;
+}
+
 .admin-login-form input {
     min-height: 44px;
     padding: 10px 12px;
@@ -145,6 +169,18 @@ body {
     font-size: 32px;
 }
 
+.program-form {
+    margin-bottom: 18px;
+}
+
+.program-table-panel {
+    margin-top: 18px;
+}
+
+.program-table {
+    min-width: 860px;
+}
+
 .admin-login-form button {
     min-height: 44px;
     padding: 0 18px;
@@ -189,6 +225,10 @@ body {
     flex-wrap: wrap;
     align-items: center;
     gap: 14px;
+    padding: 12px;
+    background: #fafbfc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
 }
 
 .admin-form-actions a {
@@ -475,6 +515,10 @@ h1 {
     }
 
     .admin-form {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-fieldset-grid {
         grid-template-columns: 1fr;
     }
 

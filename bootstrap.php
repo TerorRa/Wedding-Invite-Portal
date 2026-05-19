@@ -30,6 +30,13 @@ function generateInviteCode(): string
     return bin2hex(random_bytes(8));
 }
 
+function generateTicketNumber(?string $seed = null): string
+{
+    $source = $seed ?: bin2hex(random_bytes(8));
+
+    return 'WI-0801-' . strtoupper(substr(hash('crc32b', $source), 0, 8));
+}
+
 function csrfToken(): string
 {
     if (empty($_SESSION['csrf_token'])) {

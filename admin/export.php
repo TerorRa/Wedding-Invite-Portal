@@ -5,16 +5,20 @@ declare(strict_types=1);
 require_once __DIR__ . '/auth.php';
 
 $fields = [
+    'ticket_number',
     'name',
+    'personal_greeting',
     'phone',
     'email',
     'telegram',
     'guest_group',
+    'invitation_type',
     'status',
     'will_attend',
     'plus_one',
     'plus_one_name',
     'drink',
+    'partner_drink',
     'food_notes',
     'need_transfer',
     'song_request',

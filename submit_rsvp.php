@@ -38,6 +38,7 @@ $inviteCode = trim((string)($_POST['invite_code'] ?? ''));
 $willAttendRaw = $_POST['will_attend'] ?? null;
 $plusOne = (int)($_POST['plus_one'] ?? 0);
 $plusOneName = trim((string)($_POST['plus_one_name'] ?? ''));
+$partnerDrink = trim((string)($_POST['partner_drink'] ?? ''));
 
 if ($inviteCode === '') {
     renderError('Код запрошення обовʼязковий.');
@@ -60,15 +61,31 @@ if ($guest === null) {
     renderError('Запрошення не знайдено.');
 }
 
-if ($plusOne === 1 && (int)$guest->max_plus_one !== 1) {
+$invitationType = (string)($guest->invitation_type ?: ((int)$guest->max_plus_one === 1 ? 'single_plus_one' : 'single'));
+$isCoupleInvite = $invitationType === 'couple';
+
+if ($willAttend === 0) {
     $plusOne = 0;
     $plusOneName = '';
+    $partnerDrink = '';
+} elseif ($isCoupleInvite) {
+    $plusOne = 1;
+    $plusOneName = trim((string)$guest->plus_one_name);
+} elseif ($plusOne === 1 && (int)$guest->max_plus_one !== 1) {
+    $plusOne = 0;
+    $plusOneName = '';
+    $partnerDrink = '';
+}
+
+if ($willAttend === 1 && $plusOne === 1 && $plusOneName === '') {
+    renderError('Будь ласка, вкажіть імʼя супутника або партнера.');
 }
 
 $guest->will_attend = $willAttend;
 $guest->plus_one = $plusOne;
 $guest->plus_one_name = $plusOne === 1 ? $plusOneName : null;
 $guest->drink = trim((string)($_POST['drink'] ?? ''));
+$guest->partner_drink = $plusOne === 1 ? $partnerDrink : null;
 $guest->food_notes = trim((string)($_POST['food_notes'] ?? ''));
 $guest->need_transfer = isset($_POST['need_transfer']) ? 1 : 0;
 $guest->song_request = trim((string)($_POST['song_request'] ?? ''));

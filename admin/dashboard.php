@@ -28,6 +28,7 @@ $stats['expectedPeople'] = $stats['confirmed'] + $stats['plusOnes'];
         <nav class="admin-nav" aria-label="Адмін-меню">
             <a class="is-active" href="dashboard.php">Dashboard</a>
             <a href="guests.php">Гості</a>
+            <a href="program.php">Програма</a>
             <a href="import.php">Імпорт</a>
             <a href="export.php">Експорт</a>
             <a href="logout.php">Вийти</a>
