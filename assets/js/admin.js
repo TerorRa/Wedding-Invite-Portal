@@ -1,5 +1,7 @@
 const copyMessageButtons = document.querySelectorAll('[data-copy-message]');
 const copyPhoneButtons = document.querySelectorAll('[data-copy-phone]');
+const copySelectInputs = document.querySelectorAll('.copy-select-input');
+const confirmDeleteForms = document.querySelectorAll('.confirm-delete-form');
 
 copyMessageButtons.forEach((button) => {
     button.addEventListener('click', async () => {
@@ -34,5 +36,19 @@ copyPhoneButtons.forEach((button) => {
         window.setTimeout(() => {
             button.textContent = originalText;
         }, 1800);
+    });
+});
+
+copySelectInputs.forEach((input) => {
+    input.addEventListener('click', () => input.select());
+});
+
+confirmDeleteForms.forEach((form) => {
+    form.addEventListener('submit', (event) => {
+        const message = form.dataset.confirmMessage || 'Видалити запис?';
+
+        if (!window.confirm(message)) {
+            event.preventDefault();
+        }
     });
 });

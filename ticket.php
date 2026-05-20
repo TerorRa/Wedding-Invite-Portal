@@ -32,6 +32,28 @@ $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
     . '&dates=20260801T130000/20260802T000000'
     . '&location=' . rawurlencode('Петрівський Бровар, Київська область')
     . '&details=' . rawurlencode('Весілля Ростислава та Катерини');
+$photoFiles = [];
+$photoDirectory = __DIR__ . '/assets/foto';
+$styleVersion = (string)(@filemtime(__DIR__ . '/assets/css/style.css') ?: time());
+
+if (is_dir($photoDirectory)) {
+    $files = glob($photoDirectory . '/*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE) ?: [];
+    sort($files, SORT_NATURAL);
+
+    foreach ($files as $file) {
+        if (is_file($file)) {
+            $photoFiles[] = 'assets/foto/' . basename($file);
+        }
+    }
+}
+
+$photoGroups = [[], []];
+
+if ($photoFiles !== []) {
+    $splitIndex = (int)ceil(count($photoFiles) / 2);
+    $photoGroups[0] = array_slice($photoFiles, 0, $splitIndex);
+    $photoGroups[1] = array_slice($photoFiles, $splitIndex);
+}
 ?>
 <!doctype html>
 <html lang="uk" class="no-js">
@@ -40,7 +62,7 @@ $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Wedding Pass</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?= e($styleVersion) ?>">
 </head>
 
 <body>
@@ -59,53 +81,84 @@ $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
                 <p>Ми цінуємо вашу відповідь і будемо думками поруч.</p>
             </section>
         <?php else: ?>
-            <section class="wedding-pass pass-card reveal" data-confetti-on-load>
-                <span class="pass-glow pass-glow--one" aria-hidden="true"></span>
-                <span class="pass-glow pass-glow--two" aria-hidden="true"></span>
-                <img class="pass-symbol pass-symbol--planet" src="assets/img/bck/little_prince_transparent_planet.png" alt="" aria-hidden="true">
-                <img class="pass-symbol pass-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">
-                <div class="pass-main">
-                    <p class="eyebrow">Wedding Pass</p>
-                    <h1><?= e($guest->name) ?> <?php if ((int)$guest->plus_one === 1 && !empty($guest->plus_one_name)): ?>
-                            та <?= e($guest->plus_one_name) ?>
-                        <?php endif; ?>
-                    </h1>
+            <div class="pass-ticket-layout">
+                <?php if ($photoGroups[0] !== []): ?>
+                    <section class="pass-side-filmstrip pass-side-filmstrip--left reveal" aria-label="Фотоспогади ліворуч">
+                        <div class="pass-side-filmstrip__track">
+                            <?php for ($loop = 0; $loop < 2; $loop++): ?>
+                                <?php foreach ($photoGroups[0] as $index => $photo): ?>
+                                    <figure class="pass-side-filmstrip__frame">
+                                        <img src="<?= e($photo) ?>" alt="Фото Ростислава та Катерини <?= $index + 1 ?>" loading="eager" decoding="async" <?= $loop === 0 && $index < 2 ? ' fetchpriority="high"' : '' ?>>
+                                    </figure>
+                                <?php endforeach; ?>
+                            <?php endfor; ?>
+                        </div>
+                    </section>
+                <?php endif; ?>
 
-                    <dl class="pass-details">
-                        <div>
-                            <dt>Дата</dt>
-                            <dd>01.08.2026</dd>
-                        </div>
-                        <div>
-                            <dt>Місце</dt>
-                            <dd>Петрівський Бровар, Київська область</dd>
-                        </div>
-                        <?php if (!empty($guest->table_number)): ?>
+                <section class="wedding-pass pass-card reveal" data-confetti-on-load>
+                    <span class="pass-glow pass-glow--one" aria-hidden="true"></span>
+                    <span class="pass-glow pass-glow--two" aria-hidden="true"></span>
+                    <img class="pass-symbol pass-symbol--planet" src="assets/img/bck/little_prince_transparent_planet.png" alt="" aria-hidden="true">
+                    <img class="pass-symbol pass-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">
+                    <div class="pass-main">
+                        <p class="eyebrow">Wedding Pass</p>
+                        <h1><?= e($guest->name) ?> <?php if ((int)$guest->plus_one === 1 && !empty($guest->plus_one_name)): ?>
+                                та <?= e($guest->plus_one_name) ?>
+                            <?php endif; ?>
+                        </h1>
+                        <p class="pass-note">Дякуємо, що ви готові поринути разом із нами у цю зоряну подорож любові, музики й теплих спогадів.</p>
+
+                        <dl class="pass-details">
                             <div>
-                                <dt>Стіл</dt>
-                                <dd><?= e($guest->table_number) ?></dd>
+                                <dt>Дата</dt>
+                                <dd>01.08.2026</dd>
                             </div>
-                        <?php endif; ?>
-                        <div>
-                            <dt>Статус</dt>
-                            <dd>Confirmed</dd>
+                            <div>
+                                <dt>Місце</dt>
+                                <dd>Петрівський Бровар, Київська область</dd>
+                            </div>
+                            <?php if (!empty($guest->table_number)): ?>
+                                <div>
+                                    <dt>Стіл</dt>
+                                    <dd><?= e($guest->table_number) ?></dd>
+                                </div>
+                            <?php endif; ?>
+                            <div>
+                                <dt>Статус</dt>
+                                <dd>Зустрінемось на Весіллі</dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    <div class="pass-qr">
+                        <img src="<?= e($qrUrl) ?>" alt="QR-код Wedding Pass">
+                        <p>Покажіть цей QR-код при вході.</p>
+                    </div>
+
+                    <div class="pass-actions">
+                        <a class="section-action" href="<?= e($inviteUrl) ?>">Повернутися до запрошення</a>
+                        <a class="section-action btn-o" href="<?= e($calendarUrl) ?>" target="_blank" rel="noreferrer">Додати до календаря</a>
+                        <button type="button" class="section-action pass-copy-button" data-copy-link="<?= e($ticketUrl) ?>">
+                            Скопіювати посилання
+                        </button>
+                    </div>
+                </section>
+
+                <?php if ($photoGroups[1] !== []): ?>
+                    <section class="pass-side-filmstrip pass-side-filmstrip--right reveal" aria-label="Фотоспогади праворуч">
+                        <div class="pass-side-filmstrip__track">
+                            <?php for ($loop = 0; $loop < 2; $loop++): ?>
+                                <?php foreach ($photoGroups[1] as $index => $photo): ?>
+                                    <figure class="pass-side-filmstrip__frame">
+                                        <img src="<?= e($photo) ?>" alt="Фото Ростислава та Катерини <?= $splitIndex + $index + 1 ?>" loading="eager" decoding="async" <?= $loop === 0 && $index < 2 ? ' fetchpriority="high"' : '' ?>>
+                                    </figure>
+                                <?php endforeach; ?>
+                            <?php endfor; ?>
                         </div>
-                    </dl>
-                </div>
-
-                <div class="pass-qr">
-                    <img src="<?= e($qrUrl) ?>" alt="QR-код Wedding Pass">
-                    <p>Покажіть цей QR-код при вході.</p>
-                </div>
-
-                <div class="pass-actions">
-                    <a class="section-action" href="<?= e($inviteUrl) ?>">Повернутися до запрошення</a>
-                    <a class="section-action btn-o" href="<?= e($calendarUrl) ?>" target="_blank" rel="noreferrer">Додати до календаря</a>
-                    <button type="button" class="section-action pass-copy-button" data-copy-link="<?= e($ticketUrl) ?>">
-                        Скопіювати посилання
-                    </button>
-                </div>
-            </section>
+                    </section>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
     </main>
     <script src="assets/js/invite.js"></script>

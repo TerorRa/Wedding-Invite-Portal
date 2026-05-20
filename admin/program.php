@@ -201,7 +201,7 @@ $programItems = R::findAll('dayprograms', 'ORDER BY sort_order ASC, id ASC');
                                 <td>
                                     <div class="table-actions">
                                         <a href="program.php?edit=<?= (int)$item->id ?>">Редагувати</a>
-                                        <form action="program.php" method="post" onsubmit="return confirm('Видалити пункт програми?');">
+                                        <form class="confirm-delete-form" action="program.php" method="post" data-confirm-message="Видалити пункт програми?">
                                             <?= csrfField() ?>
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="id" value="<?= (int)$item->id ?>">

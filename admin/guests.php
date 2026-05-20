@@ -192,7 +192,7 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                                                 Copy phone
                                             </button>
                                         <?php endif; ?>
-                                        <form action="guest_delete.php" method="post" onsubmit="return confirm('Видалити гостя?');">
+                                        <form class="confirm-delete-form" action="guest_delete.php" method="post" data-confirm-message="Видалити гостя?">
                                             <?= csrfField() ?>
                                             <input type="hidden" name="id" value="<?= (int)$guest->id ?>">
                                             <button type="submit">Видалити</button>

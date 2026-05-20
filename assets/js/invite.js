@@ -33,9 +33,18 @@ function buildSplashStarbursts(container, count) {
         const star = document.createElement('span');
         const size = 8 + Math.random() * 10;
         const glow = 0.4 + Math.random() * 0.4;
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 
         star.className = 'splash__star4';
-        star.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 20 20" fill="rgba(255,255,255,${glow.toFixed(2)})" aria-hidden="true"><path d="M10 0L11.5 7.5L20 10L11.5 12.5L10 20L8.5 12.5L0 10L8.5 7.5Z"/></svg>`;
+        svg.setAttribute('width', String(size));
+        svg.setAttribute('height', String(size));
+        svg.setAttribute('viewBox', '0 0 20 20');
+        svg.setAttribute('fill', `rgba(255,255,255,${glow.toFixed(2)})`);
+        svg.setAttribute('aria-hidden', 'true');
+        path.setAttribute('d', 'M10 0L11.5 7.5L20 10L11.5 12.5L10 20L8.5 12.5L0 10L8.5 7.5Z');
+        svg.appendChild(path);
+        star.appendChild(svg);
         star.style.left = `${Math.random() * 100}%`;
         star.style.top = `${Math.random() * 100}%`;
         star.style.setProperty('--d', `${2 + Math.random() * 3}s`);
@@ -138,7 +147,12 @@ function confetti() {
         const drift = (Math.random() - 0.5) * 300;
 
         piece.className = 'cnf';
-        piece.style.cssText = `width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random() * colors.length)]};left:${Math.random() * 100}vw;top:-10px;border-radius:${Math.random() > 0.5 ? '50%' : '2px'}`;
+        piece.style.width = `${size}px`;
+        piece.style.height = `${size}px`;
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.top = '-10px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
         document.body.appendChild(piece);
         piece.animate([
             { transform: 'translateY(0) translateX(0) rotate(0deg)', opacity: 0.8 },
@@ -331,6 +345,7 @@ const partnerDrinkName = document.querySelector('[data-partner-drink-name]');
 const attendanceRadios = document.querySelectorAll('input[name="will_attend"]');
 const rsvpExtra = document.querySelector('[data-rsvp-extra]');
 const rsvpSubmit = document.querySelector('[data-rsvp-submit]');
+let rsvpYesConfettiShown = false;
 
 function syncRsvpVisibility() {
     const selected = document.querySelector('input[name="will_attend"]:checked');
@@ -373,7 +388,14 @@ plusOneRadios.forEach((radio) => {
 plusOneNameInput?.addEventListener('input', syncPlusOneName);
 
 attendanceRadios.forEach((radio) => {
-    radio.addEventListener('change', syncRsvpVisibility);
+    radio.addEventListener('change', () => {
+        syncRsvpVisibility();
+
+        if (radio.value === '1' && radio.checked && !rsvpYesConfettiShown) {
+            rsvpYesConfettiShown = true;
+            confetti();
+        }
+    });
 });
 
 syncPlusOneName();

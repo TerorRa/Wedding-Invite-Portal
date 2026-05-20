@@ -198,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <section class="copy-link-box">
             <label>
                 Персональне посилання
-                <input type="text" value="<?= e($inviteLink) ?>" readonly onclick="this.select();">
+                <input class="copy-select-input" type="text" value="<?= e($inviteLink) ?>" readonly>
             </label>
             <a class="admin-button admin-button-light" href="<?= e($inviteLink) ?>" target="_blank" rel="noreferrer">Відкрити</a>
         </section>

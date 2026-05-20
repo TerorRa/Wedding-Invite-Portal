@@ -66,6 +66,12 @@ $hasGuestAnswered = $guest !== null && (
 );
 $isInviteTooLate = $guest !== null && $isPastRsvpDeadline && !$hasGuestAnswered;
 $shouldShowInviteGate = $guest !== null && !$isInviteTooLate;
+
+if ($isInviteTooLate) {
+    header('Location: late_invite.php?code=' . urlencode($code));
+    exit;
+}
+
 $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
     . '&text=' . rawurlencode('Весілля — Ростислав & Катерина')
     . '&dates=20260801T130000/20260802T000000'
@@ -146,14 +152,6 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                     <p class="eyebrow">Запрошення</p>
                     <h1>Запрошення не знайдено</h1>
                     <p>Перевірте посилання або зверніться до організаторів.</p>
-                </div>
-            </section>
-        <?php elseif ($isInviteTooLate): ?>
-            <section class="page-shell">
-                <div class="not-found late-invite reveal">
-                    <p class="eyebrow">Час відповіді минув</p>
-                    <h1><?= e($guest->name) ?>, ми чекали на твою відповідь</h1>
-                    <p>На жаль, ми не отримали її вчасно. Звʼяжися з нами, якщо ти все ж бажаєш бути присутнім на нашому святі.</p>
                 </div>
             </section>
         <?php else: ?>
@@ -495,19 +493,22 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                 <section class="sec sec--w dress-section reveal" id="dresscode">
                     <div class="section-wrap narrow dress-wrap">
                         <p class="t-scr">Дрес-код</p>
-                        <h2 class="t-h">Образ для нашого сузірʼя</h2>
                         <div class="moon-divider"><span></span><i></i><span></span></div>
 
                         <div class="dress">
                             <p class="dress__text">Ми мріємо створити вечір, де кожен гість стане частиною нашого зоряного сузірʼя. Просимо дотримуватись палітри: ніжні пастельні відтінки допоможуть нам разом створити казку під небом.</p>
                             <div class="dress__pal" aria-label="Кольори дрес-коду">
-                                <span style="--pal:#f8f8f4" title="Молочний"></span>
                                 <span style="--pal:#f1dbe1" title="Пудровий"></span>
                                 <span style="--pal:#b8cce4" title="Небесно-блакитний"></span>
                                 <span style="--pal:#d5d5d8" title="Сріблястий"></span>
                                 <span style="--pal:#e7e8ea" title="Світло-сірий"></span>
+                                <span style="--pal:#d8e7d2" title="Пастельно-зелений"></span>
+                                <span style="--pal:#ead9c8" title="Персиковий"></span>
+                                <span style="--pal:#e7d8f0" title="Лавандовий"></span>
+                                <span style="--pal:#f4e6b8" title="Ванільний"></span>
+                                <span style="--pal:#d8eceb" title="Мʼятний"></span>
                             </div>
-                            <p class="dress__note">Світлі, молочні, блакитно-сірі та сріблясті тони будуть найкраще пасувати атмосфері вечора.</p>
+                            <p class="dress__note">Світлі пастельні відтінки будуть найкраще пасувати атмосфері вечора.</p>
                         </div>
                     </div>
                 </section>
