@@ -63,7 +63,7 @@ $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
                 <span class="pass-glow pass-glow--one" aria-hidden="true"></span>
                 <span class="pass-glow pass-glow--two" aria-hidden="true"></span>
                 <img class="pass-symbol pass-symbol--planet" src="assets/img/bck/little_prince_transparent_planet.png" alt="" aria-hidden="true">
-                <img class="pass-symbol pass-symbol--plane" src="assets/img/bck/little_prince_transparent_airplane.png" alt="" aria-hidden="true">
+                <img class="pass-symbol pass-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">
                 <div class="pass-main">
                     <p class="eyebrow">Wedding Pass</p>
                     <h1><?= e($guest->name) ?> <?php if ((int)$guest->plus_one === 1 && !empty($guest->plus_one_name)): ?>

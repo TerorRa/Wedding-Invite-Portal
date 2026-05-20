@@ -149,3 +149,6 @@ CREATE TABLE admin_users (
 
 powershell
 cloudflared tunnel --url http://127.0.0.1 --http-host-header wip
+
+https://dash.infinityfree.com/accounts/create/free
+ if0_41976788 3266442Ra

@@ -160,7 +160,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
             <section class="invite-opening" aria-label="Відкрити запрошення">
                 <div class="splash-stars" aria-hidden="true"></div>
                 <img class="splash-symbol splash-symbol--planet" src="assets/img/bck/little_prince_transparent_planet.png" alt="" aria-hidden="true">
-                <img class="splash-symbol splash-symbol--plane" src="assets/img/bck/little_prince_transparent_airplane.png" alt="" aria-hidden="true">
+                <img class="splash-symbol splash-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">
                 <span class="splash-orbit" aria-hidden="true"></span>
                 <button type="button" class="ticket-wrap" data-open-invite aria-label="Відкрити запрошення">
                     <span class="ticket">
@@ -465,7 +465,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                     </div>
 
                     <div class="wl program-wrap">
-                        <img class="section-symbol section-symbol--plane" src="assets/img/bck/little_prince_transparent_airplane.png" alt="" aria-hidden="true">
+                        <img class="section-symbol section-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">
                         <p class="t-scr">Програма дня</p>
                         <h2 class="t-h">Маршрут зоряної подорожі</h2>
                         <div class="moon-divider"><span></span><i></i><span></span></div>

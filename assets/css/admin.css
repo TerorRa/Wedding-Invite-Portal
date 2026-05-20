@@ -22,9 +22,10 @@ body {
 }
 
 .admin-shell {
-    width: min(1120px, 100%);
-    margin: 0 auto;
-    padding: 32px 20px;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 28px clamp(18px, 3vw, 42px) 42px;
 }
 
 .admin-login-shell {
@@ -60,7 +61,7 @@ body {
 }
 
 .admin-form {
-    width: min(760px, 100%);
+    width: min(1040px, 100%);
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
@@ -322,6 +323,9 @@ body {
 }
 
 .admin-nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -349,7 +353,7 @@ body {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
     gap: 16px;
 }
 
@@ -417,6 +421,7 @@ body {
 }
 
 .admin-table-panel {
+    width: 100%;
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -424,12 +429,13 @@ body {
 }
 
 .admin-table-wrap {
+    width: 100%;
     overflow-x: auto;
 }
 
 .admin-table {
     width: 100%;
-    min-width: 1120px;
+    min-width: 1380px;
     border-collapse: collapse;
 }
 

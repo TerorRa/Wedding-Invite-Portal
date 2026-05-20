@@ -22,6 +22,8 @@ $invitationTypes = [
     'single_plus_one' => 'Одна людина може взяти +1',
     'couple' => 'Сімейна пара',
 ];
+$guestGroupOptions = ['', 'Родичі', 'Друзі', 'Колеги', 'Близькі'];
+$tableNumberOptions = array_merge([''], array_map('strval', range(1, 10)));
 
 function e(?string $value): string
 {
@@ -60,6 +62,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!array_key_exists($form['invitation_type'], $invitationTypes)) {
         $errors[] = 'Оберіть коректний тип запрошення.';
+    }
+
+    if (!in_array($form['guest_group'], $guestGroupOptions, true)) {
+        $errors[] = 'Оберіть коректну групу гостя.';
+    }
+
+    if (!in_array($form['table_number'], $tableNumberOptions, true)) {
+        $errors[] = 'Оберіть коректний номер столу.';
     }
 
     if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
@@ -165,7 +175,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <label>
                 Група
-                <input type="text" name="guest_group" value="<?= e($form['guest_group']) ?>">
+                <select name="guest_group">
+                    <?php foreach ($guestGroupOptions as $group): ?>
+                        <option value="<?= e($group) ?>" <?= $form['guest_group'] === $group ? 'selected' : '' ?>>
+                            <?= $group === '' ? 'Не вказано' : e($group) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </label>
 
             <label>
@@ -184,7 +200,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <label>
                 Номер столу
-                <input type="text" name="table_number" value="<?= e($form['table_number']) ?>">
+                <select name="table_number">
+                    <?php foreach ($tableNumberOptions as $tableNumber): ?>
+                        <option value="<?= e($tableNumber) ?>" <?= $form['table_number'] === $tableNumber ? 'selected' : '' ?>>
+                            <?= $tableNumber === '' ? 'Не вказано' : e($tableNumber) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </label>
 
             <div class="admin-form-actions">
