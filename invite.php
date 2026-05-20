@@ -56,12 +56,26 @@ $inviteDisplayName = $guest !== null
     ? (string)$guest->name . ($isCoupleInvite && $partnerName !== '' ? ' та ' . $partnerName : '')
     : '';
 $hasOptionalPlusOne = $guest !== null && !$isCoupleInvite && (int)$guest->max_plus_one === 1;
-$mainDrinkLabel = $guest !== null ? 'Що буде пити ' . (string)$guest->name . '?' : 'Що будете пити?';
+$mainDrinkLabel = $guest !== null ? 'Який напій обирає ' . (string)$guest->name . '?' : 'Ваш бажаний напій?';
+$rsvpDeadline = new DateTimeImmutable('2026-07-02 23:59:59', new DateTimeZone('Europe/Kiev'));
+$isPastRsvpDeadline = new DateTimeImmutable('now', new DateTimeZone('Europe/Kiev')) > $rsvpDeadline;
+$hasGuestAnswered = $guest !== null && (
+    trim((string)$guest->answered_at) !== ''
+    || in_array((string)$guest->status, ['confirmed', 'declined'], true)
+    || trim((string)$guest->will_attend) !== ''
+);
+$isInviteTooLate = $guest !== null && $isPastRsvpDeadline && !$hasGuestAnswered;
+$shouldShowInviteGate = $guest !== null && !$isInviteTooLate;
 $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
     . '&text=' . rawurlencode('Весілля — Ростислав & Катерина')
     . '&dates=20260801T130000/20260802T000000'
     . '&location=' . rawurlencode('Петрівський Бровар, Київська область')
     . '&details=' . rawurlencode('Весілля Ростислава та Катерини');
+$telegramConfig = is_file(__DIR__ . '/config/telegram.php') ? require __DIR__ . '/config/telegram.php' : [];
+$telegramBotUsername = ltrim((string)($telegramConfig['bot_username'] ?? 'Hive_KPP_System_bot'), '@');
+$telegramBotUrl = $guest !== null
+    ? 'https://t.me/' . rawurlencode($telegramBotUsername) . '?start=' . rawurlencode((string)$guest->invite_code)
+    : 'https://t.me/' . rawurlencode($telegramBotUsername);
 $programItems = [
     [
         'event_time' => '15:00',
@@ -124,7 +138,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
-<body class="<?= $guest !== null ? 'has-invite-gate celestial-theme' : 'celestial-theme' ?>">
+<body class="<?= $shouldShowInviteGate ? 'has-invite-gate celestial-theme' : 'celestial-theme' ?>">
     <main>
         <?php if ($guest === null): ?>
             <section class="page-shell">
@@ -132,6 +146,14 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                     <p class="eyebrow">Запрошення</p>
                     <h1>Запрошення не знайдено</h1>
                     <p>Перевірте посилання або зверніться до організаторів.</p>
+                </div>
+            </section>
+        <?php elseif ($isInviteTooLate): ?>
+            <section class="page-shell">
+                <div class="not-found late-invite reveal">
+                    <p class="eyebrow">Час відповіді минув</p>
+                    <h1><?= e($guest->name) ?>, ми чекали на твою відповідь</h1>
+                    <p>На жаль, ми не отримали її вчасно. Звʼяжися з нами, якщо ти все ж бажаєш бути присутнім на нашому святі.</p>
                 </div>
             </section>
         <?php else: ?>
@@ -156,7 +178,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
 
                         <span class="ticket__mid">
                             <span class="ticket__label">ЗАПРОШЕННЯ</span>
-                            <span class="ticket__names"><?= e($inviteDisplayName) ?></span>
+                            <span class="ticket__names<?= $isCoupleInvite ? ' ticket__names--couple' : '' ?>"><?= e($inviteDisplayName) ?></span>
                             <span class="ticket__date-row">
                                 <span class="ticket__date-day">01</span>
                                 <span class="ticket__date-month">серпня 2026</span>
@@ -207,11 +229,11 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                         <?php if ($personalGreeting !== ''): ?>
                             <p class="inv__text personal-greeting"><?= e($personalGreeting) ?></p>
                         <?php else: ?>
-                            <p class="inv__text">Місяць і зірки здавна символізують долю та вічність —<br>і сьогодні вони стають частиною нашої історії.<br>Запрошуємо вас стати частиною нашого сузірʼя<br>та розділити з нами цю мить.</p>
+                            <p class="inv__text">Ми довго мандрували кожен своєю орбітою,<br>доки не знайшли планету, на якій хочеться залишитись разом.<br>Запрошуємо вас стати частиною нашого маленького всесвіту<br>і розділити з нами день, де народжується наша сімʼя.</p>
                         <?php endif; ?>
                         <div class="rose-scene">
                             <span class="rose-scene__stars" aria-hidden="true"></span>
-                            <img class="inv__image" src="assets/img/rose-dome.webp" alt="Троянда під куполом">
+                            <img class="inv__image" src="assets/img/rose.png" alt="Троянда під куполом">
                             <p>Те, що справді важливе, ми відчуваємо серцем.</p>
                         </div>
 
@@ -375,7 +397,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                                     </svg>
                                 </div>
                                 <h3>Петрівський Бровар</h3>
-                                <p class="location-card__type">Святкування</p>
+                                <p class="location-card__type">З нетерпінням чекаємо на Вас</p>
                                 <div class="location-card__meta">
                                     <p>
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dusty)" stroke-width="2" aria-hidden="true">
@@ -389,7 +411,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                                             <circle cx="12" cy="10" r="3" />
                                         </svg>
-                                        Київська область
+                                        Бровари, Київська область
                                     </p>
                                 </div>
                                 <a class="btn btn-o" href="https://maps.app.goo.gl/W17bXceU78X7ecWGA" target="_blank" rel="noreferrer">
@@ -451,7 +473,12 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                         <div class="constellation-wrap" style="--program-count: <?= count($programItems) ?>">
                             <div class="program-route">
                                 <?php foreach ($programItems as $index => $item): ?>
-                                    <article class="program-point" style="--i: <?= $index ?>">
+                                    <?php
+                                    $planetSeed = abs(crc32((string)$item['event_time'] . (string)$item['title'] . $index));
+                                    $planetSize = 90 + ($planetSeed % 71);
+                                    $planetRotate = -32 + (($planetSeed >> 8) % 65);
+                                    ?>
+                                    <article class="program-point" style="--i: <?= $index ?>; --planet-size: <?= $planetSize ?>px; --planet-rotate: <?= $planetRotate ?>deg;">
                                         <img class="program-planet" src="assets/img/bck/little_prince_transparent_planet.png" alt="" aria-hidden="true">
                                         <p><?= e((string)$item['event_time']) ?></p>
                                         <h3><?= e((string)$item['title']) ?></h3>
@@ -501,7 +528,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
 
                                 <div class="gift gift--telegram">
                                     <p class="gift__p">Обовʼязково долучайтесь до нашого Telegram-чату</p>
-                                    <a class="btn btn-p gift__telegram" href="https://t.me/Hive_KPP_System_bot" target="_blank" rel="noopener">
+                                    <a class="btn btn-p gift__telegram" href="<?= e($telegramBotUrl) ?>" target="_blank" rel="noopener">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                             <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.53 8.16l-1.87 8.78c-.14.62-.5.77-.99.48l-2.75-2.03-1.33 1.28c-.15.15-.27.27-.55.27l.2-2.8 5.1-4.6c.22-.2-.05-.3-.34-.13l-6.3 3.96-2.72-.85c-.59-.18-.6-.59.12-.88l10.63-4.1c.49-.18.92.12.75.62z" />
                                         </svg>
@@ -517,9 +544,9 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                     <div class="section-wrap narrow rsvp-wrap">
                         <img class="section-symbol section-symbol--ticket" src="assets/img/bck/little_prince_transparent_star.png" alt="" aria-hidden="true">
                         <p class="t-scr">Будьте нашим гостем</p>
-                        <h2 class="t-h">Посадкова карта гостя</h2>
+                        <h2 class="t-h">Будь ласка, підтвердіть присутність до 01.07.2026</h2>
                         <div class="moon-divider"><span></span><i></i><span></span></div>
-                        <p class="rsvp-note">Будь ласка, підтвердіть присутність до 01.07.2026</p>
+                        <p class="rsvp-note">Твоя відповідь допоможе нам продумати вечір так, щоб кожному гостю було тепло, зручно й смачно.</p>
                         <form class="rsvp-form" action="submit_rsvp.php" method="post">
                             <input type="hidden" name="invite_code" value="<?= e($guest->invite_code) ?>">
                             <?php if ($isCoupleInvite): ?>
@@ -564,7 +591,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                                 </label>
 
                                 <label class="partner-drink<?= $isCoupleInvite ? '' : ' is-hidden' ?>" <?= $isCoupleInvite ? ' data-always-visible="1"' : '' ?>>
-                                    Що буде пити <?= $isCoupleInvite && $partnerName !== '' ? e($partnerName) : 'партнер / супутник' ?>?
+                                    Який напій обирає <?= $isCoupleInvite && $partnerName !== '' ? e($partnerName) : 'партнер / супутник' ?>?
                                     <select name="partner_drink" class="drink-select">
                                         <option value="">Оберіть варіант</option>
                                         <option value="Вино">Вино</option>

@@ -7,6 +7,11 @@ CREATE TABLE IF NOT EXISTS guests (
     phone VARCHAR(50) NULL,
     email VARCHAR(255) NULL,
     telegram VARCHAR(255) NULL,
+    telegram_id BIGINT NULL,
+    telegram_chat_id BIGINT NULL,
+    telegram_username VARCHAR(255) NULL,
+    telegram_state VARCHAR(50) NULL,
+    telegram_connected_at DATETIME NULL,
     guest_group VARCHAR(255) NULL,
     invitation_type VARCHAR(50) NOT NULL DEFAULT 'single',
     max_plus_one TINYINT DEFAULT 0,
@@ -32,6 +37,13 @@ ALTER TABLE guests
 
 ALTER TABLE guests
     ADD COLUMN IF NOT EXISTS personal_greeting TEXT NULL AFTER name;
+
+ALTER TABLE guests
+    ADD COLUMN IF NOT EXISTS telegram_id BIGINT NULL AFTER telegram,
+    ADD COLUMN IF NOT EXISTS telegram_chat_id BIGINT NULL AFTER telegram_id,
+    ADD COLUMN IF NOT EXISTS telegram_username VARCHAR(255) NULL AFTER telegram_chat_id,
+    ADD COLUMN IF NOT EXISTS telegram_state VARCHAR(50) NULL AFTER telegram_username,
+    ADD COLUMN IF NOT EXISTS telegram_connected_at DATETIME NULL AFTER telegram_state;
 
 ALTER TABLE guests
     ADD COLUMN IF NOT EXISTS invitation_type VARCHAR(50) NOT NULL DEFAULT 'single' AFTER guest_group;
@@ -79,6 +91,21 @@ CREATE TABLE IF NOT EXISTS invitelogs (
     ip VARCHAR(100) NULL,
     user_agent TEXT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS guestuploads (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    guest_id INT NOT NULL,
+    telegram_file_id VARCHAR(255) NOT NULL,
+    telegram_file_unique_id VARCHAR(255) NULL,
+    file_type VARCHAR(50) NOT NULL,
+    original_name VARCHAR(255) NULL,
+    stored_path VARCHAR(500) NOT NULL,
+    mime_type VARCHAR(255) NULL,
+    file_size BIGINT NULL,
+    caption TEXT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX guestuploads_guest_id_idx (guest_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS admin_users (

@@ -61,6 +61,15 @@ if ($guest === null) {
     renderError('Запрошення не знайдено.');
 }
 
+$rsvpDeadline = new DateTimeImmutable('2026-07-02 23:59:59', new DateTimeZone('Europe/Kiev'));
+$hasGuestAnswered = trim((string)$guest->answered_at) !== ''
+    || in_array((string)$guest->status, ['confirmed', 'declined'], true)
+    || trim((string)$guest->will_attend) !== '';
+
+if ((new DateTimeImmutable('now', new DateTimeZone('Europe/Kiev'))) > $rsvpDeadline && !$hasGuestAnswered) {
+    renderError('Ми чекали на вашу відповідь, але, на жаль, не отримали її вчасно. Звʼяжіться з нами, якщо ви все ж бажаєте бути присутніми на нашому святі.');
+}
+
 $invitationType = (string)($guest->invitation_type ?: ((int)$guest->max_plus_one === 1 ? 'single_plus_one' : 'single'));
 $isCoupleInvite = $invitationType === 'couple';
 

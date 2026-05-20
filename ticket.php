@@ -35,14 +35,17 @@ $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
 ?>
 <!doctype html>
 <html lang="uk" class="no-js">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Wedding Pass</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
-    <main class="page-shell">
+    <main class="page-shell pass-shell">
+        <div class="cosmic-effects cosmic-effects--pass" aria-hidden="true"></div>
         <?php if ($guest === null): ?>
             <section class="welcome reveal">
                 <p class="eyebrow">Wedding Pass</p>
@@ -57,12 +60,16 @@ $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
             </section>
         <?php else: ?>
             <section class="wedding-pass pass-card reveal" data-confetti-on-load>
+                <span class="pass-glow pass-glow--one" aria-hidden="true"></span>
+                <span class="pass-glow pass-glow--two" aria-hidden="true"></span>
+                <img class="pass-symbol pass-symbol--planet" src="assets/img/bck/little_prince_transparent_planet.png" alt="" aria-hidden="true">
+                <img class="pass-symbol pass-symbol--plane" src="assets/img/bck/little_prince_transparent_airplane.png" alt="" aria-hidden="true">
                 <div class="pass-main">
                     <p class="eyebrow">Wedding Pass</p>
-                    <h1><?= e($guest->name) ?></h1>
-                    <?php if ((int)$guest->plus_one === 1 && !empty($guest->plus_one_name)): ?>
-                        <p class="pass-plus-one">+1: <?= e($guest->plus_one_name) ?></p>
-                    <?php endif; ?>
+                    <h1><?= e($guest->name) ?> <?php if ((int)$guest->plus_one === 1 && !empty($guest->plus_one_name)): ?>
+                            та <?= e($guest->plus_one_name) ?>
+                        <?php endif; ?>
+                    </h1>
 
                     <dl class="pass-details">
                         <div>
@@ -71,7 +78,7 @@ $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
                         </div>
                         <div>
                             <dt>Місце</dt>
-                            <dd>Petrovskyi Brovar</dd>
+                            <dd>Петрівський Бровар, Київська область</dd>
                         </div>
                         <?php if (!empty($guest->table_number)): ?>
                             <div>
@@ -103,4 +110,5 @@ $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
     </main>
     <script src="assets/js/invite.js"></script>
 </body>
+
 </html>

@@ -49,10 +49,23 @@ body::before {
 }
 
 .page-shell {
+    position: relative;
     min-height: 100vh;
     display: grid;
     place-items: center;
     padding: 24px;
+}
+
+.pass-shell {
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 15% 12%, rgba(255, 255, 255, 0.38), transparent 24%),
+        linear-gradient(180deg, #1b2845 0%, #627fa2 54%, #d8e4ef 100%);
+}
+
+.pass-shell > section {
+    position: relative;
+    z-index: 3;
 }
 
 .not-found,
@@ -64,6 +77,12 @@ body::before {
     border: 1px solid var(--line);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
+}
+
+.late-invite {
+    background:
+        radial-gradient(circle at 50% 0%, rgba(234, 217, 165, 0.18), transparent 44%),
+        rgba(255, 255, 255, 0.72);
 }
 
 .invite-opening {
@@ -377,6 +396,14 @@ body::before {
     line-height: 0.9;
 }
 
+.ticket__names--couple {
+    width: min(340px, 100%);
+    margin-right: auto;
+    margin-left: auto;
+    font-size: clamp(56px, 11vw, 78px);
+    line-height: 0.98;
+}
+
 .ticket__date-row {
     display: flex;
     align-items: flex-end;
@@ -521,8 +548,8 @@ body::before {
     pointer-events: none;
 }
 
-.invite-content > .sec,
-.invite-content > .invite-footer {
+.invite-content>.sec,
+.invite-content>.invite-footer {
     position: relative;
     z-index: 1;
 }
@@ -531,7 +558,7 @@ body::before {
 .invite-content .ws,
 .invite-content .wl,
 .invite-content .hero-content,
-.invite-content .invite-footer > * {
+.invite-content .invite-footer>* {
     position: relative;
     z-index: 3;
 }
@@ -730,7 +757,7 @@ h2 {
 h1 {
     margin: 0 0 18px;
     color: var(--text);
-    font-size: clamp(48px, 14vw, 104px);
+    font-size: clamp(36px, 14vw, 74px);
 }
 
 h2 {
@@ -1434,9 +1461,9 @@ dd {
     position: relative;
     z-index: 2;
     width: 100%;
-    min-height: 92px;
+    min-height: 152px;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 166px minmax(0, 1fr);
     grid-template-rows: auto auto auto;
     align-items: center;
     column-gap: 14px;
@@ -1461,8 +1488,8 @@ dd {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 26px;
-    min-height: max(540px, calc(var(--program-count, 1) * 112px));
+    gap: 18px;
+    min-height: max(640px, calc(var(--program-count, 1) * 158px));
     padding: 26px 0;
 }
 
@@ -1544,14 +1571,13 @@ dd {
     top: 50%;
     left: 50%;
     z-index: 2;
-    width: 46px;
+    width: var(--planet-size, 120px);
     height: auto;
     aspect-ratio: 1;
     object-fit: contain;
     filter:
-        drop-shadow(0 0 12px rgba(245, 240, 232, 0.38))
-        drop-shadow(0 8px 14px rgba(37, 61, 88, 0.18));
-    transform: translate(-50%, -50%) rotate(calc(var(--i, 0) * 11deg));
+        drop-shadow(0 0 12px rgba(245, 240, 232, 0.38)) drop-shadow(0 8px 14px rgba(37, 61, 88, 0.18));
+    transform: translate(-50%, -50%) rotate(var(--planet-rotate, calc(var(--i, 0) * 11deg)));
     transform-origin: center;
 }
 
@@ -1944,15 +1970,22 @@ dd {
 }
 
 .wedding-pass {
+    position: relative;
+    overflow: hidden;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 250px;
     gap: 30px;
     width: min(860px, 100%);
     padding: 36px;
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid var(--line);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(221, 232, 243, 0.78)),
+        radial-gradient(circle at 50% 0%, rgba(234, 217, 165, 0.28), transparent 42%);
+    border: 1px solid rgba(255, 255, 255, 0.74);
     border-radius: 32px;
-    box-shadow: var(--shadow);
+    box-shadow:
+        0 28px 80px rgba(27, 40, 69, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(16px);
 }
 
 .pass-card {
@@ -1960,6 +1993,59 @@ dd {
     width: min(460px, 100%);
     padding: 30px;
     text-align: center;
+}
+
+.pass-glow {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.62), rgba(234, 217, 165, 0.18) 36%, transparent 68%);
+    filter: blur(8px);
+}
+
+.pass-glow--one {
+    top: -90px;
+    right: -80px;
+    width: 220px;
+    height: 220px;
+}
+
+.pass-glow--two {
+    bottom: -110px;
+    left: -90px;
+    width: 260px;
+    height: 260px;
+    opacity: 0.72;
+}
+
+.pass-symbol {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.16;
+    filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.38));
+}
+
+.pass-symbol--planet {
+    top: 18px;
+    right: -42px;
+    width: 150px;
+    rotate: -16deg;
+}
+
+.pass-symbol--plane {
+    bottom: 26px;
+    left: -34px;
+    width: 132px;
+    rotate: 18deg;
+}
+
+.pass-main,
+.pass-qr,
+.pass-actions {
+    position: relative;
+    z-index: 1;
 }
 
 .pass-plus-one {
@@ -2401,25 +2487,28 @@ dd {
     }
 
     .gifts-dome {
-        width: min(360px, 100%);
+        width: 100%;
+        max-width: 380px;
+        gap: 12px;
     }
 
     .gifts-dome>img {
-        width: min(260px, 86%);
-        opacity: 0.5;
+        width: min(250px, 82%);
+        opacity: 0.38;
     }
 
     .gifts-dome__content {
         position: relative;
         top: auto;
         left: auto;
-        width: 100%;
-        margin-top: -22px;
+        width: min(100%, 320px);
+        margin-top: 0;
         transform: none;
     }
 
     .gift {
-        padding: 9px 10px;
+        padding: 13px 14px;
+        background: rgba(255, 255, 255, 0.78);
     }
 
     .gift__h {
@@ -2447,21 +2536,22 @@ dd {
     .program-route::before {
         top: 20px;
         bottom: 20px;
-        left: 18px;
+        left: 42px;
         transform: none;
     }
 
     .program-point {
         position: relative;
-        grid-template-columns: 42px minmax(0, 1fr);
+        grid-template-columns: 88px minmax(0, 1fr);
+        min-height: 118px;
         margin: 0 !important;
         text-align: left;
     }
 
     .program-planet {
         display: block;
-        left: 18px;
-        width: 34px;
+        left: 42px;
+        width: min(var(--planet-size, 110px), 86px);
         height: auto;
     }
 
