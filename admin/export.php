@@ -25,6 +25,7 @@ $fields = [
     'partner_drink',
     'food_notes',
     'need_transfer',
+    'prepare_toast',
     'song_request',
     'wish',
     'table_number',

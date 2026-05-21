@@ -142,6 +142,7 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                             <th>+1</th>
                             <th>Напій</th>
                             <th>Напій партнера</th>
+                            <th>Тост</th>
                             <th>Стіл</th>
                             <th>Відкриття</th>
                             <th>Відповідь</th>
@@ -152,7 +153,7 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                     <tbody>
                         <?php if ($guests === []): ?>
                             <tr>
-                                <td colspan="15" class="admin-empty">Гостей не знайдено.</td>
+                                <td colspan="16" class="admin-empty">Гостей не знайдено.</td>
                             </tr>
                         <?php endif; ?>
 
@@ -170,6 +171,7 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                                 <td><?= (int)$guest->plus_one === 1 ? e($guest->plus_one_name ?: 'Так') : 'Ні' ?></td>
                                 <td><?= e($guest->drink) ?></td>
                                 <td><?= e($guest->partner_drink) ?></td>
+                                <td><?= (int)$guest->prepare_toast === 1 ? 'Так' : 'Ні' ?></td>
                                 <td><?= e($guest->table_number) ?></td>
                                 <td><?= e($guest->opened_at) ?></td>
                                 <td><?= e($guest->answered_at) ?></td>

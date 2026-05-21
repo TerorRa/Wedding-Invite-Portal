@@ -87,6 +87,7 @@ $form = [
     'partner_drink' => (string)$guest->partner_drink,
     'food_notes' => (string)$guest->food_notes,
     'need_transfer' => (string)(int)$guest->need_transfer,
+    'prepare_toast' => (string)(int)$guest->prepare_toast,
     'song_request' => (string)$guest->song_request,
     'wish' => (string)$guest->wish,
     'table_number' => (string)$guest->table_number,
@@ -99,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $form['plus_one'] = isset($_POST['plus_one']) ? '1' : '0';
     $form['need_transfer'] = isset($_POST['need_transfer']) ? '1' : '0';
+    $form['prepare_toast'] = isset($_POST['prepare_toast']) ? '1' : '0';
     $form['max_plus_one'] = (string)maxPlusOneForInvitationType($form['invitation_type']);
 
     if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
@@ -154,6 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $guest->partner_drink = emptyToNull($form['partner_drink']);
         $guest->food_notes = emptyToNull($form['food_notes']);
         $guest->need_transfer = (int)$form['need_transfer'];
+        $guest->prepare_toast = (int)$form['prepare_toast'];
         $guest->song_request = emptyToNull($form['song_request']);
         $guest->wish = emptyToNull($form['wish']);
         $guest->table_number = emptyToNull($form['table_number']);
@@ -345,6 +348,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label class="admin-checkbox">
                 <input type="checkbox" name="need_transfer" value="1" <?= $form['need_transfer'] === '1' ? 'checked' : '' ?>>
                 Потрібен трансфер
+            </label>
+
+            <label class="admin-checkbox">
+                <input type="checkbox" name="prepare_toast" value="1" <?= $form['prepare_toast'] === '1' ? 'checked' : '' ?>>
+                Хоче підготувати тост
             </label>
 
             <div class="admin-form-actions">

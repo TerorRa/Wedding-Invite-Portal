@@ -97,6 +97,7 @@ $guest->drink = trim((string)($_POST['drink'] ?? ''));
 $guest->partner_drink = $plusOne === 1 ? $partnerDrink : null;
 $guest->food_notes = trim((string)($_POST['food_notes'] ?? ''));
 $guest->need_transfer = isset($_POST['need_transfer']) ? 1 : 0;
+$guest->prepare_toast = $willAttend === 1 && (string)($_POST['prepare_toast'] ?? '0') === '1' ? 1 : 0;
 $guest->song_request = trim((string)($_POST['song_request'] ?? ''));
 $guest->wish = trim((string)($_POST['wish'] ?? ''));
 $guest->answered_at = date('Y-m-d H:i:s');

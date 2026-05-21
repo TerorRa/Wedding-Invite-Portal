@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS guests (
     partner_drink VARCHAR(255) NULL,
     food_notes TEXT NULL,
     need_transfer TINYINT DEFAULT 0,
+    prepare_toast TINYINT DEFAULT 0,
     song_request VARCHAR(255) NULL,
     wish TEXT NULL,
     table_number VARCHAR(50) NULL,
@@ -50,6 +51,9 @@ ALTER TABLE guests
 
 ALTER TABLE guests
     ADD COLUMN IF NOT EXISTS partner_drink VARCHAR(255) NULL AFTER drink;
+
+ALTER TABLE guests
+    ADD COLUMN IF NOT EXISTS prepare_toast TINYINT DEFAULT 0 AFTER need_transfer;
 
 UPDATE guests
 SET invitation_type = CASE

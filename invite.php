@@ -591,6 +591,12 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                                     </select>
                                 </label>
 
+                                <fieldset class="rsvp-toggle-fieldset">
+                                    <legend>Ви бажаєте підготувати тост на весілля?</legend>
+                                    <label><input type="radio" name="prepare_toast" value="1"> Так</label>
+                                    <label><input type="radio" name="prepare_toast" value="0" checked> Ні</label>
+                                </fieldset>
+
                                 <label class="partner-drink<?= $isCoupleInvite ? '' : ' is-hidden' ?>" <?= $isCoupleInvite ? ' data-always-visible="1"' : '' ?>>
                                     Який напій обирає <?= $isCoupleInvite && $partnerName !== '' ? e($partnerName) : 'партнер / супутник' ?>?
                                     <select name="partner_drink" class="drink-select">
