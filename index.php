@@ -172,7 +172,7 @@
         <h1>Wedding Invite Portal</h1>
         <p>Персональні запрошення, RSVP та весільні QR-квитки. Для відкриття запрошення використовуйте персональне посилання з кодом гостя.</p>
         <div class="actions">
-            <a href="index.php">Відкрити портал</a>
+            <a href="about.php">Про нас</a>
             <a class="secondary" href="admin/login.php">Адмін-панель</a>
         </div>
     </main>

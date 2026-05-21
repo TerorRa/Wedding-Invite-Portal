@@ -27,6 +27,8 @@ $ticketUrl = $scheme . '://' . $host . $path . '?code=' . urlencode($code);
 $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($ticketUrl);
 $invitePath = str_replace('/ticket.php', '/invite.php', $path);
 $inviteUrl = $scheme . '://' . $host . $invitePath . '?code=' . urlencode($code);
+$aboutPath = str_replace('/ticket.php', '/about.php', $path);
+$aboutUrl = $scheme . '://' . $host . $aboutPath . '?code=' . urlencode($code);
 $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
     . '&text=' . rawurlencode('Весілля — Ростислав & Катерина')
     . '&dates=20260801T130000/20260802T000000'
@@ -137,7 +139,8 @@ if ($photoFiles !== []) {
                     </div>
 
                     <div class="pass-actions">
-                        <a class="section-action" href="<?= e($inviteUrl) ?>">Повернутися до запрошення</a>
+                        <a class="section-action pass-about-button" href="<?= e($aboutUrl) ?>">Про нас</a>
+                        <a class="section-action" href="<?= e($inviteUrl) ?>">Повернутись</a>
                         <a class="section-action btn-o" href="<?= e($calendarUrl) ?>" target="_blank" rel="noreferrer">Додати до календаря</a>
                         <button type="button" class="section-action pass-copy-button" data-copy-link="<?= e($ticketUrl) ?>">
                             Скопіювати посилання

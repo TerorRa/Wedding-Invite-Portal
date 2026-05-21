@@ -64,8 +64,17 @@ $hasGuestAnswered = $guest !== null && (
     || in_array((string)$guest->status, ['confirmed', 'declined'], true)
     || trim((string)$guest->will_attend) !== ''
 );
+$hasConfirmedAttendance = $guest !== null && (
+    (string)$guest->status === 'confirmed'
+    || (string)$guest->will_attend === '1'
+);
 $isInviteTooLate = $guest !== null && $isPastRsvpDeadline && !$hasGuestAnswered;
 $shouldShowInviteGate = $guest !== null && !$isInviteTooLate;
+
+if ($hasConfirmedAttendance) {
+    header('Location: ticket.php?code=' . urlencode($code));
+    exit;
+}
 
 if ($isInviteTooLate) {
     header('Location: late_invite.php?code=' . urlencode($code));
