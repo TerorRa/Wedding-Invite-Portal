@@ -23,18 +23,30 @@
 }
 
 html {
+    width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
     scroll-behavior: smooth;
 }
 
 body {
+    width: 100%;
+    max-width: 100%;
     margin: 0;
     min-height: 100vh;
     overflow-x: hidden;
     color: var(--text);
     font-family: "Montserrat", Arial, sans-serif;
     font-weight: 300;
+    overflow-wrap: break-word;
     background: #d8e4ef;
+}
+
+img,
+video,
+canvas,
+svg {
+    max-width: 100%;
 }
 
 body::before {
@@ -136,6 +148,7 @@ body::before {
     position: relative;
     z-index: 3;
     width: min(860px, 100%);
+    min-width: 0;
     margin: auto 0;
     padding: clamp(28px, 5vw, 52px);
     text-align: center;
@@ -166,6 +179,7 @@ body::before {
     color: rgba(238, 243, 246, 0.78);
     font-size: 16px;
     line-height: 1.8;
+    overflow-wrap: anywhere;
 }
 
 .late-filmstrip {
@@ -605,36 +619,73 @@ body::before {
 }
 
 .about-page--snap {
+    width: 100%;
+    max-width: 100vw;
     overflow-x: hidden;
     overflow-y: auto;
     background: #07070f;
 }
 
 .about-snap {
+    width: 100%;
+    max-width: 100vw;
     min-height: 100vh;
     overflow: visible;
     scroll-behavior: smooth;
 }
 
+.about-video-hero,
+.about-title-section,
+.about-snap-section {
+    width: 100%;
+    max-width: 100vw;
+}
+
 .about-snap-section {
     position: relative;
-    min-height: 118vh;
+    min-height: 112vh;
     display: flex;
     align-items: flex-end;
-    padding: 0;
+    padding: 0 0 clamp(24px, 5vw, 64px);
     overflow: hidden;
     isolation: isolate;
-    background-image:
-        linear-gradient(180deg, rgba(7, 7, 15, 0.1), rgba(7, 7, 15, 0.2) 54%, rgba(7, 7, 15, 0.9)),
+    background:
         radial-gradient(circle at 50% 18%, rgba(201, 168, 93, 0.14), transparent 34%),
+        linear-gradient(180deg, #07070f 0%, #170914 48%, #2b0d1d 100%);
+}
+
+.about-snap-section--fixed {
+    background-image:
+        radial-gradient(circle at 50% 18%, rgba(201, 168, 93, 0.14), transparent 34%),
+        linear-gradient(180deg, rgba(7, 7, 15, 0.04), rgba(7, 7, 15, 0.38) 54%, rgba(7, 7, 15, 0.9)),
         var(--about-photo);
     background-position: center;
     background-size: cover;
     background-attachment: fixed;
 }
 
+.about-snap-section--fixed .about-snap-photo {
+    display: none;
+}
+
+.about-snap-section--flow {
+    display: grid;
+    grid-template-rows: minmax(100vh, auto) auto;
+    align-items: stretch;
+    padding-bottom: 0;
+}
+
+.about-snap-section--flow .about-snap-photo {
+    display: block;
+    position: relative;
+    inset: auto;
+    min-height: 100vh;
+    padding: clamp(12px, 2vw, 26px);
+}
+
 .about-video-hero {
     position: relative;
+    --about-video-gap: clamp(12px, 2vw, 26px);
     min-height: 100vh;
     display: block;
     overflow: hidden;
@@ -647,15 +698,12 @@ body::before {
 
 .about-video-hero__media {
     position: absolute;
-    inset: clamp(12px, 2vw, 26px);
-    z-index: -2;
-    width: auto;
-    height: auto;
-    max-width: calc(100% - clamp(24px, 4vw, 52px));
-    max-height: calc(100% - clamp(24px, 4vw, 52px));
-    margin: auto;
+    inset: var(--about-video-gap);
+    z-index: 0;
+    width: calc(100% - (var(--about-video-gap) * 2));
+    height: calc(100% - (var(--about-video-gap) * 2));
     object-fit: contain;
-    object-position: center top;
+    object-position: center center;
     border-radius: 18px;
 }
 
@@ -668,14 +716,15 @@ body::before {
 
 .about-video-hero::before {
     inset: 0;
-    z-index: -1;
+    z-index: 1;
     background:
         linear-gradient(90deg, rgba(0, 0, 0, 0.42), transparent 24%, transparent 76%, rgba(0, 0, 0, 0.48)),
         linear-gradient(180deg, rgba(0, 0, 0, 0.16), transparent 42%, rgba(0, 0, 0, 0.78));
 }
 
 .about-video-hero::after {
-    inset: clamp(12px, 2vw, 26px);
+    inset: var(--about-video-gap);
+    z-index: 3;
     border: 1px solid rgba(234, 217, 165, 0.34);
     box-shadow:
         inset 0 0 0 1px rgba(111, 79, 27, 0.2),
@@ -688,7 +737,7 @@ body::before {
 
 .about-video-note {
     position: absolute;
-    z-index: 1;
+    z-index: 4;
     width: min(220px, 22vw);
     padding: 16px 18px;
     color: #fff7dc;
@@ -760,14 +809,15 @@ body::before {
 }
 
 .about-snap-section::before {
-    z-index: -1;
+    z-index: 1;
     inset: 0;
     background:
-        linear-gradient(90deg, rgba(0, 0, 0, 0.48), transparent 24%, transparent 76%, rgba(0, 0, 0, 0.48)),
-        linear-gradient(180deg, rgba(0, 0, 0, 0.18), transparent 42%, rgba(0, 0, 0, 0.76));
+        linear-gradient(90deg, rgba(0, 0, 0, 0.5), transparent 24%, transparent 76%, rgba(0, 0, 0, 0.5)),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.16), transparent 42%, rgba(0, 0, 0, 0.74));
 }
 
 .about-snap-section::after {
+    z-index: 3;
     inset: clamp(12px, 2vw, 26px);
     border: 1px solid rgba(234, 217, 165, 0.34);
     box-shadow:
@@ -775,12 +825,44 @@ body::before {
         inset 0 0 80px rgba(0, 0, 0, 0.2);
 }
 
+.about-snap-photo {
+    position: absolute;
+    inset: clamp(12px, 2vw, 26px);
+    z-index: 0;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 0;
+}
+
+.about-snap-photo img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+    filter: saturate(0.92) contrast(1.04);
+}
+
+.about-snap-section--flow .about-snap-photo img {
+    width: 100%;
+    height: calc(100vh - (clamp(12px, 2vw, 26px) * 2));
+    max-width: none;
+    margin: 0;
+    object-fit: cover;
+    border: 1px solid rgba(234, 217, 165, 0.48);
+    border-radius: 0;
+    box-shadow:
+        0 34px 90px rgba(0, 0, 0, 0.42),
+        0 0 0 8px rgba(234, 217, 165, 0.05),
+        inset 0 1px 0 rgba(255, 244, 210, 0.18);
+}
+
 .about-snap-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: 100%;
     min-height: 30vh;
-    margin: 0;
+    margin: 0 0 clamp(12px, 2vw, 28px);
     padding: clamp(26px, 5vw, 54px) clamp(20px, 7vw, 90px);
     text-align: center;
     color: #fff7dc;
@@ -3054,6 +3136,7 @@ dd {
     position: relative;
     z-index: 3;
     width: min(980px, 100%);
+    min-width: 0;
     display: grid;
     grid-template-columns: minmax(110px, 0.42fr) minmax(320px, 460px) minmax(110px, 0.42fr);
     align-items: center;
@@ -3061,6 +3144,7 @@ dd {
 }
 
 .pass-ticket-layout .pass-card {
+    min-width: 0;
     justify-self: center;
 }
 
@@ -3289,7 +3373,7 @@ dd {
 @keyframes aboutSnapContent {
     from {
         opacity: 0;
-        transform: translate3d(0, 70px, 0) scale(0.985);
+        transform: translate3d(0, 54px, 0) scale(0.99);
     }
 
     45% {
@@ -3299,7 +3383,7 @@ dd {
 
     to {
         opacity: 1;
-        transform: translate3d(0, -38px, 0) scale(1);
+        transform: translate3d(0, -34px, 0) scale(1);
     }
 }
 
@@ -3506,7 +3590,28 @@ dd {
     }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
+    .page-shell,
+    .late-page-shell,
+    .pass-shell {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
+    .late-page-shell {
+        padding-inline: 14px;
+    }
+
+    .late-invite-card {
+        width: 100%;
+        max-width: calc(100vw - 28px);
+        padding-inline: 20px;
+    }
+
+    .late-filmstrip {
+        width: 100%;
+    }
+
     .about-shell {
         padding: 14px;
     }
@@ -3579,22 +3684,52 @@ dd {
 
     .about-snap {
         min-height: 100svh;
+        max-width: 100vw;
+        overflow-x: hidden;
     }
 
     .about-snap-section {
-        min-height: 105svh;
-        padding: 0;
+        min-height: 100svh;
+        padding: 0 0 18px;
+        max-width: 100vw;
+    }
+
+    .about-snap-section--fixed {
+        background-image:
+            radial-gradient(circle at 50% 18%, rgba(201, 168, 93, 0.14), transparent 34%),
+            linear-gradient(180deg, #07070f 0%, #170914 48%, #2b0d1d 100%);
         background-attachment: scroll;
     }
 
+    .about-snap-section--fixed .about-snap-photo {
+        display: block;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        bottom: auto;
+        left: 10px;
+        height: min(58svh, 520px);
+        min-height: auto;
+        padding: 0;
+        background: #07070f;
+    }
+
+    .about-snap-section--flow {
+        grid-template-rows: minmax(100svh, auto) auto;
+        padding-bottom: 0;
+    }
+
     .about-video-hero {
+        --about-video-gap: 10px;
         min-height: 100svh;
+        max-width: 100vw;
+        overflow: hidden;
     }
 
     .about-video-hero__media {
-        inset: 10px;
-        max-width: calc(100% - 20px);
-        max-height: calc(100% - 20px);
+        inset: var(--about-video-gap);
+        width: calc(100% - (var(--about-video-gap) * 2));
+        height: calc(100% - (var(--about-video-gap) * 2));
         object-fit: contain;
         background: #07070f;
     }
@@ -3604,26 +3739,51 @@ dd {
     }
 
     .about-video-note {
-        width: min(170px, 42vw);
-        padding: 12px 13px;
+        width: min(158px, calc(50vw - 24px));
+        padding: 10px 11px;
     }
 
     .about-video-note--left {
-        left: 18px;
+        left: 16px;
         top: 12%;
     }
 
     .about-video-note--right {
-        right: 18px;
-        bottom: 12%;
+        right: auto;
+        left: 16px;
+        bottom: 10%;
     }
 
     .about-video-note p {
-        font-size: 17px;
+        font-size: 15px;
+        line-height: 1.2;
     }
 
     .about-snap-section::after {
         inset: 10px;
+    }
+
+    .about-snap-photo {
+        inset: 10px;
+        background: #07070f;
+    }
+
+    .about-snap-section--flow .about-snap-photo {
+        min-height: 100svh;
+        padding: 10px;
+    }
+
+    .about-snap-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .about-snap-section--flow .about-snap-photo img {
+        width: 100%;
+        height: calc(100svh - 20px);
+        max-height: none;
+        object-fit: contain;
     }
 
     .about-snap-content {
@@ -3647,12 +3807,15 @@ dd {
     }
 
     .pass-shell {
-        padding-inline: 8px;
+        padding-inline: 6px;
     }
 
     .pass-ticket-layout {
-        grid-template-columns: 42px minmax(0, 1fr) 42px;
-        gap: 6px;
+        grid-template-columns: 30px minmax(0, 1fr) 30px;
+        gap: 4px;
+        width: 100%;
+        max-width: 100vw;
+        overflow: hidden;
     }
 
     .pass-side-filmstrip {
@@ -3670,10 +3833,70 @@ dd {
         aspect-ratio: 3 / 5;
         border-width: 2px;
         border-radius: 6px;
+        background:
+            radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.08), transparent 48%),
+            rgba(7, 16, 31, 0.92);
+    }
+
+    .pass-side-filmstrip__frame img {
+        object-fit: contain;
+        object-position: center;
+        padding: 2px;
+    }
+
+    .pass-card {
+        width: min(100%, calc(100vw - 76px));
+        max-width: calc(100vw - 76px);
+        padding: 24px 16px;
+        border-radius: 22px;
+    }
+
+    .wedding-pass::before {
+        inset: 8px;
+        border-radius: 17px;
+    }
+
+    .pass-main .eyebrow {
+        max-width: calc(100% - 52px);
+        padding-inline: 14px;
+        letter-spacing: 0.2em;
+    }
+
+    .pass-main .eyebrow::before,
+    .pass-main .eyebrow::after {
+        width: 18px;
+    }
+
+    .pass-main h1 {
+        font-size: clamp(42px, 15vw, 64px);
+        overflow-wrap: anywhere;
+    }
+
+    .pass-note {
+        font-size: 18px;
+        overflow-wrap: anywhere;
+    }
+
+    .pass-details div {
+        padding: 13px 12px;
+        min-width: 0;
+    }
+
+    .pass-details dd {
+        overflow-wrap: anywhere;
+    }
+
+    .pass-qr {
+        padding: 14px;
+    }
+
+    .pass-qr img {
+        width: min(176px, 100%);
     }
 
     .ticket-wrap {
         width: min(100%, 390px);
+        max-width: calc(100vw - 48px);
     }
 
     .splash-symbol--planet {

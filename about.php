@@ -18,9 +18,14 @@ function e(?string $value): string
 
 function assetUrl(string $path): string
 {
-    $basePath = rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
+    $scriptDir = str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '')));
+    $basePath = rtrim($scriptDir, '/');
 
-    return ($basePath === '' ? '' : $basePath) . '/' . ltrim($path, '/');
+    if ($basePath === '/' || $basePath === '.') {
+        $basePath = '';
+    }
+
+    return $basePath . '/' . ltrim($path, '/');
 }
 
 $styleVersion = (string)(@filemtime(__DIR__ . '/assets/css/style.css') ?: time());
@@ -133,8 +138,12 @@ foreach ($aboutPhotos as $index => $photo) {
         </section>
 
         <?php foreach ($storyItems as $index => $item): ?>
-            <section class="about-snap-section" style="--about-photo: url('<?= e(assetUrl($item['photo'])) ?>');">
-                <div class="about-snap-content reveal">
+            <?php $photoMode = $index % 2 === 0 ? 'fixed' : 'flow'; ?>
+            <section class="about-snap-section about-snap-section--<?= e($photoMode) ?>" style="--about-photo: url('<?= e(assetUrl($item['photo'])) ?>');">
+                <figure class="about-snap-photo">
+                    <img src="<?= e(assetUrl($item['photo'])) ?>" alt="" aria-hidden="true" loading="<?= $index < 2 ? 'eager' : 'lazy' ?>" decoding="async" <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
+                </figure>
+                <div class="about-snap-content">
                     <span><?= str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT) ?></span>
                     <h2><?= e($item['title']) ?></h2>
                     <p><?= e($item['text']) ?></p>

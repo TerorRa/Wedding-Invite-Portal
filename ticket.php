@@ -26,7 +26,7 @@ $path = strtok($_SERVER['REQUEST_URI'] ?? '/ticket.php', '?') ?: '/ticket.php';
 $ticketUrl = $scheme . '://' . $host . $path . '?code=' . urlencode($code);
 $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($ticketUrl);
 $invitePath = str_replace('/ticket.php', '/invite.php', $path);
-$inviteUrl = $scheme . '://' . $host . $invitePath . '?code=' . urlencode($code);
+$inviteUrl = $scheme . '://' . $host . $invitePath . '?code=' . urlencode($code) . '&edit=1';
 $aboutPath = str_replace('/ticket.php', '/about.php', $path);
 $aboutUrl = $scheme . '://' . $host . $aboutPath . '?code=' . urlencode($code);
 $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'

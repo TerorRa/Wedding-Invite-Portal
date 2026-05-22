@@ -29,6 +29,8 @@
         }
 
         body {
+            width: 100%;
+            max-width: 100%;
             min-height: 100vh;
             margin: 0;
             display: grid;
@@ -40,7 +42,8 @@
                 radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.58), transparent 28%),
                 radial-gradient(circle at 80% 78%, rgba(201, 168, 93, 0.16), transparent 30%),
                 linear-gradient(180deg, #91abc8 0%, #b7c9dc 42%, #d8e4ef 100%);
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         .stars,
@@ -74,7 +77,9 @@
             position: relative;
             z-index: 1;
             width: min(680px, 100%);
+            min-width: 0;
             padding: clamp(30px, 7vw, 54px);
+            overflow: hidden;
             text-align: center;
             background: rgba(255, 255, 255, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.74);
@@ -89,6 +94,7 @@
             font-family: "Great Vibes", cursive;
             font-size: clamp(34px, 8vw, 54px);
             line-height: 1;
+            overflow-wrap: anywhere;
         }
 
         h1 {
@@ -97,6 +103,7 @@
             font-size: clamp(36px, 7vw, 62px);
             font-weight: 500;
             line-height: 1.02;
+            overflow-wrap: anywhere;
         }
 
         p {
@@ -105,6 +112,7 @@
             color: var(--muted);
             font-size: 16px;
             line-height: 1.8;
+            overflow-wrap: anywhere;
         }
 
         .actions {
@@ -144,9 +152,22 @@
             }
         }
 
-        @media (max-width: 560px) {
+        @media (max-width: 900px) {
             body {
                 padding: 16px;
+            }
+
+            .card {
+                padding-inline: 22px;
+                max-width: calc(100vw - 32px);
+            }
+
+            .script {
+                font-size: clamp(30px, 10vw, 42px);
+            }
+
+            h1 {
+                font-size: clamp(30px, 11vw, 44px);
             }
 
             .actions,

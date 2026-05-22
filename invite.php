@@ -68,10 +68,11 @@ $hasConfirmedAttendance = $guest !== null && (
     (string)$guest->status === 'confirmed'
     || (string)$guest->will_attend === '1'
 );
+$allowInviteEdit = (string)($_GET['edit'] ?? '') === '1';
 $isInviteTooLate = $guest !== null && $isPastRsvpDeadline && !$hasGuestAnswered;
 $shouldShowInviteGate = $guest !== null && !$isInviteTooLate;
 
-if ($hasConfirmedAttendance) {
+if ($hasConfirmedAttendance && !$allowInviteEdit) {
     header('Location: ticket.php?code=' . urlencode($code));
     exit;
 }
