@@ -25,6 +25,7 @@ $inviteCode = trim((string)($_POST['invite_code'] ?? ''));
 $willAttendRaw = $_POST['will_attend'] ?? null;
 $plusOne = (int)($_POST['plus_one'] ?? 0);
 $plusOneName = trim((string)($_POST['plus_one_name'] ?? ''));
+$Drink = trim((string)($_POST['drink'] ?? ''));
 $partnerDrink = trim((string)($_POST['partner_drink'] ?? ''));
 
 if ($inviteCode === '') {
@@ -35,15 +36,21 @@ if ($willAttendRaw === null || !in_array((string)$willAttendRaw, ['0', '1'], tru
     renderError('Оберіть, чи будете ви присутні.', $inviteCode);
 }
 
+if ($plusOne === 1 && $Drink === '') {
+    renderError('Будь ласка, оберіть свій напій.', $inviteCode);
+}
+
 $willAttend = (int)$willAttendRaw;
 $plusOne = $plusOne === 1 ? 1 : 0;
 
 if ($plusOne === 1 && $plusOneName === '') {
     renderError('Будь ласка, вкажіть імʼя супутника.', $inviteCode);
 }
+
 if ($plusOne === 1 && $partnerDrink === '') {
     renderError('Будь ласка, оберіть напій для супутника.', $inviteCode);
 }
+
 
 $guest = R::findOne('guests', 'invite_code = ?', [$inviteCode]);
 
@@ -83,7 +90,7 @@ if ($willAttend === 1 && $plusOne === 1 && $plusOneName === '') {
 $guest->will_attend = $willAttend;
 $guest->plus_one = $plusOne;
 $guest->plus_one_name = $plusOne === 1 ? $plusOneName : null;
-$guest->drink = trim((string)($_POST['drink'] ?? ''));
+$guest->drink = $Drink;
 $guest->partner_drink = $plusOne === 1 ? $partnerDrink : null;
 $guest->food_notes = trim((string)($_POST['food_notes'] ?? ''));
 $guest->need_transfer = isset($_POST['need_transfer']) ? 1 : 0;
