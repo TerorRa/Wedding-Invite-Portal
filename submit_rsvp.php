@@ -39,7 +39,7 @@ if ($willAttendRaw === null || !in_array((string)$willAttendRaw, ['0', '1'], tru
 $willAttend = (int)$willAttendRaw;
 $plusOne = $plusOne === 1 ? 1 : 0;
 
-if ($plusOne === 1 && $willAttend === 1 && $drink === '') {
+if ($willAttend === 1 && $drink === '') {
     renderError('Будь ласка, оберіть свій напій.', $inviteCode);
 }
 
@@ -76,6 +76,10 @@ if ($willAttend === 0) {
 
 if ($willAttend === 1 && $plusOne === 1 && $plusOneName === '') {
     renderError('Будь ласка, вкажіть імʼя супутника або партнера.', $inviteCode);
+}
+
+if ($willAttend === 1 && $plusOne === 1 && $partnerDrink === '') {
+    renderError('Будь ласка, оберіть напій для парнера.', $inviteCode);
 }
 
 $guest->will_attend = $willAttend;
