@@ -84,7 +84,9 @@ if ($photoFiles !== []) {
             </section>
         <?php else: ?>
             <div class="pass-ticket-layout">
-                <?php if ($photoGroups[0] !== []): ?>
+                <section>
+                </section>
+                <?php /* if ($photoGroups[0] !== []): ?>
                     <section class="pass-side-filmstrip pass-side-filmstrip--left reveal" aria-label="Фотоспогади ліворуч">
                         <div class="pass-side-filmstrip__track">
                             <?php for ($loop = 0; $loop < 2; $loop++): ?>
@@ -96,7 +98,7 @@ if ($photoFiles !== []) {
                             <?php endfor; ?>
                         </div>
                     </section>
-                <?php endif; ?>
+                <?php endif; */ ?>
 
                 <section class="wedding-pass pass-card reveal" data-confetti-on-load>
                     <span class="pass-glow pass-glow--one" aria-hidden="true"></span>
@@ -142,13 +144,11 @@ if ($photoFiles !== []) {
                         <a class="section-action pass-about-button" href="<?= e($aboutUrl) ?>">Про нас</a>
                         <a class="section-action" href="<?= e($inviteUrl) ?>">Повернутись</a>
                         <a class="section-action btn-o" href="<?= e($calendarUrl) ?>" target="_blank" rel="noreferrer">Додати до календаря</a>
-                        <button type="button" class="section-action pass-copy-button" data-copy-link="<?= e($ticketUrl) ?>">
-                            Скопіювати посилання
-                        </button>
+
                     </div>
                 </section>
 
-                <?php if ($photoGroups[1] !== []): ?>
+                <?php /*if ($photoGroups[1] !== []): ?>
                     <section class="pass-side-filmstrip pass-side-filmstrip--right reveal" aria-label="Фотоспогади праворуч">
                         <div class="pass-side-filmstrip__track">
                             <?php for ($loop = 0; $loop < 2; $loop++): ?>
@@ -160,7 +160,7 @@ if ($photoFiles !== []) {
                             <?php endfor; ?>
                         </div>
                     </section>
-                <?php endif; ?>
+                <?php endif; */ ?>
             </div>
         <?php endif; ?>
     </main>

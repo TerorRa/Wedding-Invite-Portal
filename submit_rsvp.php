@@ -9,7 +9,7 @@ function renderError(string $message, ?string $inviteCode = null): void
     $_SESSION['rsvp_error'] = $message;
 
     if ($inviteCode !== null && $inviteCode !== '') {
-        header('Location: invite.php?code=' . urlencode($inviteCode) . '&error=1');
+        header('Location: invite.php?code=' . urlencode($inviteCode) . '&edit=1&error=1');
     } else {
         header('Location: index.php?error=1');
     }
@@ -27,7 +27,7 @@ $plusOne = (int)($_POST['plus_one'] ?? 0);
 $plusOneName = trim((string)($_POST['plus_one_name'] ?? ''));
 $drink = trim((string)($_POST['drink'] ?? ''));
 $partnerDrink = trim((string)($_POST['partner_drink'] ?? ''));
-
+echo $drink;
 if ($inviteCode === '') {
     renderError('Код запрошення обовʼязковий.', $inviteCode);
 }
@@ -79,7 +79,7 @@ if ($willAttend === 1 && $plusOne === 1 && $plusOneName === '') {
 }
 
 if ($willAttend === 1 && $plusOne === 1 && $partnerDrink === '') {
-    renderError('Будь ласка, оберіть напій для парнера.', $inviteCode);
+    renderError('Будь ласка, оберіть напій для партнера.', $inviteCode);
 }
 
 $guest->will_attend = $willAttend;

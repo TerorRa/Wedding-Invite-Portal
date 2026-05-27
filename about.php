@@ -48,34 +48,42 @@ $inviteUrl = 'invite.php' . ($code !== '' ? '?code=' . urlencode($code) : '');
 
 $chapters = [
     [
-        'title' => 'Початок',
+        'date' => '',
+        'title' => 'Далекий 2016',
         'text' => 'У кожної сімʼї є своя перша сторінка. Наша почалась із простих моментів, які поступово стали важливішими за будь-які великі плани.',
     ],
     [
+        'date' => '202_',
         'title' => 'Ближче одне до одного',
         'text' => 'Ми вчилися бачити не тільки свята, а й будні: підтримувати, сміятися, миритися, чути і залишатися поруч.',
     ],
     [
+        'date' => '202_',
         'title' => 'Наші маршрути',
         'text' => 'Дороги, прогулянки, спільні подорожі й випадкові кадри з часом склалися в одну історію, яку вже неможливо розділити навпіл.',
     ],
     [
+        'date' => '202_',
         'title' => 'Теплі традиції',
         'text' => 'Ми створювали свої маленькі ритуали: улюблені місця, жарти, пісні, вечори й дрібниці, які роблять дім домом.',
     ],
     [
+        'date' => '202_',
         'title' => 'Рішення',
         'text' => 'Одного дня стало зрозуміло: це вже не просто спільний шлях. Це бажання будувати майбутнє разом і називати його сімʼєю.',
     ],
     [
+        'date' => '202_',
         'title' => 'Поруч із вами',
         'text' => 'У нашій історії є люди, без яких вона була б іншою. Саме тому нам так важливо розділити цей день із близькими.',
     ],
     [
+        'date' => '202_',
         'title' => 'Перед святом',
         'text' => 'Ми зберігаємо хвилювання, радість і передчуття. Попереду день, у якому багато любові, музики, обіймів і світла.',
     ],
     [
+        'date' => '202_',
         'title' => 'Далі разом',
         'text' => 'Весілля стане не фіналом історії, а її новою главою. І ми дуже хочемо, щоб перші рядки цієї глави були поруч із вами.',
     ],
@@ -90,6 +98,7 @@ foreach ($aboutPhotos as $index => $photo) {
     ];
 
     $storyItems[] = [
+        'date' => $chapter['date'],
         'photo' => $photo,
         'title' => $chapter['title'],
         'text' => $chapter['text'],
@@ -112,16 +121,16 @@ foreach ($aboutPhotos as $index => $photo) {
 <body class="about-page about-page--snap">
     <main class="about-snap" aria-label="Наша історія">
         <section class="about-video-hero">
-            <video class="about-video-hero__media" autoplay muted loop playsinline preload="metadata" poster="<?= e(assetUrl($storyItems[0]['photo'] ?? 'assets/about/1.jpg')) ?>">
+            <video class="about-video-hero__media" autoplay muted loop playsinline preload="metadata" poster="<?= e(assetUrl('assets/about/main/0.jpg')) ?>">
                 <source src="<?= e(assetUrl('assets/about/VID_1.mp4')) ?>" type="video/mp4">
             </video>
             <div class="about-video-note about-video-note--left">
-                <span>01</span>
-                <p>Це був довгий шлях для нас.</p>
+                <span>14/03/2026</span>
+                <p>Нарешті цей момент настав</p>
             </div>
             <div class="about-video-note about-video-note--right">
-                <span>02</span>
-                <p>І кожен крок зробив цю історію нашою.</p>
+                <span></span>
+                <p>Минуло всього навсього ... 10 років</p>
             </div>
         </section>
 
@@ -131,7 +140,7 @@ foreach ($aboutPhotos as $index => $photo) {
                 <h1>Про нас</h1>
                 <p>Кілька кадрів про шлях, який привів нас до створення сімʼї.</p>
                 <div class="about-actions">
-                    <a class="section-action" href="<?= e($ticketUrl) ?>">До квитка</a>
+                    <a class="section-action btn-o" href="<?= e($ticketUrl) ?>">До квитка</a>
                     <a class="section-action btn-o" href="<?= e($inviteUrl) ?>">До запрошення</a>
                 </div>
             </div>
@@ -144,7 +153,7 @@ foreach ($aboutPhotos as $index => $photo) {
                     <img src="<?= e(assetUrl($item['photo'])) ?>" alt="" aria-hidden="true" loading="<?= $index < 2 ? 'eager' : 'lazy' ?>" decoding="async" <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
                 </figure>
                 <div class="about-snap-content">
-                    <span><?= str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT) ?></span>
+                    <span><?= e($item['date'])  ?></span>
                     <h2><?= e($item['title']) ?></h2>
                     <p><?= e($item['text']) ?></p>
                 </div>
