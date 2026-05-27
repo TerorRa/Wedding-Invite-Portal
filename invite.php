@@ -616,7 +616,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
 
                                 <label class="partner-drink<?= $isCoupleInvite ? '' : ' is-hidden' ?>" <?= $isCoupleInvite ? ' data-always-visible="1"' : '' ?>>
                                     Який напій обирає <?= $isCoupleInvite && $partnerName !== '' ? e($partnerName) : 'партнер / супутник' ?>?
-                                    <select name="partner-drink" class="drink-select">
+                                    <select name="partner_drink" class="drink-select">
                                         <option value="">❗ Оберіть варіант</option>
                                         <option value="Вино">🍷 Вино</option>
                                         <option value="Шампанське">🥂 Шампанське</option>

@@ -28,6 +28,9 @@ $plusOneName = trim((string)($_POST['plus_one_name'] ?? ''));
 $Drink = trim((string)($_POST['drink'] ?? ''));
 $partnerDrink = trim((string)($_POST['partner_drink'] ?? ''));
 
+$willAttend = (int)$willAttendRaw;
+$plusOne = $plusOne === 1 ? 1 : 0;
+
 if ($inviteCode === '') {
     renderError('Код запрошення обовʼязковий.', $inviteCode);
 }
@@ -36,12 +39,10 @@ if ($willAttendRaw === null || !in_array((string)$willAttendRaw, ['0', '1'], tru
     renderError('Оберіть, чи будете ви присутні.', $inviteCode);
 }
 
-if ($plusOne === 1 && $Drink === '') {
+if ($Drink === '') {
     renderError('Будь ласка, оберіть свій напій.', $inviteCode);
 }
 
-$willAttend = (int)$willAttendRaw;
-$plusOne = $plusOne === 1 ? 1 : 0;
 
 if ($plusOne === 1 && $plusOneName === '') {
     renderError('Будь ласка, вкажіть імʼя супутника.', $inviteCode);
