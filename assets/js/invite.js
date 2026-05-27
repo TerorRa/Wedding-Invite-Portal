@@ -183,7 +183,7 @@ if (openInviteButton && inviteContent) {
             bgMusic.volume = 0.35;
             bgMusic.play().then(() => {
                 musicButton?.classList.add('is-playing');
-            }).catch(() => {});
+            }).catch(() => { });
         }
 
         window.setTimeout(() => {
@@ -209,7 +209,7 @@ if (musicButton && bgMusic) {
     musicButton.addEventListener('click', () => {
         if (bgMusic.paused) {
             seekMusicToFirstStart();
-            bgMusic.play().then(() => musicButton.classList.add('is-playing')).catch(() => {});
+            bgMusic.play().then(() => musicButton.classList.add('is-playing')).catch(() => { });
         } else {
             bgMusic.pause();
             musicButton.classList.remove('is-playing');
@@ -417,3 +417,18 @@ if ('IntersectionObserver' in window) {
 } else {
     revealItems.forEach((item) => item.classList.add('is-visible'));
 }
+
+const rsvpErrorModal = document.querySelector('[data-rsvp-error-modal]');
+const rsvpErrorCloseButtons = document.querySelectorAll('[data-close-rsvp-error]');
+
+rsvpErrorCloseButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        rsvpErrorModal?.classList.remove('is-visible');
+    });
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        rsvpErrorModal?.classList.remove('is-visible');
+    }
+});

@@ -4,29 +4,16 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/bootstrap.php';
 
-function renderError(string $message): void
+function renderError(string $message, ?string $inviteCode = null): void
 {
-    http_response_code(400);
-    ?>
-    <!doctype html>
-    <html lang="uk">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Помилка RSVP</title>
-        <link rel="stylesheet" href="assets/css/style.css">
-    </head>
-    <body>
-        <main class="page-shell">
-            <section class="welcome">
-                <p class="eyebrow">RSVP</p>
-                <h1>Не вдалося зберегти відповідь</h1>
-                <p><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></p>
-            </section>
-        </main>
-    </body>
-    </html>
-    <?php
+    $_SESSION['rsvp_error'] = $message;
+
+    if ($inviteCode !== null && $inviteCode !== '') {
+        header('Location: invite.php?code=' . urlencode($inviteCode) . '&error=1');
+    } else {
+        header('Location: index.php?error=1');
+    }
+
     exit;
 }
 
@@ -41,24 +28,27 @@ $plusOneName = trim((string)($_POST['plus_one_name'] ?? ''));
 $partnerDrink = trim((string)($_POST['partner_drink'] ?? ''));
 
 if ($inviteCode === '') {
-    renderError('Код запрошення обовʼязковий.');
+    renderError('Код запрошення обовʼязковий.', $inviteCode);
 }
 
 if ($willAttendRaw === null || !in_array((string)$willAttendRaw, ['0', '1'], true)) {
-    renderError('Оберіть, чи будете ви присутні.');
+    renderError('Оберіть, чи будете ви присутні.', $inviteCode);
 }
 
 $willAttend = (int)$willAttendRaw;
 $plusOne = $plusOne === 1 ? 1 : 0;
 
 if ($plusOne === 1 && $plusOneName === '') {
-    renderError('Будь ласка, вкажіть імʼя супутника.');
+    renderError('Будь ласка, вкажіть імʼя супутника.', $inviteCode);
+}
+if ($plusOne === 1 && $partnerDrink === '') {
+    renderError('Будь ласка, оберіть напій для супутника.', $inviteCode);
 }
 
 $guest = R::findOne('guests', 'invite_code = ?', [$inviteCode]);
 
 if ($guest === null) {
-    renderError('Запрошення не знайдено.');
+    renderError('Запрошення не знайдено.', $inviteCode);
 }
 
 $rsvpDeadline = new DateTimeImmutable('2026-07-02 23:59:59', new DateTimeZone('Europe/Kiev'));
@@ -67,7 +57,7 @@ $hasGuestAnswered = trim((string)$guest->answered_at) !== ''
     || trim((string)$guest->will_attend) !== '';
 
 if ((new DateTimeImmutable('now', new DateTimeZone('Europe/Kiev'))) > $rsvpDeadline && !$hasGuestAnswered) {
-    renderError('Ми чекали на вашу відповідь, але, на жаль, не отримали її вчасно. Звʼяжіться з нами, якщо ви все ж бажаєте бути присутніми на нашому святі.');
+    renderError('Ми чекали на вашу відповідь, але, на жаль, не отримали її вчасно. Звʼяжіться з нами, якщо ви все ж бажаєте бути присутніми на нашому святі.', $inviteCode);
 }
 
 $invitationType = (string)($guest->invitation_type ?: ((int)$guest->max_plus_one === 1 ? 'single_plus_one' : 'single'));
@@ -87,7 +77,7 @@ if ($willAttend === 0) {
 }
 
 if ($willAttend === 1 && $plusOne === 1 && $plusOneName === '') {
-    renderError('Будь ласка, вкажіть імʼя супутника або партнера.');
+    renderError('Будь ласка, вкажіть імʼя супутника або партнера.', $inviteCode);
 }
 
 $guest->will_attend = $willAttend;

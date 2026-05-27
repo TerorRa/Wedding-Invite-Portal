@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/bootstrap.php';
 
+$rsvpError = $_SESSION['rsvp_error'] ?? null;
+unset($_SESSION['rsvp_error']);
+
 $code = trim((string)($_GET['code'] ?? ''));
 $guest = null;
 
@@ -222,11 +225,12 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                         <h1 class="hero-names">Ростислав <span>&</span> Катерина</h1>
                         <div class="hero-divider"><span></span><i></i><span></span></div>
                         <p class="hero-date">01 <small>серпня</small> 2026</p>
+
+                        <p class="hero__motto"> Серед мільйонів зірок я знайшов тебе </p>
+
                         <div class="hero__img-wrap">
                             <img class="hero__img" src="assets/img/hero-new.webp" alt="Ростислав та Катерина">
                         </div>
-                        <a class="hero-scroll" href="#invitation">scroll</a>
-                        <p class="hero__motto">Серед мільйонів зірок я знайшов тебе</p>
                     </div>
                 </section>
 
@@ -239,6 +243,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                         <?php else: ?>
                             <p class="inv__text">Ми довго мандрували кожен своєю орбітою,<br>доки не знайшли планету, на якій хочеться залишитись разом.<br>Запрошуємо вас стати частиною нашого маленького всесвіту<br>і розділити з нами день, де народжується наша сімʼя.</p>
                         <?php endif; ?>
+                        <br>
                         <div class="rose-scene">
                             <span class="rose-scene__stars" aria-hidden="true"></span>
                             <img class="inv__image" src="assets/img/rose.png" alt="Троянда під куполом">
@@ -390,7 +395,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                 <section class="sec sec--w location-section reveal" id="location">
                     <div class="wl">
                         <p class="t-scr">Локація</p>
-                        <h2 class="t-h">Координати сузірʼя</h2>
+                        <h2 class="t-h">Координати весілля</h2>
                         <div class="moon-divider"><span></span><i></i><span></span></div>
 
                         <div class="location-cards">
@@ -429,6 +434,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                                     </svg>
                                     Відкрити у Картах
                                 </a>
+                                <br>
                                 <a class="btn btn-o" href="<?= e($calendarUrl) ?>" target="_blank" rel="noreferrer">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                         <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -475,7 +481,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                     <div class="wl program-wrap">
                         <img class="section-symbol section-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">
                         <p class="t-scr">Програма дня</p>
-                        <h2 class="t-h">Маршрут зоряної подорожі</h2>
+                        <h2 class="t-h">Як ми проведемо цей день разом</h2>
                         <div class="moon-divider"><span></span><i></i><span></span></div>
 
                         <div class="constellation-wrap" style="--program-count: <?= count($programItems) ?>">
@@ -506,46 +512,45 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                         <div class="moon-divider"><span></span><i></i><span></span></div>
 
                         <div class="dress">
-                            <p class="dress__text">Ми мріємо створити вечір, де кожен гість стане частиною нашого зоряного сузірʼя. Просимо дотримуватись палітри: ніжні пастельні відтінки допоможуть нам разом створити казку під небом.</p>
+                            <p class="dress__text">
+                                Дрес-код у нас один: бути собою. Якщо хочеться підтримати настрій вечора — ми будемо раді ніжним пастельним кольорам.</p>
                             <div class="dress__pal" aria-label="Кольори дрес-коду">
                                 <span style="--pal:#f1dbe1" title="Пудровий"></span>
                                 <span style="--pal:#b8cce4" title="Небесно-блакитний"></span>
-                                <span style="--pal:#d5d5d8" title="Сріблястий"></span>
                                 <span style="--pal:#e7e8ea" title="Світло-сірий"></span>
                                 <span style="--pal:#d8e7d2" title="Пастельно-зелений"></span>
                                 <span style="--pal:#ead9c8" title="Персиковий"></span>
                                 <span style="--pal:#e7d8f0" title="Лавандовий"></span>
-                                <span style="--pal:#f4e6b8" title="Ванільний"></span>
                                 <span style="--pal:#d8eceb" title="Мʼятний"></span>
                             </div>
-                            <p class="dress__note">Світлі пастельні відтінки будуть найкраще пасувати атмосфері вечора.</p>
+                            <p class="dress__note">Головне присутність, а не вигляд</p>
                         </div>
                     </div>
                 </section>
 
                 <section class="sec sec--ivory gifts-section reveal" id="gifts">
                     <div class="section-wrap narrow gifts-wrap">
-                        <p class="t-scr">Побажання</p>
-                        <h2 class="t-h">Побажання для Планети Кохання</h2>
+                        <p class="t-scr">Альтернатива квітам</p>
+                        <h2 class="t-h">Найкращий подарунок для нас —
+                            це ваша присутність і усмішка.</h2>
                         <div class="moon-divider"><span></span><i></i><span></span></div>
 
                         <div class="gifts-dome">
                             <img src="assets/img/dome.webp" alt="" aria-hidden="true">
                             <div class="gifts-dome__content">
                                 <div class="gift">
-                                    <div class="gift__h">Альтернатива квітам</div>
-                                    <p class="gift__p">Якщо захочете зробити нам приємність, подаруйте пляшечку улюбленого напою для нашої домашньої колекції спогадів. Так частинка цього дня залишиться з нами ще надовго.</p>
+
+                                    <p class="gift__p">
+                                        Але якщо Ви хочете зробити нам приємне —
+                                        замість квітів принесіть, будь ласка, смаколик або іграшку для тваринки.
+                                        Після весілля ми особисто відвеземо всі дарунки до притулку.🏡🐕🐈
+                                    </p>
+                                    <p class="gift__p">
+                                        Нехай цей день запам'ятається не лише нам, а й тим, хто чекає на свою порцію турботи. 🐾
+                                    </p>
                                 </div>
 
-                                <div class="gift gift--telegram">
-                                    <p class="gift__p">Обовʼязково долучайтесь до нашого Telegram-чату</p>
-                                    <a class="btn btn-p gift__telegram" href="<?= e($telegramBotUrl) ?>" target="_blank" rel="noopener">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                            <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.53 8.16l-1.87 8.78c-.14.62-.5.77-.99.48l-2.75-2.03-1.33 1.28c-.15.15-.27.27-.55.27l.2-2.8 5.1-4.6c.22-.2-.05-.3-.34-.13l-6.3 3.96-2.72-.85c-.59-.18-.6-.59.12-.88l10.63-4.1c.49-.18.92.12.75.62z" />
-                                        </svg>
-                                        Приєднатись
-                                    </a>
-                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -557,7 +562,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                         <p class="t-scr">Будьте нашим гостем</p>
                         <h2 class="t-h">Будь ласка, підтвердіть присутність до 01.07.2026</h2>
                         <div class="moon-divider"><span></span><i></i><span></span></div>
-                        <p class="rsvp-note">Твоя відповідь допоможе нам продумати вечір так, щоб кожному гостю було тепло, зручно й смачно.</p>
+                        <p class="rsvp-note">Ваша відповідь допоможе нам продумати вечір так, щоб кожному гостю було тепло, зручно й смачно.</p>
                         <form class="rsvp-form" action="submit_rsvp.php" method="post">
                             <input type="hidden" name="invite_code" value="<?= e($guest->invite_code) ?>">
                             <?php if ($isCoupleInvite): ?>
@@ -566,6 +571,9 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                             <?php endif; ?>
 
                             <fieldset>
+                                <?php if ($isCoupleInvite): ?>
+                                    <p class="form-hint">Запрошення для пари: <?= e($guest->name) ?><?= $partnerName !== '' ? ' та ' . e($partnerName) : '' ?>.</p>
+                                <?php endif; ?>
                                 <legend>Чи будете ви присутні?</legend>
                                 <label><input type="radio" name="will_attend" value="1" required data-rsvp-yes> Звісно</label>
                                 <label><input type="radio" name="will_attend" value="0" required> На жаль, не зможу</label>
@@ -573,7 +581,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
 
                             <div class="rsvp-extra-fields is-hidden" data-rsvp-extra>
                                 <?php if ($isCoupleInvite): ?>
-                                    <p class="form-hint">Запрошення для пари: <?= e($guest->name) ?><?= $partnerName !== '' ? ' та ' . e($partnerName) : '' ?>.</p>
+
                                 <?php elseif ($hasOptionalPlusOne): ?>
                                     <fieldset>
                                         <legend>Гості</legend>
@@ -591,42 +599,39 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                                 <label>
                                     <?= e($mainDrinkLabel) ?>
                                     <select name="drink" class="drink-select">
-                                        <option value="">Оберіть варіант</option>
-                                        <option value="Вино">Вино</option>
-                                        <option value="Шампанське">Шампанське</option>
-                                        <option value="Віскі">Віскі</option>
-                                        <option value="Горілка">Горілка</option>
-                                        <option value="Безалкогольне">Безалкогольне</option>
-                                        <option value="Інше">Інше</option>
+                                        <option value="">❗ Оберіть варіант</option>
+                                        <option value="Вино">🍷 Вино</option>
+                                        <option value="Шампанське">🥂 Шампанське</option>
+                                        <option value="Віскі">🥃 Віскі</option>
+                                        <option value="Горілка">💃 Горілка</option>
+                                        <option value="Безалкогольне">🍼 Безалкогольне</option>
                                     </select>
                                 </label>
 
                                 <fieldset class="rsvp-toggle-fieldset">
-                                    <legend>Ви бажаєте підготувати тост на весілля?</legend>
+                                    <legend>Чи хотілось би Вам виголосити тост на весіллі?</legend>
                                     <label><input type="radio" name="prepare_toast" value="1"> Так</label>
                                     <label><input type="radio" name="prepare_toast" value="0" checked> Ні</label>
                                 </fieldset>
 
                                 <label class="partner-drink<?= $isCoupleInvite ? '' : ' is-hidden' ?>" <?= $isCoupleInvite ? ' data-always-visible="1"' : '' ?>>
                                     Який напій обирає <?= $isCoupleInvite && $partnerName !== '' ? e($partnerName) : 'партнер / супутник' ?>?
-                                    <select name="partner_drink" class="drink-select">
-                                        <option value="">Оберіть варіант</option>
-                                        <option value="Вино">Вино</option>
-                                        <option value="Шампанське">Шампанське</option>
-                                        <option value="Віскі">Віскі</option>
-                                        <option value="Горілка">Горілка</option>
-                                        <option value="Безалкогольне">Безалкогольне</option>
-                                        <option value="Інше">Інше</option>
+                                    <select name="drink" class="drink-select">
+                                        <option value="">❗ Оберіть варіант</option>
+                                        <option value="Вино">🍷 Вино</option>
+                                        <option value="Шампанське">🥂 Шампанське</option>
+                                        <option value="Віскі">🥃 Віскі</option>
+                                        <option value="Горілка">💃 Горілка</option>
+                                        <option value="Безалкогольне">🍼 Безалкогольне</option>
                                     </select>
                                 </label>
 
-                                <label>Обмеження по їжі<textarea name="food_notes" rows="3"></textarea></label>
-                                <label class="checkbox-label"><input type="checkbox" name="need_transfer" value="1"> Потрібен трансфер</label>
-                                <label>Пісня, яку хочете почути<input type="text" name="song_request"></label>
-                                <label>Побажання<textarea name="wish" rows="4"></textarea></label>
+
+                                <label>Пісня, яка змусить Вас вийти на танцпол 🎶<input type="text" name="song_request"></label>
+
                             </div>
 
-                            <button type="submit" class="btn btn-primary rsvp-submit is-hidden" data-rsvp-submit>Підтвердити подорож</button>
+                            <button type="submit" class="btn btn-primary rsvp-submit is-hidden" data-rsvp-submit>Підтвердити</button>
                         </form>
                     </div>
                 </section>
@@ -662,6 +667,25 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
         <audio data-bg-music data-start-at="33.25" preload="none">
             <source src="assets/audio/<?php echo $nameAudio; ?>" type="audio/mpeg">
         </audio>
+    <?php endif; ?>
+
+
+    <?php if (!empty($rsvpError)): ?>
+        <div class="rsvp-modal is-visible" data-rsvp-error-modal>
+            <div class="rsvp-modal__backdrop" data-close-rsvp-error></div>
+
+            <div class="rsvp-modal__card" role="dialog" aria-modal="true" aria-labelledby="rsvpErrorTitle">
+                <button type="button" class="rsvp-modal__close" data-close-rsvp-error aria-label="Закрити">×</button>
+
+                <p class="rsvp-modal__eyebrow">Упс...</p>
+                <h2 id="rsvpErrorTitle">Не вдалося зберегти відповідь</h2>
+                <p><?= e($rsvpError) ?></p>
+
+                <button type="button" class="section-action" data-close-rsvp-error>
+                    Повернутися до анкети
+                </button>
+            </div>
+        </div>
     <?php endif; ?>
     <script src="assets/js/invite.js"></script>
 </body>

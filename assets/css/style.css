@@ -79,7 +79,7 @@ body::before {
         linear-gradient(180deg, #1b2845 0%, #627fa2 54%, #d8e4ef 100%);
 }
 
-.pass-shell > section {
+.pass-shell>section {
     position: relative;
     z-index: 3;
 }
@@ -3591,6 +3591,7 @@ dd {
 }
 
 @media (max-width: 900px) {
+
     .page-shell,
     .late-page-shell,
     .pass-shell {
@@ -4120,5 +4121,85 @@ dd {
     .section-action,
     .rsvp-form button {
         width: 100%;
+    }
+}
+
+.rsvp-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.rsvp-modal.is-visible {
+    display: flex;
+}
+
+.rsvp-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(19, 24, 36, 0.58);
+    backdrop-filter: blur(8px);
+}
+
+.rsvp-modal__card {
+    position: relative;
+    z-index: 1;
+    width: min(460px, 100%);
+    padding: 34px 28px;
+    border-radius: 28px;
+    background: rgba(255, 252, 246, 0.96);
+    box-shadow: 0 28px 80px rgba(31, 35, 48, 0.28);
+    text-align: center;
+    color: var(--ink, #2d2a26);
+    animation: rsvpModalIn 0.28s ease both;
+}
+
+.rsvp-modal__close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.06);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.rsvp-modal__eyebrow {
+    margin: 0 0 8px;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dusty, #9a806b);
+}
+
+.rsvp-modal__card h2 {
+    margin: 0 0 14px;
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(2rem, 7vw, 3rem);
+    font-weight: 500;
+}
+
+.rsvp-modal__card p {
+    margin: 0 0 24px;
+    line-height: 1.65;
+}
+
+@keyframes rsvpModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
