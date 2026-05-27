@@ -367,6 +367,8 @@ function syncRsvpVisibility() {
 function syncPlusOneName() {
     const selected = document.querySelector('input[name="plus_one"]:checked');
     const hasPartner = selected?.value === '1';
+    const partnerDrink = document.querySelector('.partner-drink');
+    const partnerDrinkSelect = partnerDrink?.querySelector('select[name="partner_drink"]');
 
     if (plusOneName) {
         plusOneName.classList.toggle('is-hidden', !hasPartner);
@@ -374,6 +376,10 @@ function syncPlusOneName() {
 
     if (partnerDrink && !partnerDrink.dataset.alwaysVisible) {
         partnerDrink.classList.toggle('is-hidden', !hasPartner);
+    }
+
+    if (partnerDrinkSelect && !partnerDrink?.dataset.alwaysVisible) {
+        partnerDrinkSelect.required = hasPartner;
     }
 
     if (partnerDrinkName && plusOneNameInput && !partnerDrink?.dataset.alwaysVisible) {
