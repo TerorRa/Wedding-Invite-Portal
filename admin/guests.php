@@ -30,7 +30,7 @@ $guests = R::findAll('guests', $sql, $params);
 
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$projectPath = rtrim(dirname(dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/Wedding-Invite-Portal/admin/guests.php'))), '/\\');
+$projectPath = rtrim(dirname(dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/admin/guests.php'))), '/\\');
 $projectPath = $projectPath === '' ? '' : $projectPath;
 
 function e(?string $value): string
@@ -40,7 +40,7 @@ function e(?string $value): string
 
 function inviteUrl(string $scheme, string $host, string $projectPath, string $code): string
 {
-    return $scheme . '://' . $host . $projectPath . '/invite.php?code=' . urlencode($code);
+    return $scheme . '://' . $host . $projectPath . '/start.php?code=' . urlencode($code);
 }
 
 function invitationMessage(string $name, string $link): string
@@ -66,7 +66,7 @@ function telegramUrl(?string $telegram): ?string
 
 function invitationTypeLabel(?string $type, int $maxPlusOne): string
 {
-   return match ((string)$type) {
+    return match ((string)$type) {
         'couple' => 'Пара',
         'single_plus_one' => '1 + можливий +1',
         default => $maxPlusOne === 1 ? '1 + можливий +1' : '1 без +1',
@@ -145,21 +145,15 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Квиток</th>
-                            <th>Ім'я</th>
+                            <th>ID / Квиток</th>
+                            <th>Група / Тип</th>
+                            <th>Ім'я / +1 Партнер</th>
                             <th>Телефон</th>
-                            <th>Група</th>
-                            <th>Тип</th>
-                            <th>Статус</th>
-                            <th>+1</th>
-                            <th>Напій</th>
-                            <th>Напій партнера</th>
+                            <th>Напій / Напій партнера</th>
                             <th>Тост</th>
                             <th>Стіл</th>
-                            <th>Відкриття</th>
-                            <th>Відповідь</th>
-                            <th>Посилання</th>
+                            <th>Відповідь / Відкриття</th>
+                            <th>Статус / Посилання</th>
                             <th>Дії</th>
                         </tr>
                     </thead>
@@ -174,29 +168,40 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                             <?php $link = inviteUrl($scheme, $host, $projectPath, (string)$guest->invite_code); ?>
                             <?php $telegramLink = telegramUrl($guest->telegram); ?>
                             <tr>
-                                <td><?= (int)$guest->id ?></td>
-                                <td><?= e($guest->ticket_number) ?></td>
-                                <td><?= e($guest->name) ?></td>
+                                <td>
+                                    <?= (int)$guest->id ?>
+                                    <br>
+                                    <?= e($guest->ticket_number) ?>
+                                </td>
+                                <td>
+                                    <?= e($guest->guest_group) ?>
+                                    <br>
+                                    <?= e(invitationTypeLabel($guest->invitation_type, (int)$guest->max_plus_one)) ?>
+                                </td>
+                                <td><?= e($guest->name) ?>
+                                    <br>
+                                    <?= (int)$guest->plus_one === 1 ?  '🟢+ ' : '🔴Ні' ?> <?= e($guest->plus_one_name) ?>
+                                </td>
                                 <td><?= e($guest->phone) ?></td>
-                                <td><?= e($guest->guest_group) ?></td>
-                                <td><?= e(invitationTypeLabel($guest->invitation_type, (int)$guest->max_plus_one)) ?></td>
-                                <td><span class="status-pill"><?= e($guest->status) ?></span></td>
-                                <td><?= (int)$guest->plus_one === 1 ? e($guest->plus_one_name ?: 'Так') : 'Ні' ?></td>
-                                <td><?= e($guest->drink) ?></td>
-                                <td><?= e($guest->partner_drink) ?></td>
-                                <td><?= (int)$guest->prepare_toast === 1 ? 'Так' : 'Ні' ?></td>
+
+
+                                <td><?= e($guest->drink) ?><br> <?= e($guest->partner_drink) ?></td>
+                                <td><?= (int)$guest->prepare_toast === 1 ? '🟢Так' : '🔴Ні' ?></td>
                                 <td><?= e($guest->table_number) ?></td>
-                                <td><?= e($guest->opened_at) ?></td>
-                                <td><?= e($guest->answered_at) ?></td>
-                                <td><a class="table-link" href="<?= e($link) ?>" target="_blank" rel="noreferrer">Відкрити</a></td>
+
+                                <td><?= e($guest->answered_at) ?> <br> <?= e($guest->opened_at) ?></td>
+                                <td>
+                                    <a class="table-link" href="<?= e($link) ?>" target="_blank" rel="noreferrer">Відкрити</a>
+                                    <br>
+                                    <span class="status-pill"><?= e($guest->status) ?></span>
+                                </td>
                                 <td>
                                     <div class="table-actions">
                                         <a href="guest_edit.php?id=<?= (int)$guest->id ?>">Редагувати</a>
                                         <button
                                             type="button"
                                             class="copy-message-button"
-                                            data-copy-message="<?= e(invitationMessage((string)$guest->name, $link)) ?>"
-                                        >
+                                            data-copy-message="<?= e(invitationMessage((string)$guest->name, $link)) ?>">
                                             Копіювати запрошення
                                         </button>
                                         <?php if ($telegramLink !== null): ?>

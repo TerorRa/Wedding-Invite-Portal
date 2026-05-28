@@ -600,11 +600,11 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                                     <?= e($mainDrinkLabel) ?>
                                     <select name="drink" class="drink-select">
                                         <option value="">❗ Оберіть варіант</option>
-                                        <option value="Вино">🍷 Вино</option>
-                                        <option value="Шампанське">🥂 Шампанське</option>
-                                        <option value="Віскі">🥃 Віскі</option>
-                                        <option value="Горілка">💃 Горілка</option>
-                                        <option value="Безалкогольне">🍼 Безалкогольне</option>
+                                        <option value="🍷 Вино">🍷 Вино</option>
+                                        <option value="🥂 Шампанське">🥂 Шампанське</option>
+                                        <option value="🥃 Віскі">🥃 Віскі</option>
+                                        <option value="💃 Горілка">💃 Горілка</option>
+                                        <option value="🍼 Безалкогольне">🍼 Безалкогольне</option>
                                     </select>
                                 </label>
 
@@ -618,11 +618,11 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                                     Який напій обирає <?= $isCoupleInvite && $partnerName !== '' ? e($partnerName) : 'партнер / супутник' ?>?
                                     <select name="partner_drink" class="drink-select">
                                         <option value="">❗ Оберіть варіант</option>
-                                        <option value="Вино">🍷 Вино</option>
-                                        <option value="Шампанське">🥂 Шампанське</option>
-                                        <option value="Віскі">🥃 Віскі</option>
-                                        <option value="Горілка">💃 Горілка</option>
-                                        <option value="Безалкогольне">🍼 Безалкогольне</option>
+                                        <option value="🍷 Вино">🍷 Вино</option>
+                                        <option value="🥂 Шампанське">🥂 Шампанське</option>
+                                        <option value="🥃 Віскі">🥃 Віскі</option>
+                                        <option value="💃 Горілка">💃 Горілка</option>
+                                        <option value="🍼 Безалкогольне">🍼 Безалкогольне</option>
                                     </select>
                                 </label>
 
@@ -632,6 +632,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                             </div>
 
                             <button type="submit" class="btn btn-primary rsvp-submit is-hidden" data-rsvp-submit>Підтвердити</button>
+                            <p> Ми використовуємо ваші відповіді лише для організації весілля: підтвердження присутності, посадки гостей, напоїв і трансферу. Дані не передаються третім особам.</p>
                         </form>
                     </div>
                 </section>
