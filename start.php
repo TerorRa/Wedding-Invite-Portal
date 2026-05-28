@@ -28,6 +28,15 @@ function assetUrl(string $path): string
     return $basePath . '/' . ltrim($path, '/');
 }
 
+function isRingPhoto(string $filename): bool
+{
+    $name = strtolower(pathinfo($filename, PATHINFO_FILENAME));
+
+    return in_array($name, ['ring', 'rings', 'obruchka', 'obruchky', 'wedding-ring'], true)
+        || str_contains($name, 'ring')
+        || str_contains($name, 'obruch');
+}
+
 $styleVersion = (string)(@filemtime(__DIR__ . '/assets/css/start.css') ?: time());
 $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/start.js') ?: time());
 
@@ -36,32 +45,38 @@ $aboutUrl = 'about.php' . ($code !== '' ? '?code=' . urlencode($code) : '');
 
 $introDirectory = __DIR__ . '/assets/intro';
 $introPhotos = [];
-$preferredPhotos = ['photo1.webp', 'photo2.webp', 'photo3.webp', 'photo4.webp'];
+$ringPhoto = null;
 
-foreach ($preferredPhotos as $photoName) {
-    if (is_file($introDirectory . '/' . $photoName)) {
-        $introPhotos[] = 'assets/intro/' . $photoName;
-    }
-}
-
-if ($introPhotos === [] && is_dir($introDirectory)) {
-    $files = glob($introDirectory . '/*.{jpg,jpeg,png,webp}', GLOB_BRACE) ?: [];
-    sort($files, SORT_NATURAL);
+if (is_dir($introDirectory)) {
+    $files = glob($introDirectory . '/*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE) ?: [];
+    sort($files, SORT_NATURAL | SORT_FLAG_CASE);
 
     foreach ($files as $file) {
-        if (!is_file($file) || basename($file) === 'ring.webp') {
+        if (!is_file($file)) {
             continue;
         }
 
-        $introPhotos[] = 'assets/intro/' . basename($file);
+        $relativePath = 'assets/intro/' . basename($file);
 
-        if (count($introPhotos) >= 4) {
-            break;
+        if (isRingPhoto(basename($file))) {
+            $ringPhoto ??= $relativePath;
+            continue;
         }
+
+        $introPhotos[] = $relativePath;
     }
 }
 
-$ringPhoto = is_file($introDirectory . '/ring.webp') ? 'assets/intro/ring.webp' : ($introPhotos[0] ?? null);
+if ($ringPhoto === null && $introPhotos !== []) {
+    $ringPhoto = array_pop($introPhotos);
+}
+
+$photoCount = count($introPhotos);
+$cardStepSeconds = 0.52;
+$ringDelaySeconds = max(2.6, 1.15 + ($photoCount * $cardStepSeconds));
+$finalDelaySeconds = $ringDelaySeconds + 1.25;
+$introDurationMs = (int)(($finalDelaySeconds + 1.4) * 1000);
+
 $guestName = $guest !== null ? trim((string)$guest->name) : '';
 ?>
 <!doctype html>
@@ -87,7 +102,12 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
                 <p>Перевірте посилання або зверніться до організаторів.</p>
             </section>
         <?php else: ?>
-            <section class="intro-scene" data-intro-scene>
+            <section
+                class="intro-scene"
+                data-intro-scene
+                data-intro-duration="<?= $introDurationMs ?>"
+                style="--photo-count: <?= $photoCount ?>; --ring-delay: <?= e(number_format($ringDelaySeconds, 2, '.', '')) ?>s; --final-delay: <?= e(number_format($finalDelaySeconds, 2, '.', '')) ?>s;"
+            >
                 <div class="intro-sky" aria-hidden="true">
                     <span class="intro-star intro-star--one"></span>
                     <span class="intro-star intro-star--two"></span>
@@ -98,13 +118,16 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
 
                 <a class="intro-skip" href="<?= e($inviteUrl) ?>">Пропустити вступ</a>
 
-                <div class="memory-stage" aria-hidden="true">
-                    <?php foreach ($introPhotos as $index => $photo): ?>
-                        <figure class="memory-card memory-card--<?= $index + 1 ?>">
-                            <img src="<?= e(assetUrl($photo)) ?>" alt="" loading="<?= $index === 0 ? 'eager' : 'lazy' ?>" decoding="async" <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
-                        </figure>
-                    <?php endforeach; ?>
-                </div>
+                <?php if ($introPhotos !== []): ?>
+                    <div class="memory-stage" aria-hidden="true">
+                        <?php foreach ($introPhotos as $index => $photo): ?>
+                            <?php $variant = ($index % 8) + 1; ?>
+                            <figure class="memory-card memory-card--<?= $variant ?>" style="--i: <?= $index ?>;">
+                                <img src="<?= e(assetUrl($photo)) ?>" alt="" loading="<?= $index < 2 ? 'eager' : 'lazy' ?>" decoding="async" <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
+                            </figure>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
 
                 <?php if ($ringPhoto !== null): ?>
                     <figure class="ring-card" aria-hidden="true">
