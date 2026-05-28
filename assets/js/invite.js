@@ -337,15 +337,64 @@ if (countdown) {
     }
 }
 
+const rsvpForm = document.querySelector('.rsvp-form');
 const plusOneRadios = document.querySelectorAll('input[name="plus_one"]');
 const plusOneName = document.querySelector('.plus-one-name');
 const plusOneNameInput = plusOneName?.querySelector('input[name="plus_one_name"]');
 const partnerDrink = document.querySelector('.partner-drink');
+const partnerDrinkSelect = partnerDrink?.querySelector('select[name="partner_drink"]');
+const mainDrinkSelect = document.querySelector('select[name="drink"]');
 const partnerDrinkName = document.querySelector('[data-partner-drink-name]');
 const attendanceRadios = document.querySelectorAll('input[name="will_attend"]');
 const rsvpExtra = document.querySelector('[data-rsvp-extra]');
 const rsvpSubmit = document.querySelector('[data-rsvp-submit]');
 let rsvpYesConfettiShown = false;
+
+
+if (mainDrinkSelect) {
+    mainDrinkSelect.addEventListener('invalid', () => {
+        if (mainDrinkSelect.value === '') {
+            mainDrinkSelect.setCustomValidity('Будь ласка, оберіть свій напій.');
+        }
+    });
+
+    mainDrinkSelect.addEventListener('change', () => {
+        mainDrinkSelect.setCustomValidity('');
+    });
+
+    mainDrinkSelect.addEventListener('input', () => {
+        mainDrinkSelect.setCustomValidity('');
+    });
+}
+
+if (partnerDrinkSelect) {
+    partnerDrinkSelect.addEventListener('invalid', () => {
+        if (partnerDrinkSelect.value === '') {
+            partnerDrinkSelect.setCustomValidity('Будь ласка, оберіть напій для партнера');
+        }
+    });
+
+    partnerDrinkSelect.addEventListener('change', () => {
+        partnerDrinkSelect.setCustomValidity('');
+    });
+
+    partnerDrinkSelect.addEventListener('input', () => {
+        partnerDrinkSelect.setCustomValidity('');
+    });
+}
+
+if (plusOneNameInput) {
+    plusOneNameInput.addEventListener('invalid', () => {
+        if (plusOneNameInput.value.trim() === '') {
+            plusOneNameInput.setCustomValidity('Будь ласка, вкажіть ім’я супутника.');
+        }
+    });
+
+    plusOneNameInput.addEventListener('input', () => {
+        plusOneNameInput.setCustomValidity('');
+    });
+}
+
 
 function syncRsvpVisibility() {
     const selected = document.querySelector('input[name="will_attend"]:checked');
@@ -356,35 +405,78 @@ function syncRsvpVisibility() {
         rsvpExtra.classList.toggle('is-hidden', !willAttend);
     }
 
+    if (mainDrinkSelect) {
+        mainDrinkSelect.required = willAttend;
+
+        if (!willAttend) {
+            mainDrinkSelect.value = '';
+        }
+    }
+
+    if (!willAttend) {
+        if (partnerDrinkSelect) {
+            partnerDrinkSelect.required = false;
+            partnerDrinkSelect.value = '';
+        }
+
+        if (plusOneNameInput) {
+            plusOneNameInput.required = false;
+        }
+    }
+
     if (rsvpSubmit) {
         rsvpSubmit.classList.toggle('is-hidden', !hasAnswer);
         rsvpSubmit.textContent = willAttend
             ? 'Підтвердити подорож'
             : 'Шкода, але життя вносить свої корективи';
     }
+
+    syncPlusOneName();
 }
 
 function syncPlusOneName() {
-    const selected = document.querySelector('input[name="plus_one"]:checked');
-    const hasPartner = selected?.value === '1';
-    const partnerDrink = document.querySelector('.partner-drink');
-    const partnerDrinkSelect = partnerDrink?.querySelector('select[name="partner_drink"]');
+    const selectedAttendance = document.querySelector('input[name="will_attend"]:checked');
+    const willAttend = selectedAttendance?.value === '1';
+
+    const selectedPlusOne = document.querySelector('input[name="plus_one"]:checked');
+    const hasPartner = willAttend && selectedPlusOne?.value === '1';
 
     if (plusOneName) {
         plusOneName.classList.toggle('is-hidden', !hasPartner);
+    }
+
+    if (plusOneNameInput) {
+        plusOneNameInput.required = hasPartner;
     }
 
     if (partnerDrink && !partnerDrink.dataset.alwaysVisible) {
         partnerDrink.classList.toggle('is-hidden', !hasPartner);
     }
 
-    if (partnerDrinkSelect && !partnerDrink?.dataset.alwaysVisible) {
-        partnerDrinkSelect.required = hasPartner;
+    if (partnerDrinkSelect) {
+        const isAlwaysVisible = Boolean(partnerDrink?.dataset.alwaysVisible);
+        partnerDrinkSelect.required = willAttend && (hasPartner || isAlwaysVisible);
+
+        if (!partnerDrinkSelect.required) {
+            partnerDrinkSelect.value = '';
+        }
     }
 
     if (partnerDrinkName && plusOneNameInput && !partnerDrink?.dataset.alwaysVisible) {
         partnerDrinkName.textContent = plusOneNameInput.value.trim() || 'партнер / супутник';
     }
+}
+
+if (rsvpForm) {
+    rsvpForm.addEventListener('submit', (event) => {
+        syncRsvpVisibility();
+        syncPlusOneName();
+
+        if (!rsvpForm.checkValidity()) {
+            event.preventDefault();
+            rsvpForm.reportValidity();
+        }
+    });
 }
 
 plusOneRadios.forEach((radio) => {

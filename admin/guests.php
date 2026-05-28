@@ -66,11 +66,24 @@ function telegramUrl(?string $telegram): ?string
 
 function invitationTypeLabel(?string $type, int $maxPlusOne): string
 {
-    return match ((string)$type) {
+   return match ((string)$type) {
         'couple' => 'Пара',
         'single_plus_one' => '1 + можливий +1',
         default => $maxPlusOne === 1 ? '1 + можливий +1' : '1 без +1',
     };
+    /*switch ((string)$type) {
+
+        case 'couple':
+            return 'Пара';
+    
+        case 'single_plus_one':
+            return '1 + можливий +1';
+    
+        default:
+            return $maxPlusOne == 1
+                ? '1 + можливий +1'
+                : '1 без +1';
+    };*/
 }
 ?>
 <!doctype html>

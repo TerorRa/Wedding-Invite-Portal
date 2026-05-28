@@ -616,7 +616,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
 
                                 <label class="partner-drink<?= $isCoupleInvite ? '' : ' is-hidden' ?>" <?= $isCoupleInvite ? ' data-always-visible="1"' : '' ?>>
                                     Який напій обирає <?= $isCoupleInvite && $partnerName !== '' ? e($partnerName) : 'партнер / супутник' ?>?
-                                    <select name="partner_drink" class="drink-select" ?>>
+                                    <select name="partner_drink" class="drink-select">
                                         <option value="">❗ Оберіть варіант</option>
                                         <option value="Вино">🍷 Вино</option>
                                         <option value="Шампанське">🥂 Шампанське</option>
@@ -662,7 +662,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
             <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M6 19h4V5H6zm8-14v14h4V5z" />
             </svg>
-            <span>Музика планети</span>
+            <span>Для вайбу</span>
         </button>
         <audio data-bg-music data-start-at="33.25" preload="none">
             <source src="assets/audio/<?php echo $nameAudio; ?>" type="audio/mpeg">

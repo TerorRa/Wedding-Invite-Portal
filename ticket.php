@@ -48,7 +48,7 @@ if (is_dir($photoDirectory)) {
         }
     }
 }
-
+$ticketNumber = $guest !== null ? (string)$guest->ticket_number : '';
 $photoGroups = [[], []];
 
 if ($photoFiles !== []) {
@@ -135,14 +135,22 @@ if ($photoFiles !== []) {
                         </dl>
                     </div>
 
-                    <div class="pass-qr">
+                    <!--<div class="pass-qr">
                         <img src="<?= e($qrUrl) ?>" alt="QR-код Wedding Pass">
                         <p>Покажіть цей QR-код при вході.</p>
-                    </div>
+                    </div>-->
+                    <div class="pass-qr">
+
+                            <span class="ticket__stub-label">Покажіть цей код на весіллі.</span>
+                            <span class="ticket__barcode" aria-hidden="true"></span>
+                            <span class="ticket__barcode-num"><?= e($ticketNumber) ?></span>
+  
+                        </div>
+                            
 
                     <div class="pass-actions">
                         <a class="section-action pass-about-button" href="<?= e($aboutUrl) ?>">Про нас</a>
-                        <a class="section-action" href="<?= e($inviteUrl) ?>">Повернутись</a>
+                        <a class="section-action" href="<?= e($inviteUrl) ?>">В запрошення</a>
                         <a class="section-action btn-o" href="<?= e($calendarUrl) ?>" target="_blank" rel="noreferrer">Додати до календаря</a>
 
                     </div>

@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 require_once __DIR__ . '/bootstrap.php';
@@ -116,6 +115,7 @@ foreach ($aboutPhotos as $index => $photo) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css?v=<?= e($styleVersion) ?>">
+    <link rel="stylesheet" href="assets/css/style_about.css?v=<?= e($styleVersion) ?>">
 </head>
 
 <body class="about-page about-page--snap">
