@@ -44,47 +44,25 @@ function stableRandomInt(string $seed, int $min, int $max): int
     return $min + ($hash % ($max - $min + 1));
 }
 
-function pickZone(array $zones, string $seed, int $index): array
-{
-    $zoneIndex = ($index + stableRandomInt($seed . '|zone', 0, count($zones) - 1)) % count($zones);
-
-    return $zones[$zoneIndex];
-}
-
 function stablePhotoPlacement(string $filename, int $index): array
 {
     $seed = basename($filename) . '|' . $index;
 
-    // Desktop/tablet zones. They intentionally avoid the center where the ring appears.
-    $desktopZones = [
-        ['left' => [5, 14], 'top' => [7, 19]],
-        ['left' => [72, 80], 'top' => [7, 19]],
-        ['left' => [5, 14], 'top' => [57, 70]],
-        ['left' => [72, 80], 'top' => [57, 70]],
-        ['left' => [22, 31], 'top' => [5, 16]],
-        ['left' => [55, 64], 'top' => [5, 16]],
-        ['left' => [22, 31], 'top' => [68, 78]],
-        ['left' => [55, 64], 'top' => [68, 78]],
-        ['left' => [4, 12], 'top' => [32, 45]],
-        ['left' => [75, 82], 'top' => [32, 45]],
-        ['left' => [36, 45], 'top' => [3, 12]],
-        ['left' => [42, 51], 'top' => [74, 82]],
+    $zones = [
+        ['left' => [4, 18], 'top' => [6, 24]],
+        ['left' => [68, 82], 'top' => [7, 25]],
+        ['left' => [5, 20], 'top' => [56, 74]],
+        ['left' => [66, 81], 'top' => [55, 74]],
+        ['left' => [24, 36], 'top' => [4, 18]],
+        ['left' => [52, 64], 'top' => [5, 19]],
+        ['left' => [23, 36], 'top' => [66, 78]],
+        ['left' => [51, 64], 'top' => [65, 78]],
+        ['left' => [3, 14], 'top' => [30, 48]],
+        ['left' => [73, 84], 'top' => [30, 48]],
     ];
 
-    // Mobile zones are much safer: left values stay under ~56%, because card width is ~32vw.
-    $mobileZones = [
-        ['left' => [4, 9], 'top' => [8, 18]],
-        ['left' => [55, 62], 'top' => [9, 20]],
-        ['left' => [5, 11], 'top' => [29, 40]],
-        ['left' => [54, 61], 'top' => [31, 42]],
-        ['left' => [5, 12], 'top' => [56, 67]],
-        ['left' => [53, 60], 'top' => [57, 68]],
-        ['left' => [28, 36], 'top' => [5, 14]],
-        ['left' => [29, 37], 'top' => [69, 77]],
-    ];
-
-    $desktopZone = pickZone($desktopZones, $seed . '|desktop', $index);
-    $mobileZone = pickZone($mobileZones, $seed . '|mobile', $index);
+    $zoneIndex = ($index + stableRandomInt($seed . '|zone', 0, count($zones) - 1)) % count($zones);
+    $zone = $zones[$zoneIndex];
 
     $startXSign = stableRandomInt($seed . '|x-sign', 0, 1) === 1 ? 1 : -1;
     $startYSign = stableRandomInt($seed . '|y-sign', 0, 1) === 1 ? 1 : -1;
@@ -92,15 +70,13 @@ function stablePhotoPlacement(string $filename, int $index): array
     $endRSign = stableRandomInt($seed . '|er-sign', 0, 1) === 1 ? 1 : -1;
 
     return [
-        'left' => stableRandomInt($seed . '|left', $desktopZone['left'][0], $desktopZone['left'][1]),
-        'top' => stableRandomInt($seed . '|top', $desktopZone['top'][0], $desktopZone['top'][1]),
-        'mobileLeft' => stableRandomInt($seed . '|mobile-left', $mobileZone['left'][0], $mobileZone['left'][1]),
-        'mobileTop' => stableRandomInt($seed . '|mobile-top', $mobileZone['top'][0], $mobileZone['top'][1]),
-        'startX' => $startXSign * stableRandomInt($seed . '|sx', 24, 58),
-        'startY' => $startYSign * stableRandomInt($seed . '|sy', 24, 56),
-        'startR' => $startRSign * stableRandomInt($seed . '|sr', 18, 40),
-        'endR' => $endRSign * stableRandomInt($seed . '|er', 3, 9),
-        'size' => stableRandomInt($seed . '|size', 92, 108),
+        'left' => stableRandomInt($seed . '|left', $zone['left'][0], $zone['left'][1]),
+        'top' => stableRandomInt($seed . '|top', $zone['top'][0], $zone['top'][1]),
+        'startX' => $startXSign * stableRandomInt($seed . '|sx', 24, 64),
+        'startY' => $startYSign * stableRandomInt($seed . '|sy', 24, 62),
+        'startR' => $startRSign * stableRandomInt($seed . '|sr', 20, 46),
+        'endR' => $endRSign * stableRandomInt($seed . '|er', 3, 11),
+        'size' => stableRandomInt($seed . '|size', 94, 112),
     ];
 }
 
@@ -193,7 +169,7 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
                             <?php $placement = stablePhotoPlacement($photo, $index); ?>
                             <figure
                                 class="memory-card"
-                                style="--i: <?= $index ?>; --left: <?= $placement['left'] ?>; --top: <?= $placement['top'] ?>; --mobile-left: <?= $placement['mobileLeft'] ?>; --mobile-top: <?= $placement['mobileTop'] ?>; --start-x: <?= $placement['startX'] ?>vw; --start-y: <?= $placement['startY'] ?>vh; --start-r: <?= $placement['startR'] ?>deg; --end-r: <?= $placement['endR'] ?>deg; --card-scale: <?= e(number_format($placement['size'] / 100, 2, '.', '')) ?>;"
+                                style="--i: <?= $index ?>; --left: <?= $placement['left'] ?>; --top: <?= $placement['top'] ?>; --start-x: <?= $placement['startX'] ?>vw; --start-y: <?= $placement['startY'] ?>vh; --start-r: <?= $placement['startR'] ?>deg; --end-r: <?= $placement['endR'] ?>deg; --card-scale: <?= e(number_format($placement['size'] / 100, 2, '.', '')) ?>;"
                             >
                                 <img src="<?= e(assetUrl($photo)) ?>" alt="" loading="<?= $index < 2 ? 'eager' : 'lazy' ?>" decoding="async" <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
                             </figure>
