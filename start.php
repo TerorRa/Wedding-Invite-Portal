@@ -38,6 +38,7 @@ function isRingPhoto(string $filename): bool
 }
 
 $styleVersion = (string)(@filemtime(__DIR__ . '/assets/css/start.css') ?: time());
+$dynamicStyleVersion = (string)(@filemtime(__DIR__ . '/assets/css/start-dynamic.css') ?: time());
 $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/start.js') ?: time());
 
 $inviteUrl = 'invite.php' . ($code !== '' ? '?code=' . urlencode($code) : '');
@@ -92,6 +93,7 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= e(assetUrl('assets/css/start.css')) ?>?v=<?= e($styleVersion) ?>">
+    <link rel="stylesheet" href="<?= e(assetUrl('assets/css/start-dynamic.css')) ?>?v=<?= e($dynamicStyleVersion) ?>">
 </head>
 <body class="start-page">
     <main class="start-shell" aria-label="Вступ до запрошення">
