@@ -1,0 +1,148 @@
+/* Dynamic intro-photo fixes for start.php. Loaded after start.css. */
+
+.memory-card {
+    animation-delay: calc(0.25s + (var(--i, 0) * 0.52s)) !important;
+}
+
+.memory-card--1 {
+    left: 7%;
+    top: 10%;
+    --start-x: -58vw;
+    --start-y: -48vh;
+    --start-r: -44deg;
+    --end-r: -9deg;
+}
+
+.memory-card--2 {
+    right: 8%;
+    top: 12%;
+    --start-x: 58vw;
+    --start-y: -48vh;
+    --start-r: 38deg;
+    --end-r: 8deg;
+}
+
+.memory-card--3 {
+    left: 9%;
+    bottom: 12%;
+    --start-x: -58vw;
+    --start-y: 48vh;
+    --start-r: 34deg;
+    --end-r: 7deg;
+}
+
+.memory-card--4 {
+    right: 9%;
+    bottom: 12%;
+    --start-x: 56vw;
+    --start-y: 46vh;
+    --start-r: -36deg;
+    --end-r: -7deg;
+}
+
+.memory-card--5 {
+    left: 28%;
+    top: 7%;
+    --start-x: -18vw;
+    --start-y: -62vh;
+    --start-r: 31deg;
+    --end-r: 5deg;
+}
+
+.memory-card--6 {
+    right: 28%;
+    top: 8%;
+    --start-x: 18vw;
+    --start-y: -62vh;
+    --start-r: -32deg;
+    --end-r: -6deg;
+}
+
+.memory-card--7 {
+    left: 26%;
+    bottom: 8%;
+    --start-x: -20vw;
+    --start-y: 62vh;
+    --start-r: -26deg;
+    --end-r: -4deg;
+}
+
+.memory-card--8 {
+    right: 26%;
+    bottom: 8%;
+    --start-x: 20vw;
+    --start-y: 62vh;
+    --start-r: 28deg;
+    --end-r: 4deg;
+}
+
+@media (max-width: 768px) {
+    .memory-card--1 {
+        left: 4%;
+        top: 10%;
+    }
+
+    .memory-card--2 {
+        right: 4%;
+        top: 13%;
+    }
+
+    .memory-card--3 {
+        left: 5%;
+        bottom: 24%;
+    }
+
+    .memory-card--4 {
+        right: 5%;
+        bottom: 22%;
+    }
+
+    .memory-card--5 {
+        left: 32%;
+        top: 6%;
+    }
+
+    .memory-card--6 {
+        right: 32%;
+        top: 20%;
+    }
+
+    .memory-card--7 {
+        left: 30%;
+        bottom: 14%;
+    }
+
+    .memory-card--8 {
+        right: 30%;
+        bottom: 8%;
+    }
+}
+
+@media (max-width: 420px) {
+    .memory-card--5,
+    .memory-card--6,
+    .memory-card--7,
+    .memory-card--8 {
+        width: clamp(86px, 29vw, 124px);
+    }
+
+    .memory-card--5 {
+        left: 34%;
+        top: 6%;
+    }
+
+    .memory-card--6 {
+        right: 34%;
+        top: 22%;
+    }
+
+    .memory-card--7 {
+        left: 33%;
+        bottom: 15%;
+    }
+
+    .memory-card--8 {
+        right: 33%;
+        bottom: 8%;
+    }
+}
