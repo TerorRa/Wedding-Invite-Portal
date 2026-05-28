@@ -37,6 +37,49 @@ function isRingPhoto(string $filename): bool
         || str_contains($name, 'obruch');
 }
 
+function stableRandomInt(string $seed, int $min, int $max): int
+{
+    $hash = (int)sprintf('%u', crc32($seed));
+
+    return $min + ($hash % ($max - $min + 1));
+}
+
+function stablePhotoPlacement(string $filename, int $index): array
+{
+    $seed = basename($filename) . '|' . $index;
+
+    $zones = [
+        ['left' => [4, 18], 'top' => [6, 24]],
+        ['left' => [68, 82], 'top' => [7, 25]],
+        ['left' => [5, 20], 'top' => [56, 74]],
+        ['left' => [66, 81], 'top' => [55, 74]],
+        ['left' => [24, 36], 'top' => [4, 18]],
+        ['left' => [52, 64], 'top' => [5, 19]],
+        ['left' => [23, 36], 'top' => [66, 78]],
+        ['left' => [51, 64], 'top' => [65, 78]],
+        ['left' => [3, 14], 'top' => [30, 48]],
+        ['left' => [73, 84], 'top' => [30, 48]],
+    ];
+
+    $zoneIndex = ($index + stableRandomInt($seed . '|zone', 0, count($zones) - 1)) % count($zones);
+    $zone = $zones[$zoneIndex];
+
+    $startXSign = stableRandomInt($seed . '|x-sign', 0, 1) === 1 ? 1 : -1;
+    $startYSign = stableRandomInt($seed . '|y-sign', 0, 1) === 1 ? 1 : -1;
+    $startRSign = stableRandomInt($seed . '|r-sign', 0, 1) === 1 ? 1 : -1;
+    $endRSign = stableRandomInt($seed . '|er-sign', 0, 1) === 1 ? 1 : -1;
+
+    return [
+        'left' => stableRandomInt($seed . '|left', $zone['left'][0], $zone['left'][1]),
+        'top' => stableRandomInt($seed . '|top', $zone['top'][0], $zone['top'][1]),
+        'startX' => $startXSign * stableRandomInt($seed . '|sx', 24, 64),
+        'startY' => $startYSign * stableRandomInt($seed . '|sy', 24, 62),
+        'startR' => $startRSign * stableRandomInt($seed . '|sr', 20, 46),
+        'endR' => $endRSign * stableRandomInt($seed . '|er', 3, 11),
+        'size' => stableRandomInt($seed . '|size', 94, 112),
+    ];
+}
+
 $styleVersion = (string)(@filemtime(__DIR__ . '/assets/css/start.css') ?: time());
 $dynamicStyleVersion = (string)(@filemtime(__DIR__ . '/assets/css/start-dynamic.css') ?: time());
 $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/start.js') ?: time());
@@ -123,8 +166,11 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
                 <?php if ($introPhotos !== []): ?>
                     <div class="memory-stage" aria-hidden="true">
                         <?php foreach ($introPhotos as $index => $photo): ?>
-                            <?php $variant = ($index % 8) + 1; ?>
-                            <figure class="memory-card memory-card--<?= $variant ?>" style="--i: <?= $index ?>;">
+                            <?php $placement = stablePhotoPlacement($photo, $index); ?>
+                            <figure
+                                class="memory-card"
+                                style="--i: <?= $index ?>; --left: <?= $placement['left'] ?>; --top: <?= $placement['top'] ?>; --start-x: <?= $placement['startX'] ?>vw; --start-y: <?= $placement['startY'] ?>vh; --start-r: <?= $placement['startR'] ?>deg; --end-r: <?= $placement['endR'] ?>deg; --card-scale: <?= e(number_format($placement['size'] / 100, 2, '.', '')) ?>;"
+                            >
                                 <img src="<?= e(assetUrl($photo)) ?>" alt="" loading="<?= $index < 2 ? 'eager' : 'lazy' ?>" decoding="async" <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
                             </figure>
                         <?php endforeach; ?>
