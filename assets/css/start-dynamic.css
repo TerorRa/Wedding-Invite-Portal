@@ -15,7 +15,7 @@
 
 /* Move final text below the ring photo so it does not cover the accent image. */
 .intro-final {
-    margin-top: min(62vh, 520px) !important;
+    margin-top: min(52vh, 420px) !important;
 }
 
 @media (max-width: 768px) {
@@ -37,6 +37,6 @@
     }
 
     .intro-final {
-        margin-top: 66svh !important;
+        margin-top: 50svh !important;
     }
 }

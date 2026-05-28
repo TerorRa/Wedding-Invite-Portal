@@ -125,6 +125,7 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
 ?>
 <!doctype html>
 <html lang="uk" class="no-js">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -138,6 +139,7 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
     <link rel="stylesheet" href="<?= e(assetUrl('assets/css/start.css')) ?>?v=<?= e($styleVersion) ?>">
     <link rel="stylesheet" href="<?= e(assetUrl('assets/css/start-dynamic.css')) ?>?v=<?= e($dynamicStyleVersion) ?>">
 </head>
+
 <body class="start-page">
     <main class="start-shell" aria-label="Вступ до запрошення">
         <?php if ($guest === null): ?>
@@ -151,8 +153,7 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
                 class="intro-scene"
                 data-intro-scene
                 data-intro-duration="<?= $introDurationMs ?>"
-                style="--photo-count: <?= $photoCount ?>; --ring-delay: <?= e(number_format($ringDelaySeconds, 2, '.', '')) ?>s; --final-delay: <?= e(number_format($finalDelaySeconds, 2, '.', '')) ?>s;"
-            >
+                style="--photo-count: <?= $photoCount ?>; --ring-delay: <?= e(number_format($ringDelaySeconds, 2, '.', '')) ?>s; --final-delay: <?= e(number_format($finalDelaySeconds, 2, '.', '')) ?>s;">
                 <div class="intro-sky" aria-hidden="true">
                     <span class="intro-star intro-star--one"></span>
                     <span class="intro-star intro-star--two"></span>
@@ -169,8 +170,7 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
                             <?php $placement = stablePhotoPlacement($photo, $index); ?>
                             <figure
                                 class="memory-card"
-                                style="--i: <?= $index ?>; --left: <?= $placement['left'] ?>; --top: <?= $placement['top'] ?>; --start-x: <?= $placement['startX'] ?>vw; --start-y: <?= $placement['startY'] ?>vh; --start-r: <?= $placement['startR'] ?>deg; --end-r: <?= $placement['endR'] ?>deg; --card-scale: <?= e(number_format($placement['size'] / 100, 2, '.', '')) ?>;"
-                            >
+                                style="--i: <?= $index ?>; --left: <?= $placement['left'] ?>; --top: <?= $placement['top'] ?>; --start-x: <?= $placement['startX'] ?>vw; --start-y: <?= $placement['startY'] ?>vh; --start-r: <?= $placement['startR'] ?>deg; --end-r: <?= $placement['endR'] ?>deg; --card-scale: <?= e(number_format($placement['size'] / 100, 2, '.', '')) ?>;">
                                 <img src="<?= e(assetUrl($photo)) ?>" alt="" loading="<?= $index < 2 ? 'eager' : 'lazy' ?>" decoding="async" <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
                             </figure>
                         <?php endforeach; ?>
@@ -185,7 +185,7 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
 
                 <div class="intro-final" data-intro-final>
                     <p class="start-eyebrow"><?= $guestName !== '' ? e($guestName) . ',' : 'Дорогий гостю,' ?></p>
-                    <h1>У нашій історії починається нова глава</h1>
+                    <h1>Скоро наше Весілля!</h1>
                     <p>Ми хочемо запросити вас на день, у якому народиться наша сімʼя.</p>
                     <div class="intro-actions">
                         <a class="intro-btn intro-btn--primary" href="<?= e($inviteUrl) ?>">Відкрити запрошення</a>
@@ -197,4 +197,5 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
     </main>
     <script src="<?= e(assetUrl('assets/js/start.js')) ?>?v=<?= e($scriptVersion) ?>"></script>
 </body>
+
 </html>
