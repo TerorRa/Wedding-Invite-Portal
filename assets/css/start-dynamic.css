@@ -13,6 +13,11 @@
     transform: scale(var(--card-scale, 1));
 }
 
+/* Move final text below the ring photo so it does not cover the accent image. */
+.intro-final {
+    margin-top: min(62vh, 520px) !important;
+}
+
 @media (max-width: 768px) {
     .memory-card {
         width: clamp(104px, 34vw, 160px);
@@ -20,10 +25,18 @@
         border-bottom-width: 22px;
         border-radius: 10px;
     }
+
+    .intro-final {
+        margin-top: 64svh !important;
+    }
 }
 
 @media (max-width: 420px) {
     .memory-card {
         width: clamp(92px, 32vw, 134px);
+    }
+
+    .intro-final {
+        margin-top: 66svh !important;
     }
 }
