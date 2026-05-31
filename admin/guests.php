@@ -40,7 +40,7 @@ function e(?string $value): string
 
 function inviteUrl(string $scheme, string $host, string $projectPath, string $code): string
 {
-    return $scheme . '://' . $host . $projectPath . '/start.php?code=' . urlencode($code);
+    return $scheme . '://' . $host . $projectPath . '/invite.php?code=' . urlencode($code);
 }
 
 function invitationMessage(string $name, string $link): string

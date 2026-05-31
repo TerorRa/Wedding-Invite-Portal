@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+
 require_once __DIR__ . '/bootstrap.php';
 
 $rsvpError = $_SESSION['rsvp_error'] ?? null;
@@ -140,7 +141,126 @@ try {
     // Keep the default program available until install.sql is applied.
 }
 
+
 $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
+
+
+$code = trim((string)($_GET['code'] ?? ''));
+$guest = $code !== '' ? R::findOne('guests', 'invite_code = ?', [$code]) : null;
+
+if ($guest !== null) {
+    logInviteAction((int)$guest->id, 'viewed_start');
+}
+
+
+
+function assetUrl(string $path): string
+{
+    $scriptDir = str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '')));
+    $basePath = rtrim($scriptDir, '/');
+
+    if ($basePath === '/' || $basePath === '.') {
+        $basePath = '';
+    }
+
+    return $basePath . '/' . ltrim($path, '/');
+}
+
+function isRingPhoto(string $filename): bool
+{
+    $name = strtolower(pathinfo($filename, PATHINFO_FILENAME));
+
+    return in_array($name, ['ring', 'rings', 'obruchka', 'obruchky', 'wedding-ring'], true)
+        || str_contains($name, 'ring')
+        || str_contains($name, 'obruch');
+}
+
+function stableRandomInt(string $seed, int $min, int $max): int
+{
+    $hash = (int)sprintf('%u', crc32($seed));
+
+    return $min + ($hash % ($max - $min + 1));
+}
+
+function stablePhotoPlacement(string $filename, int $index): array
+{
+    $seed = basename($filename) . '|' . $index;
+
+    $zones = [
+        ['left' => [4, 18], 'top' => [6, 24]],
+        ['left' => [68, 82], 'top' => [7, 25]],
+        ['left' => [5, 20], 'top' => [56, 74]],
+        ['left' => [66, 81], 'top' => [55, 74]],
+        ['left' => [24, 36], 'top' => [4, 18]],
+        ['left' => [52, 64], 'top' => [5, 19]],
+        ['left' => [23, 36], 'top' => [66, 78]],
+        ['left' => [51, 64], 'top' => [65, 78]],
+        ['left' => [3, 14], 'top' => [30, 48]],
+        ['left' => [73, 84], 'top' => [30, 48]],
+    ];
+
+    $zoneIndex = ($index + stableRandomInt($seed . '|zone', 0, count($zones) - 1)) % count($zones);
+    $zone = $zones[$zoneIndex];
+
+    $startXSign = stableRandomInt($seed . '|x-sign', 0, 1) === 1 ? 1 : -1;
+    $startYSign = stableRandomInt($seed . '|y-sign', 0, 1) === 1 ? 1 : -1;
+    $startRSign = stableRandomInt($seed . '|r-sign', 0, 1) === 1 ? 1 : -1;
+    $endRSign = stableRandomInt($seed . '|er-sign', 0, 1) === 1 ? 1 : -1;
+
+    return [
+        'left' => stableRandomInt($seed . '|left', $zone['left'][0], $zone['left'][1]),
+        'top' => stableRandomInt($seed . '|top', $zone['top'][0], $zone['top'][1]),
+        'startX' => $startXSign * stableRandomInt($seed . '|sx', 24, 64),
+        'startY' => $startYSign * stableRandomInt($seed . '|sy', 24, 62),
+        'startR' => $startRSign * stableRandomInt($seed . '|sr', 20, 46),
+        'endR' => $endRSign * stableRandomInt($seed . '|er', 3, 11),
+        'size' => stableRandomInt($seed . '|size', 94, 112),
+    ];
+}
+
+$styleVersion = (string)(@filemtime(__DIR__ . '/assets/css/start.css') ?: time());
+$dynamicStyleVersion = (string)(@filemtime(__DIR__ . '/assets/css/start-dynamic.css') ?: time());
+$scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/start.js') ?: time());
+
+$inviteUrl = 'invite.php' . ($code !== '' ? '?code=' . urlencode($code) : '');
+$aboutUrl = 'about.php' . ($code !== '' ? '?code=' . urlencode($code) : '');
+
+$introDirectory = __DIR__ . '/assets/intro';
+$introPhotos = [];
+$ringPhoto = null;
+
+if (is_dir($introDirectory)) {
+    $files = glob($introDirectory . '/*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE) ?: [];
+    sort($files, SORT_NATURAL | SORT_FLAG_CASE);
+
+    foreach ($files as $file) {
+        if (!is_file($file)) {
+            continue;
+        }
+
+        $relativePath = 'assets/intro/' . basename($file);
+
+        if (isRingPhoto(basename($file))) {
+            $ringPhoto ??= $relativePath;
+            continue;
+        }
+
+        $introPhotos[] = $relativePath;
+    }
+}
+
+if ($ringPhoto === null && $introPhotos !== []) {
+    $ringPhoto = array_pop($introPhotos);
+}
+
+$photoCount = count($introPhotos);
+$cardStepSeconds = 0.52;
+$ringDelaySeconds = max(2.6, 1.15 + ($photoCount * $cardStepSeconds));
+$finalDelaySeconds = $ringDelaySeconds + 1.25;
+$introDurationMs = (int)(($finalDelaySeconds + 1.4) * 1000);
+
+$guestName = $guest !== null ? trim((string)$guest->name) : '';
+?>
 ?>
 <!doctype html>
 <html lang="uk" class="no-js">
@@ -155,10 +275,13 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="<?= e(assetUrl('assets/css/start.css')) ?>?v=<?= e($styleVersion) ?>">
+    <link rel="stylesheet" href="<?= e(assetUrl('assets/css/start-dynamic.css')) ?>?v=<?= e($dynamicStyleVersion) ?>">
 </head>
 
 <body class="<?= $shouldShowInviteGate ? 'has-invite-gate celestial-theme' : 'celestial-theme' ?>">
     <main>
+        <!-- -->
         <?php if ($guest === null): ?>
             <section class="page-shell">
                 <div class="not-found reveal">
@@ -168,7 +291,60 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                 </div>
             </section>
         <?php else: ?>
-            <section class="invite-opening" aria-label="Відкрити запрошення">
+            <section
+                class="invite-opening"
+                data-intro-scene
+                data-intro-duration="<?= $introDurationMs ?>"
+                style="--photo-count: <?= $photoCount ?>; --ring-delay: <?= e(number_format($ringDelaySeconds, 2, '.', '')) ?>s; --final-delay: <?= e(number_format($finalDelaySeconds, 2, '.', '')) ?>s;">
+                <div class="intro-sky" aria-hidden="true">
+                    <span class="intro-star intro-star--one"></span>
+                    <span class="intro-star intro-star--two"></span>
+                    <span class="intro-star intro-star--three"></span>
+                    <span class="intro-orbit intro-orbit--one"></span>
+                    <span class="intro-orbit intro-orbit--two"></span>
+                </div>
+
+                <a class="intro-skip" href="<?= e($inviteUrl) ?>">Пропустити вступ</a>
+
+                <?php if ($introPhotos !== []): ?>
+                    <div class="memory-stage" aria-hidden="true">
+                        <?php foreach ($introPhotos as $index => $photo): ?>
+                            <?php $placement = stablePhotoPlacement($photo, $index); ?>
+                            <figure
+                                class="memory-card"
+                                style="--i: <?= $index ?>; --left: <?= $placement['left'] ?>; --top: <?= $placement['top'] ?>; --start-x: <?= $placement['startX'] ?>vw; --start-y: <?= $placement['startY'] ?>vh; --start-r: <?= $placement['startR'] ?>deg; --end-r: <?= $placement['endR'] ?>deg; --card-scale: <?= e(number_format($placement['size'] / 100, 2, '.', '')) ?>;">
+                                <img src="<?= e(assetUrl($photo)) ?>" alt="" loading="<?= $index < 2 ? 'eager' : 'lazy' ?>" decoding="async" <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
+                            </figure>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($ringPhoto !== null): ?>
+                    <figure class="ring-card" aria-hidden="true">
+                        <img src="<?= e(assetUrl($ringPhoto)) ?>" alt="" loading="eager" decoding="async">
+                    </figure>
+                <?php endif; ?>
+
+                <div class="intro-final" data-intro-final>
+                    <p class="start-eyebrow"><?= $guestName !== '' ? e($guestName) . ',' : 'Дорогий гостю,' ?></p>
+
+                    <div style="width:min(620px,100%);margin:0 auto;color:var(--text);font-family:'Cormorant Garamond', Georgia, serif;font-size:clamp(22px,3.6vw,34px);font-weight:500;line-height:1.32;">
+                        <p style="margin:0 0 10px;">Здавна люди вірили, що кожна зірка на небі — це чиясь доля.</p>
+                        <p style="margin:0 0 10px;">Дві долі, що знайшли одна одну, зливаються в одне світло —</p>
+                        <p style="margin:0 0 14px;">і на небосхилі спалахує нова зірочка.</p>
+                        <p style="margin:0 0 10px;">Незабаром така з'явиться і в нас.</p>
+                        <p style="margin:0;">Хочемо, щоб саме ви були поруч,<br>коли вона засяє вперше. ✨</p>
+                    </div>
+                    <button type="button" class="ticket-wrap" data-open-invite aria-label="Відкрити запрошення">
+                        <span class="ticket__hint">
+                            <span><i class="ticket__hint-dot"></i> Розгорнути запрошення <i class="ticket__hint-dot"></i></span>
+                        </span>
+                    </button>
+                </div>
+            </section>
+
+            <!--  <section class="invite-opening" aria-label="Відкрити запрошення">
+
                 <div class="splash-stars" aria-hidden="true"></div>
                 <img class="splash-symbol splash-symbol--planet" src="assets/img/bck/little_prince_transparent_planet.png" alt="" aria-hidden="true">
                 <img class="splash-symbol splash-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">
@@ -212,6 +388,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
                     </span>
                 </button>
             </section>
+                -->
 
             <div class="invite-content" id="inviteContent">
                 <div class="cosmic-effects" aria-hidden="true"></div>
@@ -689,6 +866,7 @@ $ticketStartTime = (string)($programItems[0]['event_time'] ?? '15:00');
         </div>
     <?php endif; ?>
     <script src="assets/js/invite.js"></script>
+    <script src="<?= e(assetUrl('assets/js/start.js')) ?>?v=<?= e($scriptVersion) ?>"></script>
 </body>
 
 </html>
