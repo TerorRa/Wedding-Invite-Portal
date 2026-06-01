@@ -49,20 +49,28 @@ function stablePhotoPlacement(string $filename, int $index): array
     $seed = basename($filename) . '|' . $index;
 
     $zones = [
-        ['left' => [4, 18], 'top' => [6, 24]],
-        ['left' => [68, 82], 'top' => [7, 25]],
-        ['left' => [5, 20], 'top' => [56, 74]],
-        ['left' => [66, 81], 'top' => [55, 74]],
-        ['left' => [24, 36], 'top' => [4, 18]],
-        ['left' => [52, 64], 'top' => [5, 19]],
-        ['left' => [23, 36], 'top' => [66, 78]],
-        ['left' => [51, 64], 'top' => [65, 78]],
-        ['left' => [3, 14], 'top' => [30, 48]],
-        ['left' => [73, 84], 'top' => [30, 48]],
+        ['left' => [5, 16], 'top' => [8, 24]],
+        ['left' => [25, 37], 'top' => [5, 18]],
+        ['left' => [53, 65], 'top' => [5, 18]],
+        ['left' => [74, 84], 'top' => [8, 24]],
+        ['left' => [4, 15], 'top' => [34, 50]],
+        ['left' => [74, 84], 'top' => [34, 50]],
+        ['left' => [6, 18], 'top' => [60, 76]],
+        ['left' => [28, 40], 'top' => [67, 80]],
+        ['left' => [52, 64], 'top' => [67, 80]],
+        ['left' => [74, 84], 'top' => [60, 76]],
+        ['left' => [17, 29], 'top' => [28, 44]],
+        ['left' => [61, 73], 'top' => [28, 44]],
     ];
 
-    $zoneIndex = ($index + stableRandomInt($seed . '|zone', 0, count($zones) - 1)) % count($zones);
+    $zoneIndex = $index % count($zones);
     $zone = $zones[$zoneIndex];
+    $cycle = intdiv($index, count($zones));
+    $cycleNudge = min(6, $cycle * 3);
+    $leftMin = min($zone['left'][1], $zone['left'][0] + $cycleNudge);
+    $leftMax = max($leftMin, $zone['left'][1] - $cycleNudge);
+    $topMin = min($zone['top'][1], $zone['top'][0] + $cycleNudge);
+    $topMax = max($topMin, $zone['top'][1] - $cycleNudge);
 
     $startXSign = stableRandomInt($seed . '|x-sign', 0, 1) === 1 ? 1 : -1;
     $startYSign = stableRandomInt($seed . '|y-sign', 0, 1) === 1 ? 1 : -1;
@@ -70,8 +78,8 @@ function stablePhotoPlacement(string $filename, int $index): array
     $endRSign = stableRandomInt($seed . '|er-sign', 0, 1) === 1 ? 1 : -1;
 
     return [
-        'left' => stableRandomInt($seed . '|left', $zone['left'][0], $zone['left'][1]),
-        'top' => stableRandomInt($seed . '|top', $zone['top'][0], $zone['top'][1]),
+        'left' => stableRandomInt($seed . '|left', $leftMin, $leftMax),
+        'top' => stableRandomInt($seed . '|top', $topMin, $topMax),
         'startX' => $startXSign * stableRandomInt($seed . '|sx', 24, 64),
         'startY' => $startYSign * stableRandomInt($seed . '|sy', 24, 62),
         'startR' => $startRSign * stableRandomInt($seed . '|sr', 20, 46),
@@ -191,8 +199,7 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
                     <p class="start-eyebrow"><?= $guestName !== '' ? e($guestName) . ',' : 'Дорогий гостю,' ?></p>
                     <div class="intro-copy">
                         <p style="margin:0 0 10px;">Здавна люди вірили, що кожна зірка на небі — це чиясь доля.</p>
-                        <span class="intro-shine-star" aria-hidden="true"></span>
-                        <p style="margin:0 0 10px;">Дві долі, що знайшли одна одну, зливаються в одне світло — і на небосхилі спалахує нова зірочка.</p>
+                        <p style="margin:0 0 10px;">Дві долі, що знайшли одна одну, зливаються в одне світло — і на небосхилі спалахує нова зірочка.<span class="intro-shine-star" aria-hidden="true"></span></p>
                         <p style="margin:0 0 10px;">Незабаром така з'явиться і в нас.</p>
                         <p style="margin:0;">Хочемо, щоб саме ви були поруч,<br>коли вона засяє вперше. ✨</p>
                     </div>

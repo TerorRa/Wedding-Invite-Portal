@@ -16,20 +16,6 @@ function e(?string $value): string
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
-$photoFiles = [];
-$photoDirectory = __DIR__ . '/assets/foto';
-$styleVersion = (string)(@filemtime(__DIR__ . '/assets/css/style.css') ?: time());
-
-if (is_dir($photoDirectory)) {
-    $files = glob($photoDirectory . '/*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE) ?: [];
-    sort($files, SORT_NATURAL);
-
-    foreach ($files as $file) {
-        if (is_file($file)) {
-            $photoFiles[] = 'assets/foto/' . basename($file);
-        }
-    }
-}
 ?>
 <!doctype html>
 <html lang="uk" class="no-js">
@@ -54,21 +40,7 @@ if (is_dir($photoDirectory)) {
                 <p class="late-invite-text">Перевірте посилання або зверніться до організаторів.</p>
             <?php else: ?>
                 <h1 class="t-h"><?= e($guest->name) ?>, ми чекали на твою відповідь</h1>
-                <p class="late-invite-text">На жаль, ми не отримали відповіді вчасно, але ми завжди раді бачити тебе на нашому святі. Звʼяжися з нами, якщо ти все ж бажаєш бути присутнім.</p>
-            <?php endif; ?>
-
-            <?php if ($photoFiles !== []): ?>
-                <div class="late-filmstrip" aria-label="Фотоспогади">
-                    <div class="late-filmstrip__track">
-                        <?php for ($loop = 0; $loop < 2; $loop++): ?>
-                            <?php foreach ($photoFiles as $index => $photo): ?>
-                                <figure class="late-filmstrip__frame">
-                                    <img src="<?= e($photo) ?>" alt="Фото Ростислава та Катерини <?= $index + 1 ?>" loading="eager" decoding="async"<?= $loop === 0 && $index < 4 ? ' fetchpriority="high"' : '' ?>>
-                                </figure>
-                            <?php endforeach; ?>
-                        <?php endfor; ?>
-                    </div>
-                </div>
+                <p class="late-invite-text">На жаль, ми не отримали відповіді вчасно, але ми завжди раді бачити тебе на нашому святі. Звʼяжися з нами, якщо ти все ж можешь бути присутнім.</p>
             <?php endif; ?>
         </section>
     </main>

@@ -186,7 +186,7 @@ $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/invite.js') ?: time()
                         <div class="hero-divider"><span></span><i></i><span></span></div>
                         <p class="hero-date">01 <small>серпня</small> 2026</p>
 
-                        <p class="hero__motto"> Серед мільйонів зірок я знайшов тебе </p>
+                        <p class="hero__motto"> Серед мільярдів зірок наші орбіти знайшли одна одну </p>
 
                         <div class="hero__img-wrap">
                             <img class="hero__img" src="assets/img/hero-new.webp" alt="Ростислав та Катерина">
@@ -520,7 +520,7 @@ $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/invite.js') ?: time()
                     <div class="section-wrap narrow rsvp-wrap">
                         <img class="section-symbol section-symbol--ticket" src="assets/img/bck/little_prince_transparent_star.png" alt="" aria-hidden="true">
                         <p class="t-scr">Будьте нашим гостем</p>
-                        <h2 class="t-h">Будь ласка, підтвердіть присутність до 01.07.2026</h2>
+                        <h2 class="t-h">Будь ласка, підтвердіть присутність до 17.07.2026</h2>
                         <div class="moon-divider"><span></span><i></i><span></span></div>
                         <p class="rsvp-note">Ваша відповідь допоможе нам продумати вечір так, щоб кожному гостю було тепло, зручно й смачно.</p>
                         <form class="rsvp-form" action="submit_rsvp.php" method="post">
@@ -592,7 +592,7 @@ $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/invite.js') ?: time()
                             </div>
 
                             <button type="submit" class="btn btn-primary rsvp-submit is-hidden" data-rsvp-submit>Підтвердити</button>
-                            <p> Ми використовуємо ваші відповіді лише для організації весілля: підтвердження присутності, посадки гостей, напоїв і трансферу. Дані не передаються третім особам.</p>
+                            <p> Ми використовуємо ваші відповіді лише для організації весілля: підтвердження присутності, напоїв, тощо. Дані не передаються третім особам.</p>
                         </form>
                     </div>
                 </section>
@@ -605,7 +605,7 @@ $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/invite.js') ?: time()
                 </section>
 
                 <footer class="invite-footer">
-                    <p>Серед мільйонів зірок створюється нове сузірʼя — наша сімʼя</p>
+                    <p>Серед мільйонів зірок зароджується нова — наша сімʼя</p>
                     <h2>Ростислав & Катерина</h2>
                     <span>1 серпня 2026</span>
                 </footer>

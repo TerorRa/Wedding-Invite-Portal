@@ -324,7 +324,8 @@ body.about-orbit-page {
     gap: clamp(18px, 5vw, 58px);
     opacity: 0;
     pointer-events: none;
-    transform: rotate(-16deg) translateX(24vw) scale(.82);
+    transform: rotate(-24deg) translate3d(28vw, 16vh, 0) scale(.78);
+    transform-origin: 50% 130%;
     transition: opacity 520ms ease, transform 720ms cubic-bezier(.2, .76, .18, 1);
 }
 
@@ -335,16 +336,28 @@ body.about-orbit-page {
 }
 
 .about-orbit-slide.is-exiting-left {
-    transform: rotate(16deg) translateX(-24vw) scale(.82);
+    transform: rotate(28deg) translate3d(-30vw, 18vh, 0) scale(.78);
 }
 
 .about-orbit-slide.is-exiting-right {
-    transform: rotate(-16deg) translateX(24vw) scale(.82);
+    transform: rotate(-28deg) translate3d(30vw, -18vh, 0) scale(.78);
+}
+
+.about-orbit-slide.is-orbit-next {
+    transform: rotate(-24deg) translate3d(28vw, -14vh, 0) scale(.78);
+}
+
+.about-orbit-slide.is-orbit-prev {
+    transform: rotate(24deg) translate3d(-28vw, 14vh, 0) scale(.78);
 }
 
 .about-orbit-photo {
+    width: fit-content;
+    max-width: 100%;
     margin: 0;
     padding: 10px 10px 34px;
+    justify-self: center;
+    box-sizing: border-box;
     background: rgba(255, 247, 220, .86);
     border-radius: 12px;
     box-shadow: 0 28px 76px rgba(0, 0, 0, .42);
@@ -354,6 +367,7 @@ body.about-orbit-page {
 .about-orbit-photo img {
     display: block;
     width: min(78vw, 420px);
+    max-width: 100%;
     aspect-ratio: .78;
     object-fit: cover;
     border-radius: 6px;
@@ -407,31 +421,129 @@ body.about-orbit-page {
     width: 48px;
     height: 48px;
     color: #fff7dc;
-    border: 1px solid rgba(234, 217, 165, .5);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    border: 1px solid rgba(234, 217, 165, .82);
     border-radius: 999px;
-    background: rgba(255, 255, 255, .08);
+    background:
+        radial-gradient(circle at 50% 20%, rgba(255, 247, 220, .24), transparent 54%),
+        rgba(11, 23, 40, .74);
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, .32),
+        inset 0 0 0 1px rgba(255, 255, 255, .08);
     cursor: pointer;
+    transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.about-nav-btn:hover,
+.about-nav-btn:focus-visible {
+    color: #ffffff;
+    border-color: rgba(255, 247, 220, .96);
+    background-color: rgba(20, 31, 50, .92);
+    transform: translateY(-1px);
+    outline: none;
 }
 
 .about-orbit-count {
     min-width: 58px;
-    color: rgba(245, 240, 232, .78);
+    padding: 8px 12px;
+    color: #fff7dc;
     text-align: center;
+    font-weight: 600;
+    border: 1px solid rgba(234, 217, 165, .56);
+    border-radius: 999px;
+    background: rgba(11, 23, 40, .62);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .2);
 }
 
 @media (max-width: 820px) {
+    html:has(body.about-orbit-page) {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
     body.about-orbit-page {
-        overflow: auto;
+        overflow-x: hidden;
+        overflow-y: visible;
+    }
+
+    .about-orbit {
+        overflow-x: clip;
     }
 
     .about-orbit-slide {
         grid-template-columns: 1fr;
-        position: relative;
-        display: none;
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        display: grid;
+        gap: 18px;
+        padding-top: 38px;
+        visibility: hidden;
     }
 
     .about-orbit-slide.is-active {
         display: grid;
+        visibility: visible;
+    }
+
+    .about-orbit {
+        grid-template-rows: 1fr;
+        gap: 0;
+        padding-inline: 16px;
+    }
+
+    .about-orbit-controls {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        z-index: 6;
+        display: grid;
+        grid-template-columns: repeat(3, auto);
+        justify-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: min(360px, calc(100% - 32px));
+        transform: translateX(-50%);
+    }
+
+    .about-back-link {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        margin-bottom: -4px;
+        transform: translateY(14px);
+    }
+
+    .about-nav-btn,
+    .about-orbit-count {
+        grid-row: 2;
+    }
+
+    .about-nav-btn {
+        transform: translateY(calc(min(78vw, 420px) + 62px));
+    }
+
+    .about-nav-btn:hover,
+    .about-nav-btn:focus-visible {
+        transform: translateY(calc(min(78vw, 420px) + 62px));
+    }
+
+    .about-orbit-count {
+        transform: translateY(calc(min(78vw, 420px) + 62px));
+    }
+
+    .about-orbit__scene {
+        align-items: start;
+    }
+
+    .about-orbit-photo {
+        position: relative;
+        z-index: 2;
+    }
+
+    .about-orbit-card {
+        margin-top: 18px;
     }
 
     .about-orbit-controls {

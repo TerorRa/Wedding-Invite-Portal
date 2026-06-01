@@ -29,31 +29,38 @@
 
 @media (max-width: 768px) {
     .memory-card {
-        width: clamp(104px, 34vw, 160px);
+        width: clamp(118px, 38vw, 178px);
         border-width: 6px;
         border-bottom-width: 22px;
         border-radius: 10px;
     }
 
+    .ring-card {
+        top: 23%;
+        width: min(90vw, 370px);
+        border-width: 7px;
+        border-bottom-width: 24px;
+    }
+
     .intro-final {
-        margin-top: 64svh !important;
+        margin-top: 52svh !important;
     }
 }
 
 @media (max-width: 420px) {
     .memory-card {
-        width: clamp(92px, 32vw, 134px);
+        width: clamp(108px, 38vw, 152px);
     }
 
     .ring-card {
-        top: 26%;
-        width: min(68vw, 250px);
+        top: 22.5%;
+        width: min(92vw, 350px);
         border-width: 6px;
-        border-bottom-width: 22px;
+        border-bottom-width: 24px;
     }
 
     .intro-final {
-        margin-top: 52svh !important;
+        margin-top: 46svh !important;
     }
 }
 
@@ -211,7 +218,6 @@ html.start-root {
     position: relative;
     width: min(470px, 100%);
     margin: 0 auto;
-    padding-right: 24px;
     color: rgba(245, 240, 232, .86);
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: clamp(16px, 1.75vw, 21px);
@@ -231,11 +237,12 @@ html.start-root {
 }
 
 .intro-shine-star {
-    position: absolute;
-    top: 36px;
-    right: -32px;
-    width: 34px;
-    height: 34px;
+    position: relative;
+    top: .12em;
+    width: 1.15em;
+    height: 1.15em;
+    display: inline-block;
+    margin-left: .3em;
     pointer-events: none;
     filter:
         drop-shadow(0 0 12px rgba(255, 255, 255, .95))

@@ -2,8 +2,9 @@
     color-scheme: light;
     --bg: #f5f6f8;
     --text: #20242a;
-    --panel: #ffffff;
-    --border: #dfe3e8;
+    --panel: rgba(234, 240, 247, 0.9);
+    --panel-strong: rgba(224, 233, 243, 0.94);
+    --border: rgba(184, 204, 228, 0.54);
     --accent: #7b5f32;
     --danger-bg: #fff0f0;
     --danger-text: #8f1d1d;
@@ -18,10 +19,31 @@ body {
     min-height: 100vh;
     font-family: Arial, sans-serif;
     color: var(--text);
-    background: var(--bg);
+    background:
+        radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.16), transparent 24%),
+        radial-gradient(circle at 88% 12%, rgba(201, 168, 93, 0.16), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(48, 78, 116, 0.38), transparent 42%),
+        linear-gradient(180deg, #07101f 0%, #0b1728 50%, #14233a 100%);
+    background-attachment: fixed;
+}
+
+body::before {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    content: "";
+    opacity: .52;
+    background-image:
+        radial-gradient(circle, rgba(255, 255, 255, .84) 0 1px, transparent 1.8px),
+        radial-gradient(circle, rgba(234, 217, 165, .62) 0 1px, transparent 1.9px);
+    background-size: 140px 140px, 220px 220px;
+    background-position: 16% 22%, 72% 34%;
 }
 
 .admin-shell {
+    position: relative;
+    z-index: 1;
     width: 100%;
     min-height: 100vh;
     margin: 0;
@@ -29,6 +51,8 @@ body {
 }
 
 .admin-login-shell {
+    position: relative;
+    z-index: 1;
     min-height: 100vh;
     display: grid;
     place-items: center;
@@ -41,9 +65,10 @@ body {
     gap: 18px;
     padding: 28px;
     background: var(--panel);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(234, 217, 165, .24);
     border-radius: 8px;
-    box-shadow: 0 18px 50px rgba(32, 36, 42, 0.08);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(14px);
 }
 
 .admin-eyebrow {
@@ -67,9 +92,10 @@ body {
     gap: 16px;
     padding: 20px;
     background: var(--panel);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(234, 217, 165, .22);
     border-radius: 8px;
-    box-shadow: 0 14px 36px rgba(32, 36, 42, 0.06);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.16);
+    backdrop-filter: blur(12px);
 }
 
 .admin-form-wide {
@@ -90,7 +116,7 @@ body {
     display: grid;
     gap: 14px;
     padding: 16px;
-    background: #fafbfc;
+    background: rgba(245, 248, 251, .64);
     border: 1px solid var(--border);
     border-radius: 8px;
 }
@@ -157,7 +183,7 @@ body {
     gap: 8px;
     padding: 16px;
     background: var(--panel);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(234, 217, 165, .22);
     border-radius: 8px;
 }
 
@@ -227,7 +253,7 @@ body {
     align-items: center;
     gap: 14px;
     padding: 12px;
-    background: #fafbfc;
+    background: rgba(245, 248, 251, .64);
     border: 1px solid var(--border);
     border-radius: 8px;
 }
@@ -262,7 +288,7 @@ body {
     margin-bottom: 18px;
     padding: 16px;
     background: var(--panel);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(234, 217, 165, .22);
     border-radius: 8px;
 }
 
@@ -287,6 +313,7 @@ body {
     justify-content: space-between;
     gap: 16px;
     margin: 26px 0;
+    color: #f5f0e8;
 }
 
 .admin-header a {
@@ -330,9 +357,15 @@ body {
     flex-wrap: wrap;
     gap: 10px;
     padding: 10px;
-    background: var(--panel);
-    border: 1px solid var(--border);
+    background:
+        radial-gradient(circle at 10% 0%, rgba(234, 217, 165, .12), transparent 34%),
+        linear-gradient(180deg, rgba(20, 31, 50, .92), rgba(8, 18, 32, .94));
+    border: 1px solid rgba(234, 217, 165, .34);
     border-radius: 8px;
+    box-shadow:
+        0 18px 50px rgba(0, 0, 0, .26),
+        inset 0 1px 0 rgba(255, 255, 255, .08);
+    backdrop-filter: blur(14px);
 }
 
 .admin-nav a {
@@ -340,15 +373,18 @@ body {
     display: inline-flex;
     align-items: center;
     padding: 0 14px;
-    color: var(--text);
+    color: rgba(245, 240, 232, .88);
     text-decoration: none;
     border-radius: 8px;
 }
 
 .admin-nav a:hover,
 .admin-nav a.is-active {
-    color: #fff;
-    background: var(--accent);
+    color: #fff7dc;
+    background: rgba(123, 95, 50, .92);
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, .24),
+        inset 0 1px 0 rgba(255, 255, 255, .16);
 }
 
 .stats-grid {
@@ -363,10 +399,13 @@ body {
     align-content: space-between;
     gap: 18px;
     padding: 20px;
-    background: var(--panel);
-    border: 1px solid var(--border);
+    background:
+        radial-gradient(circle at 100% 0%, rgba(255, 255, 255, .34), transparent 34%),
+        var(--panel-strong);
+    border: 1px solid rgba(234, 217, 165, .28);
     border-radius: 8px;
-    box-shadow: 0 14px 36px rgba(32, 36, 42, 0.06);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.16);
+    backdrop-filter: blur(12px);
 }
 
 .stat-card span {
@@ -382,6 +421,45 @@ body {
 
 .stat-card-wide {
     grid-column: span 2;
+}
+
+.stat-card-drinks {
+    grid-column: span 2;
+    align-content: start;
+}
+
+.drink-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.drink-stat {
+    min-height: 92px;
+    display: grid;
+    align-content: space-between;
+    gap: 10px;
+    padding: 14px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(255, 255, 255, .42), transparent 42%),
+        rgba(247, 250, 253, .58);
+    border: 1px solid rgba(184, 204, 228, .62);
+    border-radius: 8px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .58),
+        0 10px 24px rgba(8, 18, 32, .08);
+}
+
+.drink-stat span {
+    color: #5f6d7d;
+    font-size: 13px;
+    line-height: 1.25;
+}
+
+.drink-stat strong {
+    color: #20242a;
+    font-size: 30px;
+    line-height: 1;
 }
 
 .admin-filters {
@@ -425,7 +503,8 @@ body {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 8px;
-    box-shadow: 0 14px 36px rgba(32, 36, 42, 0.06);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.14);
+    backdrop-filter: blur(12px);
 }
 
 .admin-table-wrap {
@@ -451,7 +530,7 @@ body {
     color: #68707c;
     font-size: 12px;
     text-transform: uppercase;
-    background: #fafbfc;
+    background: rgba(218, 228, 239, .86);
 }
 
 .admin-table td {
@@ -541,6 +620,10 @@ h1 {
     .stats-grid,
     .stat-card-wide {
         grid-template-columns: 1fr;
+        grid-column: auto;
+    }
+
+    .stat-card-drinks {
         grid-column: auto;
     }
 

@@ -20,6 +20,25 @@ function e(?string $value): string
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
+function safeGreetingCode(string $code): string
+{
+    return preg_replace('/[^a-zA-Z0-9_-]/', '_', $code) ?: 'guest';
+}
+
+function findVideoGreeting(string $directory, string $safeCode): ?string
+{
+    $matches = glob($directory . '/' . $safeCode . '.*') ?: [];
+    sort($matches, SORT_NATURAL);
+
+    foreach ($matches as $match) {
+        if (is_file($match)) {
+            return $match;
+        }
+    }
+
+    return null;
+}
+
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $path = strtok($_SERVER['REQUEST_URI'] ?? '/ticket.php', '?') ?: '/ticket.php';
@@ -32,6 +51,7 @@ $aboutUrl = $scheme . '://' . $host . $aboutPath . '?code=' . urlencode($code);
 $telegramConfig = is_file(__DIR__ . '/config/telegram.php') ? require __DIR__ . '/config/telegram.php' : [];
 $telegramBotUsername = ltrim((string)($telegramConfig['bot_username'] ?? 'Hive_KPP_System_bot'), '@');
 $telegramVideoUrl = (string)($telegramConfig['video_group_url'] ?? $telegramConfig['group_url'] ?? '');
+$telegramGalleryUrl = 'https://t.me/+uS_pxorqzKxkZmVi';
 
 if ($telegramVideoUrl === '') {
     $telegramVideoUrl = 'https://t.me/' . rawurlencode($telegramBotUsername);
@@ -43,7 +63,61 @@ $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
     . '&details=' . rawurlencode('Весілля Ростислава та Катерини');
 $photoFiles = [];
 $photoDirectory = __DIR__ . '/assets/foto';
+$videoGreetingDirectory = __DIR__ . '/assets/video_greetings';
 $styleVersion = (string)(@filemtime(__DIR__ . '/assets/css/style.css') ?: time());
+$videoGreetingMessage = '';
+$videoGreetingError = '';
+$safeInviteCode = safeGreetingCode($code);
+
+if ($guest !== null && ($guest->status === 'declined' || (int)$guest->will_attend === 0) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $videoAction = (string)($_POST['video_action'] ?? '');
+
+    if (!is_dir($videoGreetingDirectory)) {
+        mkdir($videoGreetingDirectory, 0775, true);
+    }
+
+    if ($videoAction === 'delete_video') {
+        $existingVideo = findVideoGreeting($videoGreetingDirectory, $safeInviteCode);
+
+        if ($existingVideo !== null && unlink($existingVideo)) {
+            $videoGreetingMessage = 'Відеопривітання видалено. Ви можете записати або завантажити нове.';
+        } else {
+            $videoGreetingError = 'Не вдалося знайти відеопривітання для видалення.';
+        }
+    }
+
+    if ($videoAction === 'upload_video') {
+        $uploadedFile = $_FILES['video_greeting'] ?? null;
+        $allowedExtensions = ['mp4', 'mov', 'webm', 'm4v'];
+
+        if (!is_array($uploadedFile) || (int)($uploadedFile['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            $videoGreetingError = 'Оберіть або запишіть відео перед надсиланням.';
+        } elseif ((int)$uploadedFile['error'] !== UPLOAD_ERR_OK) {
+            $videoGreetingError = 'Не вдалося завантажити відео. Спробуйте ще раз.';
+        } else {
+            $originalName = (string)($uploadedFile['name'] ?? '');
+            $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+
+            if (!in_array($extension, $allowedExtensions, true)) {
+                $videoGreetingError = 'Підтримуються відео у форматах MP4, MOV, WEBM або M4V.';
+            } else {
+                $existingVideo = findVideoGreeting($videoGreetingDirectory, $safeInviteCode);
+
+                if ($existingVideo !== null) {
+                    unlink($existingVideo);
+                }
+
+                $targetPath = $videoGreetingDirectory . '/' . $safeInviteCode . '.' . $extension;
+
+                if (move_uploaded_file((string)$uploadedFile['tmp_name'], $targetPath)) {
+                    $videoGreetingMessage = 'Дякуємо, відеопривітання збережено.';
+                } else {
+                    $videoGreetingError = 'Не вдалося зберегти відео. Спробуйте ще раз.';
+                }
+            }
+        }
+    }
+}
 
 if (is_dir($photoDirectory)) {
     $files = glob($photoDirectory . '/*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE) ?: [];
@@ -63,6 +137,9 @@ if ($photoFiles !== []) {
     $photoGroups[0] = array_slice($photoFiles, 0, $splitIndex);
     $photoGroups[1] = array_slice($photoFiles, $splitIndex);
 }
+
+$videoGreetingPath = $guest !== null ? findVideoGreeting($videoGreetingDirectory, $safeInviteCode) : null;
+$videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/' . basename($videoGreetingPath) : null;
 ?>
 <!doctype html>
 <html lang="uk" class="no-js">
@@ -87,9 +164,35 @@ if ($photoFiles !== []) {
             <section class="welcome reveal pass-declined-card">
                 <p class="eyebrow">Дякуємо за відповідь</p>
                 <h1><?= e($guest->name) ?>,</h1>
-                <p>Нам шкода, що ви не зможете бути з нами.</p>
-                <p>Ми дуже хотіли б, щоб ви були присутні поруч у цей день. Якщо матимете бажання, запишіть коротке відеопривітання для нас і надішліть його в Telegram-групу.</p>
-                <a class="section-action pass-about-button" href="<?= e($telegramVideoUrl) ?>" target="_blank" rel="noreferrer">Надіслати відеопривітання</a>
+                <p>Ми дуже хотіли б, щоб ви були присутні поруч у цей день. Якщо матимете бажання, запишіть коротке відеопривітання для нас або надішліть готове відео з галереї.</p>
+                <div class="pass-video-greeting">
+                    <h2>Відеопривітання</h2>
+                    <?php if ($videoGreetingMessage !== ''): ?>
+                        <p class="pass-form-status"><?= e($videoGreetingMessage) ?></p>
+                    <?php endif; ?>
+                    <?php if ($videoGreetingError !== ''): ?>
+                        <p class="pass-form-status pass-form-status--error"><?= e($videoGreetingError) ?></p>
+                    <?php endif; ?>
+                    <?php if ($videoGreetingRelative !== null): ?>
+                        <video class="pass-video-preview" controls preload="metadata" src="<?= e($videoGreetingRelative) ?>"></video>
+                    <?php endif; ?>
+                    <form class="pass-video-form" action="<?= e($ticketUrl) ?>" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="video_action" value="upload_video">
+                        <label class="pass-file-picker">
+                            <span class="pass-file-picker__title">Записати або обрати відео</span>
+                            <input class="pass-video-file-input" type="file" name="video_greeting" accept="video/mp4,video/quicktime,video/webm,video/x-m4v" capture="user" data-file-input required>
+                            <span class="pass-file-picker__control">Обрати відео</span>
+                            <span class="pass-file-picker__name" data-file-name>Файл не обрано</span>
+                        </label>
+                        <button class="section-action pass-about-button" type="submit"><?= $videoGreetingRelative !== null ? 'Замінити відеопривітання' : 'Надіслати відеопривітання' ?></button>
+                    </form>
+                    <?php if ($videoGreetingRelative !== null): ?>
+                        <form action="<?= e($ticketUrl) ?>" method="post">
+                            <input type="hidden" name="video_action" value="delete_video">
+                            <button class="section-action btn-o" type="submit">Видалити відеопривітання</button>
+                        </form>
+                    <?php endif; ?>
+                </div>
                 <a class="section-action btn-o" href="<?= e($inviteUrl) ?>">Повернутися до запрошення</a>
             </section>
         <?php else: ?>
@@ -113,15 +216,29 @@ if ($photoFiles !== []) {
                 <section class="wedding-pass pass-card reveal" data-confetti-on-load>
                     <span class="pass-glow pass-glow--one" aria-hidden="true"></span>
                     <span class="pass-glow pass-glow--two" aria-hidden="true"></span>
+                    <span class="pass-cross-star pass-cross-star--one" aria-hidden="true"></span>
+                    <span class="pass-cross-star pass-cross-star--two" aria-hidden="true"></span>
+                    <span class="pass-cross-star pass-cross-star--three" aria-hidden="true"></span>
+                    <span class="pass-cross-star pass-cross-star--four" aria-hidden="true"></span>
+                    <span class="pass-cross-star pass-cross-star--five" aria-hidden="true"></span>
                     <img class="pass-symbol pass-symbol--planet" src="assets/img/bck/little_prince_transparent_planet.png" alt="" aria-hidden="true">
                     <img class="pass-symbol pass-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">
                     <div class="pass-main">
-                        <p class="eyebrow">Wedding Pass</p>
                         <h1><?= e($guest->name) ?> <?php if ((int)$guest->plus_one === 1 && !empty($guest->plus_one_name)): ?>
                                 та <?= e($guest->plus_one_name) ?>
                             <?php endif; ?>
                         </h1>
                         <p class="pass-note">Дякуємо, що ви готові поринути разом із нами у цю зоряну подорож любові, музики й теплих спогадів.</p>
+
+                        <div class="pass-countdown">
+                            <p>Наша зірка готова засяяти на небосхилі, через:</p>
+                            <div class="pass-countdown__timer" data-countdown="2026-08-01T15:00:00">
+                                <div><strong data-days>00</strong><span>днів</span></div>
+                                <div><strong data-hours>00</strong><span>годин</span></div>
+                                <div><strong data-minutes>00</strong><span>хвилин</span></div>
+                                <div><strong data-seconds>00</strong><span>секунд</span></div>
+                            </div>
+                        </div>
 
                         <dl class="pass-details">
                             <div>
@@ -132,7 +249,7 @@ if ($photoFiles !== []) {
                                 <dt>Місце</dt>
                                 <dd>Петрівський Бровар, Київська область</dd>
                             </div>
-                            <?php if (!empty($guest->table_number)): ?>
+                            <!-- <?php if (!empty($guest->table_number)): ?>
                                 <div>
                                     <dt>Стіл</dt>
                                     <dd><?= e($guest->table_number) ?></dd>
@@ -141,7 +258,7 @@ if ($photoFiles !== []) {
                             <div>
                                 <dt>Статус</dt>
                                 <dd>Зустрінемось на Весіллі</dd>
-                            </div>
+                            </div>-->
                         </dl>
                     </div>
 
@@ -151,18 +268,22 @@ if ($photoFiles !== []) {
                     </div>-->
                     <div class="pass-qr">
 
-                            <span class="ticket__stub-label">Покажіть цей код на весіллі.</span>
-                            <span class="ticket__barcode" aria-hidden="true"></span>
-                            <span class="ticket__barcode-num"><?= e($ticketNumber) ?></span>
-  
-                        </div>
-                            
+                        <span class="ticket__stub-label">Покажіть цей код на весіллі.</span>
+                        <span class="ticket__barcode" aria-hidden="true"></span>
+                        <span class="ticket__barcode-num"><?= e($ticketNumber) ?></span>
+
+                    </div>
+
 
                     <div class="pass-actions">
-                        <a class="section-action pass-about-button" href="<?= e($aboutUrl) ?>">Про нас</a>
-                        <a class="section-action" href="<?= e($inviteUrl) ?>">В запрошення</a>
+                        <a class="section-action pass-about-button" href="<?= e($aboutUrl) ?>">Трохи нас</a>
+                        <!--  <a class="section-action" href="<?= e($inviteUrl) ?>">В запрошення</a>-->
                         <a class="section-action btn-o" href="<?= e($calendarUrl) ?>" target="_blank" rel="noreferrer">Додати до календаря</a>
 
+                    </div>
+                    <div class="pass-share-block">
+                        <p>Будемо раді, якщо ви додатково зможете зробити фото/відео записи весілля і поділитесь ними з нами в окремій групі Telegram.</p>
+                        <a class="section-action btn-o" href="<?= e($telegramGalleryUrl) ?>" target="_blank" rel="noreferrer">Група в Telegram</a>
                     </div>
                 </section>
 

@@ -8,6 +8,18 @@ const musicButton = document.querySelector('[data-music-toggle]');
 const bgMusic = document.querySelector('[data-bg-music]');
 let bgMusicPendingGesture = false;
 
+document.querySelectorAll('[data-file-input]').forEach((input) => {
+    const fileName = input.closest('label')?.querySelector('[data-file-name]');
+
+    if (!fileName) {
+        return;
+    }
+
+    input.addEventListener('change', () => {
+        fileName.textContent = input.files?.[0]?.name || 'Файл не обрано';
+    });
+});
+
 function buildStars(container, count) {
     if (!container) {
         return;
@@ -77,6 +89,20 @@ function buildSplashStarbursts(container, count) {
     }
 }
 
+function randomizeSplashComet(comet) {
+    const width = 50 + Math.random() * 100;
+    const dropVh = 10 + Math.random() * 20;
+    const travelX = window.innerWidth + 300;
+    const travelY = window.innerHeight * (dropVh / 100);
+    const angle = Math.atan2(travelY, travelX) * (180 / Math.PI);
+
+    comet.style.top = `${3 + Math.random() * 50}%`;
+    comet.style.width = `${width}px`;
+    comet.style.setProperty('--cd', `${3 + Math.random() * 4}s`);
+    comet.style.setProperty('--a', `${angle}deg`);
+    comet.style.setProperty('--dy', `${dropVh}vh`);
+}
+
 function buildSplashComets(container, count) {
     if (!container) {
         return;
@@ -84,18 +110,29 @@ function buildSplashComets(container, count) {
 
     for (let i = 0; i < count; i++) {
         const comet = document.createElement('span');
-        const width = 50 + Math.random() * 100;
 
         comet.className = 'splash__comet';
         comet.style.left = '0';
-        comet.style.top = `${3 + Math.random() * 50}%`;
-        comet.style.width = `${width}px`;
-        comet.style.setProperty('--cd', `${3 + Math.random() * 4}s`);
         comet.style.setProperty('--cdel', `${i * 1.5 + Math.random() * 2}s`);
-        comet.style.setProperty('--a', `${20 + Math.random() * 15}deg`);
-        comet.style.setProperty('--dy', `${10 + Math.random() * 20}vh`);
+        randomizeSplashComet(comet);
+        comet.addEventListener('animationiteration', () => randomizeSplashComet(comet));
         container.appendChild(comet);
     }
+}
+
+function randomizeCosmicComet(comet, isCelestialInvite) {
+    const dropVh = isCelestialInvite ? 16 + Math.random() * 36 : 18 + Math.random() * 36;
+    const travelVw = 147;
+    const travelX = window.innerWidth * (travelVw / 100);
+    const travelY = window.innerHeight * (dropVh / 100);
+    const angle = Math.atan2(travelY, travelX) * (180 / Math.PI);
+
+    comet.style.left = `${-12 - Math.random() * 18}vw`;
+    comet.style.top = `${4 + Math.random() * 92}%`;
+    comet.style.setProperty('--tail', isCelestialInvite ? `${90 + Math.random() * 130}px` : `${90 + Math.random() * 90}px`);
+    comet.style.setProperty('--angle', `${angle}deg`);
+    comet.style.setProperty('--drop', `${dropVh}vh`);
+    comet.style.setProperty('--duration', isCelestialInvite ? `${6 + Math.random() * 5.5}s` : `${5.5 + Math.random() * 4.5}s`);
 }
 
 function buildCosmicEffects(container) {
@@ -106,7 +143,7 @@ function buildCosmicEffects(container) {
     const isCelestialInvite = document.body.classList.contains('celestial-theme');
     const starCount = isCelestialInvite ? 18 : 44;
     const dustCount = isCelestialInvite ? 0 : 38;
-    const cometCount = isCelestialInvite ? 5 : 7;
+    const cometCount = isCelestialInvite ? 7 : 9;
     const orbCount = isCelestialInvite ? 4 : 12;
 
     for (let i = 0; i < starCount; i++) {
@@ -139,14 +176,11 @@ function buildCosmicEffects(container) {
 
     for (let i = 0; i < cometCount; i++) {
         const comet = document.createElement('span');
+
         comet.className = 'cosmic-comet';
-        comet.style.left = `${-12 - Math.random() * 18}vw`;
-        comet.style.top = `${4 + Math.random() * 92}%`;
-        comet.style.setProperty('--tail', isCelestialInvite ? `${90 + Math.random() * 130}px` : `${90 + Math.random() * 90}px`);
-        comet.style.setProperty('--angle', `${20 + Math.random() * 16}deg`);
-        comet.style.setProperty('--drop', isCelestialInvite ? `${16 + Math.random() * 36}vh` : `${18 + Math.random() * 36}vh`);
-        comet.style.setProperty('--duration', isCelestialInvite ? `${6 + Math.random() * 5.5}s` : `${5.5 + Math.random() * 4.5}s`);
         comet.style.setProperty('--delay', `${i * (isCelestialInvite ? 3.2 : 2.8) + Math.random() * 5}s`);
+        randomizeCosmicComet(comet, isCelestialInvite);
+        comet.addEventListener('animationiteration', () => randomizeCosmicComet(comet, isCelestialInvite));
         container.appendChild(comet);
     }
 

@@ -105,10 +105,7 @@ foreach ($drinkStatsRows as $row) {
                 <span>Ще не відповіли</span>
                 <strong><?= $stats['notAnswered'] ?></strong>
             </article>
-
-            <br>
-
-            <article class="stat-card ">
+            <article class="stat-card stat-card-drinks">
                 <span>Кількість осіб по напоям</span>
                 <?php if ($drinkStats === []): ?>
                     <p class="admin-muted">Поки немає підтверджених відповідей з обраними напоями.</p>

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 require_once __DIR__ . '/bootstrap.php';
@@ -55,7 +56,9 @@ $chapters = [
     ['title' => 'Рішення', 'text' => 'Одного дня стало зрозуміло: це вже не просто спільний шлях, а бажання будувати майбутнє як сімʼя.'],
     ['title' => 'Поруч із вами', 'text' => 'У нашій історії є люди, без яких вона була б іншою. Саме тому нам важливо розділити цей день із близькими.'],
     ['title' => 'Перед святом', 'text' => 'Ми зберігаємо хвилювання і передчуття дня, у якому буде багато любові, музики, обіймів і світла.'],
-    ['title' => 'Далі разом', 'text' => 'Весілля стане не фіналом історії, а її новою главою. І нам радісно починати її поруч із вами.'],
+    ['title' => 'Майбутнє', 'text' => 'Що б не сталося, ми віримо, що найкраще ще попереду, і з нетерпінням чекаємо на всі пригоди, радості та виклики, які ми зустрінемо разом.'],
+    ['title' => 'Що далі', 'text' => 'Весілля — це не кінець, а початок нашої спільної історії. Ми з нетерпінням чекаємо на всі моменти, які попереду, і раді розділити їх із вами.'],
+    ['title' => 'Далі разом', 'text' => 'А далі — це вже наша спільна дорога, на якій ми хочемо бути поруч із вами, розділяючи радість, підтримку і любов у кожному кроці.'],
 ];
 
 $storyItems = [];
@@ -83,7 +86,7 @@ foreach ($chapters as $index => $chapter) {
     <link rel="stylesheet" href="assets/css/style_about.css?v=<?= e($aboutStyleVersion) ?>">
 </head>
 
-<body class="about-page about-orbit-page">
+<body class="about-page2 about-orbit-page">
     <main class="about-orbit" data-about-orbit aria-label="Наша історія">
         <div class="about-orbit__stars" aria-hidden="true"></div>
 
@@ -118,31 +121,56 @@ foreach ($chapters as $index => $chapter) {
             const back = document.querySelector('[data-about-back]');
             const count = document.querySelector('[data-about-count]');
             let index = 0;
+            let previousIndex = 0;
+
+            const syncMobileSceneHeight = () => {
+                const activeSlide = slides[index];
+
+                if (activeSlide && window.matchMedia('(max-width: 820px)').matches) {
+                    activeSlide.parentElement.style.minHeight = `${activeSlide.offsetHeight}px`;
+                } else if (activeSlide) {
+                    activeSlide.parentElement.style.minHeight = '';
+                }
+            };
 
             const render = (direction = 1) => {
+                const directionClass = direction > 0 ? 'is-orbit-next' : 'is-orbit-prev';
+                document.body.classList.toggle('is-about-next', direction > 0);
+                document.body.classList.toggle('is-about-prev', direction < 0);
+
                 slides.forEach((slide, slideIndex) => {
+                    slide.classList.remove('is-exiting-left', 'is-exiting-right', 'is-orbit-next', 'is-orbit-prev');
                     slide.classList.toggle('is-active', slideIndex === index);
-                    slide.classList.toggle('is-exiting-left', slideIndex !== index && direction > 0);
-                    slide.classList.toggle('is-exiting-right', slideIndex !== index && direction < 0);
+
+                    if (slideIndex === previousIndex && previousIndex !== index) {
+                        slide.classList.add(direction > 0 ? 'is-exiting-left' : 'is-exiting-right');
+                    } else if (slideIndex !== index) {
+                        slide.classList.add(directionClass);
+                    }
                 });
 
                 back?.classList.toggle('is-visible', index === 0 || index === slides.length - 1);
                 if (count) {
                     count.textContent = `${index + 1} / ${slides.length}`;
                 }
+
+                requestAnimationFrame(syncMobileSceneHeight);
             };
 
             prev?.addEventListener('click', () => {
+                previousIndex = index;
                 index = (index - 1 + slides.length) % slides.length;
                 render(-1);
             });
 
             next?.addEventListener('click', () => {
+                previousIndex = index;
                 index = (index + 1) % slides.length;
                 render(1);
             });
 
             render();
+            window.addEventListener('resize', syncMobileSceneHeight);
         })();
     </script>
 </body>
