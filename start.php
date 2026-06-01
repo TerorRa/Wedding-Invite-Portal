@@ -124,7 +124,7 @@ $introDurationMs = (int)(($finalDelaySeconds + 1.4) * 1000);
 $guestName = $guest !== null ? trim((string)$guest->name) : '';
 ?>
 <!doctype html>
-<html lang="uk" class="no-js">
+<html lang="uk" class="no-js start-root">
 
 <head>
     <meta charset="utf-8">
@@ -154,6 +154,10 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
                 data-intro-scene
                 data-intro-duration="<?= $introDurationMs ?>"
                 style="--photo-count: <?= $photoCount ?>; --ring-delay: <?= e(number_format($ringDelaySeconds, 2, '.', '')) ?>s; --final-delay: <?= e(number_format($finalDelaySeconds, 2, '.', '')) ?>s;">
+                <div class="start-starfield" aria-hidden="true"></div>
+                <div class="start-starbursts" aria-hidden="true"></div>
+                <div class="start-comets" aria-hidden="true"></div>
+                <img class="intro-moon" src="<?= e(assetUrl('assets/img/bck/little_prince_transparent_moon.png')) ?>" alt="" aria-hidden="true">
                 <div class="intro-sky" aria-hidden="true">
                     <span class="intro-star intro-star--one"></span>
                     <span class="intro-star intro-star--two"></span>
@@ -162,7 +166,7 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
                     <span class="intro-orbit intro-orbit--two"></span>
                 </div>
 
-                <a class="intro-skip" href="<?= e($inviteUrl) ?>">Пропустити вступ</a>
+                <button type="button" class="intro-skip" data-skip-intro>Пропустити вступ</button>
 
                 <?php if ($introPhotos !== []): ?>
                     <div class="memory-stage" aria-hidden="true">
@@ -185,16 +189,23 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
 
                 <div class="intro-final" data-intro-final>
                     <p class="start-eyebrow"><?= $guestName !== '' ? e($guestName) . ',' : 'Дорогий гостю,' ?></p>
-                    <h1>Скоро наше Весілля!</h1>
-                    <p>Ми хочемо запросити вас на день, у якому народиться наша сімʼя.</p>
+                    <div class="intro-copy">
+                        <p style="margin:0 0 10px;">Здавна люди вірили, що кожна зірка на небі — це чиясь доля.</p>
+                        <span class="intro-shine-star" aria-hidden="true"></span>
+                        <p style="margin:0 0 10px;">Дві долі, що знайшли одна одну, зливаються в одне світло — і на небосхилі спалахує нова зірочка.</p>
+                        <p style="margin:0 0 10px;">Незабаром така з'явиться і в нас.</p>
+                        <p style="margin:0;">Хочемо, щоб саме ви були поруч,<br>коли вона засяє вперше. ✨</p>
+                    </div>
                     <div class="intro-actions">
-                        <a class="intro-btn intro-btn--primary" href="<?= e($inviteUrl) ?>">Відкрити запрошення</a>
-                        <a class="intro-btn" href="<?= e($aboutUrl) ?>">Наша історія</a>
+                        <a class="intro-btn intro-btn--primary" href="<?= e($inviteUrl) ?>" data-open-start>Відкрити запрошення</a>
                     </div>
                 </div>
             </section>
         <?php endif; ?>
     </main>
+    <audio data-shine-sound preload="auto">
+        <source src="<?= e(assetUrl('assets/audio/shine.mp3')) ?>" type="audio/mpeg">
+    </audio>
     <script src="<?= e(assetUrl('assets/js/start.js')) ?>?v=<?= e($scriptVersion) ?>"></script>
 </body>
 

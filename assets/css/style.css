@@ -976,6 +976,43 @@ body::before {
     filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
 }
 
+.night-cross-star {
+    position: absolute;
+    z-index: 1;
+    width: var(--size, 14px);
+    height: var(--size, 14px);
+    pointer-events: none;
+    opacity: var(--alpha, .72);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, .96) 0 10%, rgba(255, 255, 255, .34) 12% 24%, transparent 34%);
+    filter:
+        drop-shadow(0 0 5px rgba(255, 255, 255, .78))
+        drop-shadow(0 0 16px rgba(184, 204, 228, .34));
+    transform: translate(-50%, -50%) scale(.78);
+    animation: nightCrossShine var(--duration, 5s) ease-in-out var(--delay, 0s) infinite;
+}
+
+.night-cross-star::before,
+.night-cross-star::after {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    content: "";
+    border-radius: 999px;
+    transform: translate(-50%, -50%);
+}
+
+.night-cross-star::before {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, .28) 28%, #fff 50%, rgba(255, 255, 255, .28) 72%, transparent 100%);
+}
+
+.night-cross-star::after {
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, .28) 28%, #fff 50%, rgba(255, 255, 255, .28) 72%, transparent 100%);
+}
+
 .splash__comet {
     position: absolute;
     z-index: 1;
@@ -3132,6 +3169,48 @@ dd {
     border: 0;
 }
 
+body:has(.pass-shell) {
+    background:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, .07), transparent 24%),
+        radial-gradient(circle at 100% 0%, rgba(184, 204, 228, .08), transparent 28%),
+        linear-gradient(180deg, #07101f 0%, #0b1728 52%, #14233a 100%);
+}
+
+.pass-shell {
+    color: #f5f0e8;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(234, 217, 165, .1), transparent 36%),
+        linear-gradient(180deg, #07101f 0%, #0b1728 52%, #14233a 100%);
+}
+
+.pass-card,
+.pass-declined-card {
+    border: 1px solid rgba(234, 217, 165, .34);
+    background:
+        radial-gradient(circle at 50% 0%, rgba(234, 217, 165, .14), transparent 48%),
+        linear-gradient(180deg, rgba(20, 31, 50, .82), rgba(5, 9, 20, .92));
+    box-shadow:
+        0 28px 80px rgba(0, 0, 0, .38),
+        inset 0 1px 0 rgba(255, 244, 210, .12);
+    backdrop-filter: blur(14px);
+}
+
+.pass-declined-card {
+    width: min(680px, 100%);
+    padding: clamp(28px, 5vw, 48px);
+    text-align: center;
+    border-radius: 28px;
+}
+
+.pass-declined-card h1,
+.pass-declined-card p {
+    color: rgba(245, 240, 232, .9);
+}
+
+.pass-declined-card .section-action {
+    margin: 8px;
+}
+
 .pass-copy-button:hover {
     background: linear-gradient(135deg, #d6b15c, #8d7038);
     color: #fff;
@@ -3276,6 +3355,45 @@ dd {
     to {
         opacity: 1;
         transform: scale(1.35);
+    }
+}
+
+@keyframes nightCrossShine {
+    0%,
+    100% {
+        opacity: calc(var(--alpha, .72) * .46);
+        transform: translate(-50%, -50%) scale(.62);
+        filter:
+            drop-shadow(0 0 3px rgba(255, 255, 255, .5))
+            drop-shadow(0 0 10px rgba(184, 204, 228, .18));
+    }
+
+    48% {
+        opacity: var(--alpha, .72);
+        transform: translate(-50%, -50%) scale(1.35);
+        filter:
+            drop-shadow(0 0 7px rgba(255, 255, 255, .95))
+            drop-shadow(0 0 20px rgba(184, 204, 228, .48));
+    }
+}
+
+@keyframes inviteRoundStarPulse {
+    0%,
+    100% {
+        opacity: calc(var(--alpha, .72) * .48);
+        transform: scale(.88);
+    }
+
+    50% {
+        opacity: var(--alpha, .72);
+        transform: scale(1.12);
+    }
+}
+
+@keyframes inviteMoonFloat {
+    to {
+        opacity: .72;
+        transform: translate3d(8px, -10px, 0);
     }
 }
 
@@ -4206,5 +4324,422 @@ dd {
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
+    }
+}
+
+.celestial-theme {
+    background: #07101f;
+}
+
+.celestial-theme .invite-content {
+    background:
+        linear-gradient(180deg,
+            #07101f 0%,
+            #0b1728 18%,
+            #14233a 34%,
+            #314e73 48%,
+            #7898bb 62%,
+            #dbe7f2 78%,
+            #eef3f6 100%);
+}
+
+.celestial-theme .hero,
+.celestial-theme section.hero.sec.reveal {
+    color: #f5f0e8;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, .07), transparent 24%),
+        radial-gradient(circle at 100% 0%, rgba(184, 204, 228, .08), transparent 28%),
+        radial-gradient(circle at 50% 100%, rgba(41, 68, 104, .3), transparent 44%),
+        linear-gradient(180deg, #07101f 0%, #0b1728 48%, #14233a 82%, #172945 100%) !important;
+}
+
+.celestial-theme section.hero.sec.reveal::after {
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    z-index: 1;
+    height: clamp(160px, 24vh, 260px);
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(20, 35, 58, 0) 0%, rgba(20, 35, 58, .72) 52%, #14233a 100%);
+}
+
+.celestial-theme section.hero.sec.reveal .hero-content {
+    z-index: 3;
+}
+
+.celestial-theme .hero__img-wrap::before {
+    width: 128%;
+    height: 118%;
+    background: radial-gradient(ellipse 58% 64% at 50% 48%, rgba(255, 255, 255, .28) 0%, rgba(184, 204, 228, .13) 34%, transparent 68%);
+    filter: blur(14px);
+}
+
+.celestial-theme .hero__img-wrap::after {
+    bottom: -10px;
+    width: 76%;
+    height: 22px;
+    background: radial-gradient(ellipse at center, rgba(184, 204, 228, .2) 0%, rgba(184, 204, 228, .08) 42%, transparent 72%);
+    filter: blur(8px);
+}
+
+.celestial-theme .hero__img {
+    filter: drop-shadow(0 0 22px rgba(184, 204, 228, .22));
+    -webkit-mask-image: none;
+    mask-image: none;
+}
+
+.celestial-theme .hero .starfield i {
+    background: rgba(255, 255, 255, var(--alpha, .75));
+    box-shadow:
+        0 0 5px rgba(255, 255, 255, .5),
+        0 0 13px rgba(184, 204, 228, .22);
+    animation: inviteRoundStarPulse var(--duration, 6s) ease-in-out var(--delay, 0s) infinite;
+}
+
+.celestial-theme .hero .night-cross-star {
+    animation: nightCrossShine var(--duration, 5s) ease-in-out var(--delay, 0s) infinite;
+}
+
+.celestial-theme .hero-moon.hero-moon--image {
+    top: clamp(70px, 10vh, 120px);
+    left: clamp(32px, 9vw, 170px);
+    width: clamp(58px, 8vw, 110px);
+    height: auto;
+    border-radius: 0;
+    opacity: .6;
+    box-shadow: none;
+    filter: drop-shadow(0 0 22px rgba(255, 255, 255, .28));
+    animation: inviteMoonFloat 9s ease-in-out infinite alternate;
+}
+
+.celestial-theme .cosmic-effects {
+    opacity: .72;
+}
+
+.celestial-theme .cosmic-dust {
+    display: none;
+}
+
+.celestial-theme .cosmic-comet {
+    background: linear-gradient(90deg, transparent, rgba(184, 204, 228, .16), rgba(255, 255, 255, .96));
+    box-shadow:
+        0 0 18px rgba(255, 255, 255, .58),
+        0 0 32px rgba(184, 204, 228, .28);
+    animation: cosmicComet var(--duration, 8s) linear var(--delay, 0s) infinite;
+}
+
+.celestial-theme .hero-pre,
+.celestial-theme .hero-names,
+.celestial-theme .hero-date,
+.celestial-theme .hero__motto {
+    color: rgba(245, 240, 232, .9);
+}
+
+.celestial-theme .hero-names span,
+.celestial-theme .hero-date small {
+    color: rgba(184, 204, 228, .72);
+}
+
+.celestial-theme .invitation-section,
+.celestial-theme section.invitation-section {
+    color: #f5f0e8;
+    margin-top: -1px;
+    background: linear-gradient(180deg, #14233a 0%, #182d49 42%, #203958 100%) !important;
+}
+
+.celestial-theme .invitation-section .t-h,
+.celestial-theme .invitation-section .inv__text,
+.celestial-theme .invitation-section .rose-scene p {
+    color: rgba(245, 240, 232, .88);
+}
+
+.celestial-theme .countdown-section,
+.celestial-theme section.countdown-section {
+    color: #f5f0e8;
+    background: linear-gradient(180deg, #203958 0%, #314e73 48%, #5d7fa5 100%) !important;
+}
+
+.celestial-theme .countdown-section .t-h,
+.celestial-theme .countdown-section .t-sub,
+.celestial-theme .countdown-section .t-scr {
+    color: rgba(245, 240, 232, .9);
+}
+
+.celestial-theme .location-section.sec--w,
+.celestial-theme section.location-section.sec--w {
+    background: linear-gradient(180deg, #5d7fa5 0%, #8fa9c3 46%, #a9bdd3 100%) !important;
+}
+
+.celestial-theme .program-section,
+.celestial-theme section.program-section {
+    background: linear-gradient(180deg, #a9bdd3 0%, #b8c9dc 52%, #c3d3e4 100%) !important;
+}
+
+.celestial-theme .dress-section,
+.celestial-theme section.dress-section {
+    background: linear-gradient(180deg, #c3d3e4 0%, #d4e0eb 46%, #dbe7f2 100%) !important;
+}
+
+.celestial-theme .gifts-section,
+.celestial-theme section.gifts-section {
+    background: linear-gradient(180deg, #dbe7f2 0%, #e8eff5 54%, #eef3f6 100%) !important;
+}
+
+.celestial-theme .rsvp-section,
+.celestial-theme section.rsvp-section {
+    background: linear-gradient(180deg, #eef3f6 0%, #f6f8fa 100%) !important;
+}
+
+.celestial-theme .t-scr {
+    color: rgba(234, 217, 165, .96);
+    text-shadow:
+        0 0 16px rgba(255, 255, 255, .22),
+        0 0 32px rgba(234, 217, 165, .18);
+}
+
+.celestial-theme .t-h {
+    color: #223a5a;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .42);
+}
+
+.celestial-theme .invitation-section .t-h,
+.celestial-theme .countdown-section .t-h {
+    color: #f5f0e8;
+    text-shadow:
+        0 0 22px rgba(255, 255, 255, .28),
+        0 0 48px rgba(184, 204, 228, .18);
+}
+
+.celestial-theme .location-section .t-h,
+.celestial-theme .program-section .t-h {
+    color: #f5f0e8;
+    text-shadow:
+        0 0 16px rgba(255, 255, 255, .25),
+        0 2px 12px rgba(15, 30, 52, .28);
+}
+
+.celestial-theme .location-section .t-sub,
+.celestial-theme .location-section p,
+.celestial-theme .program-section .t-sub,
+.celestial-theme .program-section p {
+    color: rgba(245, 240, 232, .84);
+}
+
+.celestial-theme .location-section .section-wrap {
+    color: #f5f0e8;
+    background: rgba(10, 22, 38, .34);
+    border-color: rgba(245, 240, 232, .24);
+    box-shadow: 0 28px 80px rgba(10, 20, 36, .22);
+    backdrop-filter: blur(10px);
+}
+
+.celestial-theme .location-card {
+    color: #f5f0e8;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(234, 217, 165, .13), transparent 48%),
+        linear-gradient(180deg, rgba(16, 34, 58, .74), rgba(8, 18, 32, .86));
+    border-color: rgba(245, 240, 232, .28);
+    box-shadow:
+        0 24px 70px rgba(10, 20, 36, .28),
+        inset 0 1px 0 rgba(255, 255, 255, .1);
+    backdrop-filter: blur(12px);
+}
+
+.celestial-theme .location-card h3,
+.celestial-theme .location-card__type,
+.celestial-theme .location-card__meta,
+.celestial-theme .location-card__meta p {
+    color: rgba(245, 240, 232, .92);
+}
+
+.celestial-theme .location-card__type {
+    color: rgba(234, 217, 165, .94);
+}
+
+.celestial-theme .location-card svg {
+    stroke: rgba(234, 217, 165, .92);
+}
+
+.celestial-theme .location-card .btn,
+.celestial-theme .location-card .btn-o {
+    color: rgba(245, 240, 232, .94);
+    background: rgba(255, 255, 255, .08);
+    border-color: rgba(234, 217, 165, .58);
+    box-shadow:
+        0 0 22px rgba(234, 217, 165, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+.celestial-theme .location-card .btn:hover,
+.celestial-theme .location-card .btn:focus-visible,
+.celestial-theme .location-card .btn-o:hover,
+.celestial-theme .location-card .btn-o:focus-visible {
+    color: #fff7dc;
+    background: rgba(234, 217, 165, .16);
+    border-color: rgba(255, 242, 190, .84);
+}
+
+.celestial-theme .location-card .btn svg,
+.celestial-theme .location-card .btn-o svg {
+    stroke: currentColor;
+}
+
+.celestial-theme .location-section .section-wrap p,
+.celestial-theme .location-section .section-wrap a,
+.celestial-theme .location-section .section-wrap h3 {
+    color: rgba(245, 240, 232, .9);
+}
+
+.celestial-theme .program-point h3,
+.celestial-theme .program-point p,
+.celestial-theme .program-point small,
+.celestial-theme .program-point:nth-child(odd) h3,
+.celestial-theme .program-point:nth-child(odd) p,
+.celestial-theme .program-point:nth-child(odd) small,
+.celestial-theme .program-point:nth-child(even) h3,
+.celestial-theme .program-point:nth-child(even) p,
+.celestial-theme .program-point:nth-child(even) small {
+    color: #1f3655;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .36);
+}
+
+.celestial-theme .program-point::before,
+.celestial-theme .program-point:nth-child(odd)::before,
+.celestial-theme .program-point:nth-child(even)::before {
+    color: #f5f0e8;
+    text-shadow: 0 0 16px rgba(255, 255, 255, .34);
+}
+
+.celestial-theme .dress-section .t-scr,
+.celestial-theme .gifts-section .t-scr,
+.celestial-theme .rsvp-section .t-scr {
+    color: #9a8756;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .48);
+}
+
+.celestial-theme .dress__text,
+.celestial-theme .dress__note,
+.celestial-theme .gifts-section p,
+.celestial-theme .rsvp-section p {
+    color: #405a78;
+}
+
+.celestial-theme .sec .t-scr {
+    color: #9a8756;
+    font-family: "Great Vibes", cursive;
+    font-size: clamp(30px, 5.2vw, 40px);
+    line-height: 1;
+    letter-spacing: 0;
+    text-shadow:
+        0 1px 0 rgba(255, 255, 255, .5),
+        0 0 24px rgba(234, 217, 165, .24);
+}
+
+.celestial-theme .sec .t-h {
+    color: #223a5a;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: clamp(31px, 5.4vw, 46px);
+    font-weight: 500;
+    letter-spacing: .015em;
+    text-shadow:
+        0 1px 0 rgba(255, 255, 255, .48),
+        0 10px 28px rgba(34, 58, 90, .1);
+}
+
+.celestial-theme .invitation-section .t-scr,
+.celestial-theme .countdown-section .t-scr,
+.celestial-theme .location-section .t-scr,
+.celestial-theme .program-section .t-scr {
+    color: rgba(234, 217, 165, .96);
+    text-shadow:
+        0 0 18px rgba(255, 255, 255, .18),
+        0 0 34px rgba(234, 217, 165, .22);
+}
+
+.celestial-theme .invitation-section .t-h,
+.celestial-theme .countdown-section .t-h,
+.celestial-theme .location-section .t-h,
+.celestial-theme .program-section .t-h {
+    color: #f5f0e8;
+    text-shadow:
+        0 0 18px rgba(255, 255, 255, .28),
+        0 2px 14px rgba(15, 30, 52, .32);
+}
+
+.celestial-theme .program-section .t-scr,
+.celestial-theme .dress-section .t-scr,
+.celestial-theme .gifts-section .t-scr,
+.celestial-theme .rsvp-section .t-scr {
+    color: #8f7746;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .64);
+}
+
+.celestial-theme .program-section .t-h,
+.celestial-theme .dress-section .t-h,
+.celestial-theme .gifts-section .t-h,
+.celestial-theme .rsvp-section .t-h {
+    color: #203854;
+    text-shadow:
+        0 1px 0 rgba(255, 255, 255, .66),
+        0 8px 24px rgba(32, 56, 84, .12);
+}
+
+.celestial-theme .program-point {
+    background: transparent;
+    box-shadow: none;
+}
+
+.celestial-theme .program-point::before {
+    background: rgba(246, 250, 253, .86);
+    border-color: rgba(234, 217, 165, .5);
+    box-shadow:
+        0 18px 44px rgba(32, 56, 84, .1),
+        inset 0 1px 0 rgba(255, 255, 255, .64);
+}
+
+.celestial-theme .program-point h3,
+.celestial-theme .program-point p,
+.celestial-theme .program-point small,
+.celestial-theme .program-point:nth-child(odd) h3,
+.celestial-theme .program-point:nth-child(odd) p,
+.celestial-theme .program-point:nth-child(odd) small,
+.celestial-theme .program-point:nth-child(even) h3,
+.celestial-theme .program-point:nth-child(even) p,
+.celestial-theme .program-point:nth-child(even) small {
+    color: #203854;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .54);
+}
+
+.celestial-theme .dress__text,
+.celestial-theme .dress__note {
+    color: #2f4b6a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .celestial-theme .hero .starfield i {
+        animation: inviteRoundStarPulse var(--duration, 6s) ease-in-out var(--delay, 0s) infinite !important;
+    }
+
+    .celestial-theme .hero .night-cross-star {
+        animation: nightCrossShine var(--duration, 5s) ease-in-out var(--delay, 0s) infinite !important;
+    }
+
+    .celestial-theme .cosmic-star {
+        animation:
+            twinkle var(--duration, 6s) ease-in-out var(--delay, 0s) infinite alternate,
+            cosmicStarDrift var(--float, 14s) ease-in-out var(--delay, 0s) infinite alternate !important;
+    }
+
+    .celestial-theme .cosmic-comet {
+        animation: cosmicComet var(--duration, 8s) linear var(--delay, 0s) infinite !important;
+    }
+
+    .celestial-theme .cosmic-orb,
+    .celestial-theme .hero-moon.hero-moon--image,
+    .celestial-theme .hero-symbol {
+        animation-duration: revert !important;
+        animation-iteration-count: infinite !important;
     }
 }

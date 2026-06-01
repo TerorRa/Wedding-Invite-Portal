@@ -29,6 +29,13 @@ $invitePath = str_replace('/ticket.php', '/invite.php', $path);
 $inviteUrl = $scheme . '://' . $host . $invitePath . '?code=' . urlencode($code) . '&edit=1';
 $aboutPath = str_replace('/ticket.php', '/about.php', $path);
 $aboutUrl = $scheme . '://' . $host . $aboutPath . '?code=' . urlencode($code);
+$telegramConfig = is_file(__DIR__ . '/config/telegram.php') ? require __DIR__ . '/config/telegram.php' : [];
+$telegramBotUsername = ltrim((string)($telegramConfig['bot_username'] ?? 'Hive_KPP_System_bot'), '@');
+$telegramVideoUrl = (string)($telegramConfig['video_group_url'] ?? $telegramConfig['group_url'] ?? '');
+
+if ($telegramVideoUrl === '') {
+    $telegramVideoUrl = 'https://t.me/' . rawurlencode($telegramBotUsername);
+}
 $calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
     . '&text=' . rawurlencode('Весілля — Ростислав & Катерина')
     . '&dates=20260801T130000/20260802T000000'
@@ -77,10 +84,13 @@ if ($photoFiles !== []) {
                 <p>Перевірте посилання або зверніться до організаторів.</p>
             </section>
         <?php elseif ($guest->status === 'declined' || (int)$guest->will_attend === 0): ?>
-            <section class="welcome reveal">
+            <section class="welcome reveal pass-declined-card">
                 <p class="eyebrow">Дякуємо за відповідь</p>
-                <h1><?= e($guest->name) ?>, нам шкода, що ви не зможете бути з нами.</h1>
-                <p>Ми цінуємо вашу відповідь і будемо думками поруч.</p>
+                <h1><?= e($guest->name) ?>,</h1>
+                <p>Нам шкода, що ви не зможете бути з нами.</p>
+                <p>Ми дуже хотіли б, щоб ви були присутні поруч у цей день. Якщо матимете бажання, запишіть коротке відеопривітання для нас і надішліть його в Telegram-групу.</p>
+                <a class="section-action pass-about-button" href="<?= e($telegramVideoUrl) ?>" target="_blank" rel="noreferrer">Надіслати відеопривітання</a>
+                <a class="section-action btn-o" href="<?= e($inviteUrl) ?>">Повернутися до запрошення</a>
             </section>
         <?php else: ?>
             <div class="pass-ticket-layout">

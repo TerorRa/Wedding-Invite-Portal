@@ -13,9 +13,18 @@
     transform: scale(var(--card-scale, 1));
 }
 
+.ring-card {
+    top: 23%;
+    width: clamp(220px, 28vw, 360px);
+    border-width: 7px;
+    border-bottom-width: 26px;
+    animation-delay: var(--ring-delay, 5.1s) !important;
+}
+
 /* Move final text below the ring photo so it does not cover the accent image. */
 .intro-final {
     margin-top: min(52vh, 420px) !important;
+    animation-delay: var(--final-delay, 6.15s) !important;
 }
 
 @media (max-width: 768px) {
@@ -36,7 +45,458 @@
         width: clamp(92px, 32vw, 134px);
     }
 
+    .ring-card {
+        top: 26%;
+        width: min(68vw, 250px);
+        border-width: 6px;
+        border-bottom-width: 22px;
+    }
+
     .intro-final {
-        margin-top: 50svh !important;
+        margin-top: 52svh !important;
+    }
+}
+
+body.start-page {
+    height: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, .07), transparent 24%),
+        radial-gradient(circle at 100% 0%, rgba(184, 204, 228, .08), transparent 28%),
+        radial-gradient(circle at 50% 100%, rgba(41, 68, 104, .3), transparent 44%),
+        linear-gradient(180deg, #07101f 0%, #0b1728 48%, #14233a 100%);
+}
+
+html.start-root {
+    height: 100%;
+    overflow: hidden;
+}
+
+.intro-scene {
+    min-height: 100svh;
+    overflow: visible;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, .07), transparent 24%),
+        radial-gradient(circle at 100% 0%, rgba(184, 204, 228, .08), transparent 28%),
+        linear-gradient(180deg, #07101f 0%, #0b1728 52%, #14233a 100%);
+}
+
+.intro-scene::before,
+.intro-scene::after {
+    display: none;
+}
+
+.intro-skip {
+    font: inherit;
+    cursor: pointer;
+}
+
+.start-starfield,
+.start-starbursts,
+.start-comets {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.start-starfield i {
+    position: absolute;
+    width: var(--size, 2px);
+    height: var(--size, 2px);
+    border-radius: 50%;
+    opacity: var(--alpha, .75);
+    background: rgba(255, 255, 255, var(--alpha, .75));
+    box-shadow:
+        0 0 5px rgba(255, 255, 255, .5),
+        0 0 13px rgba(184, 204, 228, .22);
+    animation: startRoundStarPulse var(--duration, 6s) ease-in-out var(--delay, 0s) infinite;
+}
+
+.start-star4 {
+    position: absolute;
+    width: var(--size, 14px);
+    height: var(--size, 14px);
+    opacity: var(--alpha, .75);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, .96) 0 10%, rgba(255, 255, 255, .34) 12% 24%, transparent 34%);
+    filter:
+        drop-shadow(0 0 5px rgba(255, 255, 255, .78))
+        drop-shadow(0 0 16px rgba(184, 204, 228, .34));
+    transform: translate(-50%, -50%) scale(.7);
+    animation: startFourStarPulse var(--duration, 5s) ease-in-out var(--delay, 0s) infinite;
+}
+
+.start-star4::before,
+.start-star4::after {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    content: "";
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, .18) 21%, rgba(255, 255, 255, .96) 50%, rgba(255, 255, 255, .18) 79%, transparent 100%);
+    transform: translate(-50%, -50%);
+}
+
+.start-star4::before {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, .28) 28%, #fff 50%, rgba(255, 255, 255, .28) 72%, transparent 100%);
+}
+
+.start-star4::after {
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, .28) 28%, #fff 50%, rgba(255, 255, 255, .28) 72%, transparent 100%);
+}
+
+.start-comet {
+    position: absolute;
+    width: var(--tail, 120px);
+    height: 2px;
+    opacity: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(184, 204, 228, .16), rgba(255, 255, 255, .96));
+    box-shadow:
+        0 0 18px rgba(255, 255, 255, .58),
+        0 0 32px rgba(184, 204, 228, .28);
+    transform: rotate(var(--angle, 28deg));
+    animation: startCometFly var(--duration, 8s) linear var(--delay, 0s) infinite;
+}
+
+.start-comet::after {
+    position: absolute;
+    right: -3px;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    content: "";
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 10px #fff, 0 0 22px rgba(184, 204, 228, .8);
+    transform: translateY(-50%);
+}
+
+.intro-moon {
+    position: absolute;
+    top: clamp(70px, 10vh, 120px);
+    left: clamp(32px, 9vw, 170px);
+    z-index: 1;
+    width: clamp(58px, 8vw, 110px);
+    opacity: .6;
+    filter: drop-shadow(0 0 22px rgba(255, 255, 255, .28));
+    animation: startMoonFloat 9s ease-in-out infinite alternate;
+}
+
+.intro-sky {
+    z-index: 1;
+}
+
+.intro-orbit {
+    opacity: .2;
+}
+
+.intro-final {
+    width: min(620px, 100%);
+    margin-top: min(52vh, 430px) !important;
+    padding: clamp(20px, 3vw, 30px);
+    background:
+        radial-gradient(circle at 50% 0%, rgba(234, 217, 165, .13), transparent 48%),
+        linear-gradient(180deg, rgba(20, 31, 50, .7), rgba(5, 9, 20, .84));
+}
+
+.intro-copy {
+    position: relative;
+    width: min(470px, 100%);
+    margin: 0 auto;
+    padding-right: 24px;
+    color: rgba(245, 240, 232, .86);
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: clamp(16px, 1.75vw, 21px);
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.intro-final p:not(.start-eyebrow),
+.start-not-found p:not(.start-eyebrow) {
+    width: auto;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.intro-copy p {
+    margin-bottom: 5px !important;
+}
+
+.intro-shine-star {
+    position: absolute;
+    top: 36px;
+    right: -32px;
+    width: 34px;
+    height: 34px;
+    pointer-events: none;
+    filter:
+        drop-shadow(0 0 12px rgba(255, 255, 255, .95))
+        drop-shadow(0 0 30px rgba(234, 217, 165, .8));
+    transform: rotate(45deg) scale(.85);
+    animation: introShinePulse 1.7s ease-in-out infinite;
+}
+
+.intro-shine-star::before,
+.intro-shine-star::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background: linear-gradient(180deg, #fffdf0 0%, #fff0a7 55%, rgba(255, 244, 188, .08) 100%);
+    clip-path: polygon(50% 0, 61% 38%, 100% 50%, 61% 62%, 50% 100%, 39% 62%, 0 50%, 39% 38%);
+}
+
+.intro-shine-star::after {
+    opacity: .68;
+    transform: rotate(45deg) scale(.58);
+}
+
+.intro-final.is-open-hover .intro-shine-star {
+    filter:
+        drop-shadow(0 0 18px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 46px rgba(234, 217, 165, 1))
+        drop-shadow(0 0 76px rgba(184, 204, 228, .72));
+    animation: introShineHoverPulse 780ms ease-in-out infinite alternate;
+}
+
+.intro-scene.is-shine-burst::after {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: block;
+    pointer-events: none;
+    content: "";
+    background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0 6%, rgba(255, 244, 188, .94) 11%, rgba(255, 244, 188, .35) 23%, transparent 42%),
+        conic-gradient(from 45deg at 50% 50%, transparent 0 19%, rgba(255, 255, 255, 1) 22% 28%, transparent 31% 44%, rgba(255, 255, 255, .95) 47% 53%, transparent 56% 69%, rgba(255, 255, 255, 1) 72% 78%, transparent 81% 100%);
+    mix-blend-mode: screen;
+    opacity: 0;
+    animation: startFullShine 1150ms cubic-bezier(.16, .84, .28, 1) forwards;
+}
+
+.intro-final.is-shining .intro-shine-star {
+    z-index: 1000;
+    animation: startStarBurst 1150ms cubic-bezier(.12, .78, .18, 1) forwards;
+}
+
+.intro-scene.is-skip-hidden .intro-skip {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+}
+
+.intro-scene.is-complete .memory-card {
+    opacity: .74;
+    transform: translate3d(0, 0, -40px) rotateX(0) rotateY(0) rotateZ(var(--end-r)) scale(.92);
+    animation: memoryFloat calc(5.8s + (var(--i, 0) * .24s)) ease-in-out calc(var(--i, 0) * -.62s) infinite alternate !important;
+}
+
+.intro-scene.is-complete .ring-card {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotateY(0) rotateZ(0);
+    animation: ringFloat 5.8s ease-in-out -.8s infinite alternate !important;
+}
+
+.intro-scene.is-complete .intro-final {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    animation: none !important;
+}
+
+@keyframes startRoundStarPulse {
+    0%,
+    100% {
+        opacity: calc(var(--alpha, .72) * .48);
+        transform: scale(.88);
+    }
+
+    50% {
+        opacity: var(--alpha, .72);
+        transform: scale(1.12);
+    }
+}
+
+@keyframes startFourStarPulse {
+    0%,
+    100% {
+        opacity: calc(var(--alpha, .72) * .46);
+        transform: translate(-50%, -50%) scale(.62);
+        filter:
+            drop-shadow(0 0 3px rgba(255, 255, 255, .5))
+            drop-shadow(0 0 10px rgba(184, 204, 228, .18));
+    }
+
+    50% {
+        opacity: var(--alpha, .72);
+        transform: translate(-50%, -50%) scale(1.35);
+        filter:
+            drop-shadow(0 0 7px rgba(255, 255, 255, .95))
+            drop-shadow(0 0 20px rgba(184, 204, 228, .48));
+    }
+}
+
+@keyframes startCometFly {
+    0% {
+        opacity: 0;
+        transform: translate3d(-22vw, 0, 0) rotate(var(--angle, 28deg));
+    }
+
+    8% {
+        opacity: .9;
+    }
+
+    48% {
+        opacity: .7;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate3d(125vw, var(--drop, 34vh), 0) rotate(var(--angle, 28deg));
+    }
+}
+
+@keyframes startMoonFloat {
+    to {
+        opacity: .72;
+        transform: translate3d(8px, -10px, 0);
+    }
+}
+
+@keyframes introShinePulse {
+    0%,
+    100% {
+        opacity: .86;
+        transform: rotate(45deg) scale(.78);
+    }
+
+    50% {
+        opacity: 1;
+        transform: rotate(45deg) scale(1.16);
+    }
+}
+
+@keyframes introShineHoverPulse {
+    from {
+        opacity: .96;
+        transform: rotate(45deg) scale(1.12);
+    }
+
+    to {
+        opacity: 1;
+        transform: rotate(45deg) scale(1.46);
+    }
+}
+
+@keyframes startFullShine {
+    0% {
+        opacity: 0;
+        transform: scale(.04);
+    }
+
+    24% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(2.2);
+    }
+}
+
+@keyframes startStarBurst {
+    0% {
+        opacity: 1;
+        transform: scale(1) rotate(45deg);
+    }
+
+    42% {
+        opacity: 1;
+        transform: scale(30) rotate(225deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(105) rotate(405deg);
+    }
+}
+
+@keyframes memoryFloat {
+    from {
+        opacity: .68;
+        transform: translate3d(-4px, 3px, -48px) rotateX(0) rotateY(0) rotateZ(var(--end-r)) scale(.9);
+    }
+
+    to {
+        opacity: .82;
+        transform: translate3d(5px, -5px, -34px) rotateX(0) rotateY(0) rotateZ(calc(var(--end-r) + 1.4deg)) scale(.94);
+    }
+}
+
+@keyframes ringFloat {
+    from {
+        transform: translate(-50%, -50%) translate3d(-3px, 4px, 0) scale(.99) rotateY(0) rotateZ(-.5deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) translate3d(4px, -5px, 0) scale(1.015) rotateY(0) rotateZ(.5deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .intro-moon {
+        top: 68px;
+        left: 26px;
+        width: 64px;
+    }
+
+    .intro-final {
+        margin-top: 58svh !important;
+        width: min(100%, 460px);
+        padding: 20px 16px;
+    }
+
+    .intro-copy {
+        padding-right: 0;
+    }
+
+    .intro-shine-star {
+        top: auto;
+        right: 4px;
+        bottom: -18px;
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.force-intro-motion .intro-scene::before,
+    body.force-intro-motion .intro-star,
+    body.force-intro-motion .memory-card,
+    body.force-intro-motion .ring-card,
+    body.force-intro-motion .intro-final {
+        animation-play-state: running !important;
+    }
+
+    body.force-intro-motion .memory-card {
+        opacity: 0;
+        animation: memoryArrive 7.2s cubic-bezier(.2, .72, .18, 1) forwards !important;
+        animation-delay: calc(.25s + (var(--i, 0) * .52s)) !important;
+    }
+
+    body.force-intro-motion .ring-card {
+        opacity: 0;
+        animation: ringReveal 1.6s cubic-bezier(.2, .72, .18, 1) var(--ring-delay, 5.1s) forwards !important;
+    }
+
+    body.force-intro-motion .intro-final {
+        opacity: 0;
+        animation: finalReveal 1.2s ease var(--final-delay, 6.15s) forwards !important;
     }
 }

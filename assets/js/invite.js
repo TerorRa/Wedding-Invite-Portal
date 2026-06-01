@@ -6,20 +6,42 @@ const inviteContent = document.querySelector('#inviteContent');
 const copyLinkButton = document.querySelector('[data-copy-link]');
 const musicButton = document.querySelector('[data-music-toggle]');
 const bgMusic = document.querySelector('[data-bg-music]');
+let bgMusicPendingGesture = false;
 
 function buildStars(container, count) {
     if (!container) {
         return;
     }
 
-    for (let i = 0; i < count; i++) {
+    const isCelestialInvite = document.body.classList.contains('celestial-theme');
+    const starCount = isCelestialInvite ? Math.min(count, 44) : count;
+
+    for (let i = 0; i < starCount; i++) {
         const star = document.createElement('i');
         star.style.left = `${Math.random() * 100}%`;
         star.style.top = `${Math.random() * 100}%`;
-        star.style.setProperty('--size', `${1 + Math.random() * 3}px`);
-        star.style.setProperty('--alpha', `${0.35 + Math.random() * 0.65}`);
-        star.style.setProperty('--duration', `${2 + Math.random() * 4}s`);
-        star.style.setProperty('--delay', `${Math.random() * 4}s`);
+        star.style.setProperty('--size', isCelestialInvite ? `${1 + Math.random() * 2.4}px` : `${1 + Math.random() * 3}px`);
+        star.style.setProperty('--alpha', isCelestialInvite ? `${0.48 + Math.random() * 0.44}` : `${0.35 + Math.random() * 0.65}`);
+        star.style.setProperty('--duration', isCelestialInvite ? `${3.8 + Math.random() * 4.8}s` : `${2 + Math.random() * 4}s`);
+        star.style.setProperty('--delay', `${Math.random() * 5}s`);
+        container.appendChild(star);
+    }
+}
+
+function buildNightCrossStars(container, count) {
+    if (!container) {
+        return;
+    }
+
+    for (let i = 0; i < count; i++) {
+        const star = document.createElement('span');
+        star.className = 'night-cross-star';
+        star.style.left = `${8 + Math.random() * 84}%`;
+        star.style.top = `${6 + Math.random() * 72}%`;
+        star.style.setProperty('--size', `${10 + Math.random() * 7}px`);
+        star.style.setProperty('--alpha', `${0.58 + Math.random() * 0.34}`);
+        star.style.setProperty('--duration', `${3.8 + Math.random() * 3.6}s`);
+        star.style.setProperty('--delay', `${Math.random() * 5}s`);
         container.appendChild(star);
     }
 }
@@ -81,22 +103,28 @@ function buildCosmicEffects(container) {
         return;
     }
 
-    for (let i = 0; i < 44; i++) {
+    const isCelestialInvite = document.body.classList.contains('celestial-theme');
+    const starCount = isCelestialInvite ? 18 : 44;
+    const dustCount = isCelestialInvite ? 0 : 38;
+    const cometCount = isCelestialInvite ? 5 : 7;
+    const orbCount = isCelestialInvite ? 4 : 12;
+
+    for (let i = 0; i < starCount; i++) {
         const star = document.createElement('span');
         star.className = 'cosmic-star';
         star.style.left = `${Math.random() * 100}%`;
         star.style.top = `${Math.random() * 100}%`;
-        star.style.setProperty('--size', `${1 + Math.random() * 2.8}px`);
-        star.style.setProperty('--alpha', `${0.35 + Math.random() * 0.55}`);
-        star.style.setProperty('--duration', `${2.4 + Math.random() * 4.5}s`);
-        star.style.setProperty('--float', `${8 + Math.random() * 11}s`);
+        star.style.setProperty('--size', isCelestialInvite ? `${1.1 + Math.random() * 2.5}px` : `${1 + Math.random() * 2.8}px`);
+        star.style.setProperty('--alpha', isCelestialInvite ? `${0.28 + Math.random() * 0.28}` : `${0.35 + Math.random() * 0.55}`);
+        star.style.setProperty('--duration', isCelestialInvite ? `${5.8 + Math.random() * 3.8}s` : `${2.4 + Math.random() * 4.5}s`);
+        star.style.setProperty('--float', isCelestialInvite ? `${13 + Math.random() * 8}s` : `${8 + Math.random() * 11}s`);
         star.style.setProperty('--delay', `${Math.random() * 7}s`);
-        star.style.setProperty('--drift-x', `${-14 + Math.random() * 28}px`);
-        star.style.setProperty('--drift-y', `${-18 + Math.random() * 12}px`);
+        star.style.setProperty('--drift-x', isCelestialInvite ? `${-5 + Math.random() * 10}px` : `${-14 + Math.random() * 28}px`);
+        star.style.setProperty('--drift-y', isCelestialInvite ? `${-6 + Math.random() * 8}px` : `${-18 + Math.random() * 12}px`);
         container.appendChild(star);
     }
 
-    for (let i = 0; i < 38; i++) {
+    for (let i = 0; i < dustCount; i++) {
         const dust = document.createElement('span');
         dust.className = 'cosmic-dust';
         dust.style.left = `${Math.random() * 100}%`;
@@ -109,30 +137,30 @@ function buildCosmicEffects(container) {
         container.appendChild(dust);
     }
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < cometCount; i++) {
         const comet = document.createElement('span');
         comet.className = 'cosmic-comet';
         comet.style.left = `${-12 - Math.random() * 18}vw`;
         comet.style.top = `${4 + Math.random() * 92}%`;
-        comet.style.setProperty('--tail', `${90 + Math.random() * 90}px`);
+        comet.style.setProperty('--tail', isCelestialInvite ? `${90 + Math.random() * 130}px` : `${90 + Math.random() * 90}px`);
         comet.style.setProperty('--angle', `${20 + Math.random() * 16}deg`);
-        comet.style.setProperty('--drop', `${18 + Math.random() * 36}vh`);
-        comet.style.setProperty('--duration', `${5.5 + Math.random() * 4.5}s`);
-        comet.style.setProperty('--delay', `${i * 2.8 + Math.random() * 5}s`);
+        comet.style.setProperty('--drop', isCelestialInvite ? `${16 + Math.random() * 36}vh` : `${18 + Math.random() * 36}vh`);
+        comet.style.setProperty('--duration', isCelestialInvite ? `${6 + Math.random() * 5.5}s` : `${5.5 + Math.random() * 4.5}s`);
+        comet.style.setProperty('--delay', `${i * (isCelestialInvite ? 3.2 : 2.8) + Math.random() * 5}s`);
         container.appendChild(comet);
     }
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < orbCount; i++) {
         const orb = document.createElement('span');
         orb.className = 'cosmic-orb';
         orb.style.left = `${Math.random() * 100}%`;
         orb.style.top = `${Math.random() * 100}%`;
-        orb.style.setProperty('--size', `${4 + Math.random() * 9}px`);
-        orb.style.setProperty('--alpha', `${0.16 + Math.random() * 0.3}`);
-        orb.style.setProperty('--duration', `${10 + Math.random() * 12}s`);
+        orb.style.setProperty('--size', isCelestialInvite ? `${4 + Math.random() * 5}px` : `${4 + Math.random() * 9}px`);
+        orb.style.setProperty('--alpha', isCelestialInvite ? `${0.12 + Math.random() * 0.14}` : `${0.16 + Math.random() * 0.3}`);
+        orb.style.setProperty('--duration', isCelestialInvite ? `${14 + Math.random() * 8}s` : `${10 + Math.random() * 12}s`);
         orb.style.setProperty('--delay', `${Math.random() * 8}s`);
-        orb.style.setProperty('--drift-x', `${-28 + Math.random() * 56}px`);
-        orb.style.setProperty('--drift-y', `${-34 + Math.random() * 22}px`);
+        orb.style.setProperty('--drift-x', isCelestialInvite ? `${-10 + Math.random() * 20}px` : `${-28 + Math.random() * 56}px`);
+        orb.style.setProperty('--drift-y', isCelestialInvite ? `${-12 + Math.random() * 16}px` : `${-34 + Math.random() * 22}px`);
         container.appendChild(orb);
     }
 }
@@ -167,8 +195,9 @@ const splashStars = document.querySelector('.splash-stars');
 buildStars(splashStars, 70);
 buildSplashStarbursts(splashStars, 10);
 buildSplashComets(splashStars, 4);
-buildStars(document.querySelector('.starfield'), 90);
-buildCosmicEffects(document.querySelector('.cosmic-effects'));
+document.querySelectorAll('.starfield').forEach((starfield) => buildStars(starfield, 90));
+document.querySelectorAll('.starfield').forEach((starfield) => buildNightCrossStars(starfield, 8));
+document.querySelectorAll('.cosmic-effects').forEach((effects) => buildCosmicEffects(effects));
 
 if (document.querySelector('[data-confetti-on-load]')) {
     window.setTimeout(confetti, 450);
@@ -178,18 +207,34 @@ if (openInviteButton && inviteContent) {
     openInviteButton.addEventListener('click', () => {
         document.body.classList.add('invite-opened');
 
-        if (bgMusic) {
-            seekMusicToFirstStart();
-            bgMusic.volume = 0.35;
-            bgMusic.play().then(() => {
-                musicButton?.classList.add('is-playing');
-            }).catch(() => { });
-        }
+        startBackgroundMusic();
 
         window.setTimeout(() => {
             inviteContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 320);
     });
+} else if (inviteContent) {
+    window.addEventListener('load', () => {
+        startBackgroundMusic();
+    }, { once: true });
+}
+
+function armMusicGestureFallback() {
+    if (!bgMusic || bgMusicPendingGesture) {
+        return;
+    }
+
+    bgMusicPendingGesture = true;
+    const options = { once: true, passive: true };
+    const playAfterGesture = () => {
+        bgMusicPendingGesture = false;
+        startBackgroundMusic();
+    };
+
+    window.addEventListener('pointerdown', playAfterGesture, options);
+    window.addEventListener('keydown', playAfterGesture, { once: true });
+    window.addEventListener('touchstart', playAfterGesture, options);
+    window.addEventListener('wheel', playAfterGesture, options);
 }
 
 function seekMusicToFirstStart() {
@@ -203,6 +248,22 @@ function seekMusicToFirstStart() {
     } catch (error) {
         bgMusic.addEventListener('loadedmetadata', seekMusicToFirstStart, { once: true });
     }
+}
+
+function startBackgroundMusic() {
+    if (!bgMusic) {
+        return;
+    }
+
+    seekMusicToFirstStart();
+    bgMusic.volume = 0.35;
+    bgMusic.play().then(() => {
+        bgMusicPendingGesture = false;
+        musicButton?.classList.add('is-playing');
+    }).catch(() => {
+        musicButton?.classList.remove('is-playing');
+        armMusicGestureFallback();
+    });
 }
 
 if (musicButton && bgMusic) {
@@ -500,6 +561,7 @@ syncPlusOneName();
 syncRsvpVisibility();
 
 const revealItems = document.querySelectorAll('.reveal');
+revealItems[0]?.classList.add('is-visible');
 
 if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
