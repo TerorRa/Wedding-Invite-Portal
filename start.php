@@ -130,6 +130,13 @@ $finalDelaySeconds = $ringDelaySeconds + 1.25;
 $introDurationMs = (int)(($finalDelaySeconds + 1.4) * 1000);
 
 $guestName = $guest !== null ? trim((string)$guest->name) : '';
+$partnerName = $guest !== null ? trim((string)$guest->plus_one_name) : '';
+$invitationType = $guest !== null ? (string)($guest->invitation_type ?: '') : '';
+$guestDisplayName = $guestName;
+
+if ($invitationType === 'couple' && $partnerName !== '') {
+    $guestDisplayName .= ' та ' . $partnerName;
+}
 ?>
 <!doctype html>
 <html lang="uk" class="no-js start-root">
@@ -196,7 +203,7 @@ $guestName = $guest !== null ? trim((string)$guest->name) : '';
                 <?php endif; ?>
 
                 <div class="intro-final" data-intro-final>
-                    <p class="start-eyebrow"><?= $guestName !== '' ? e($guestName) . ',' : 'Дорогий гостю,' ?></p>
+                    <p class="start-eyebrow"><?= $guestDisplayName !== '' ? e($guestDisplayName) . ',' : 'Дорогий гостю,' ?></p>
                     <div class="intro-copy">
                         <p style="margin:0 0 10px;">Здавна люди вірили, що кожна зірка на небі — це чиясь доля.</p>
                         <p style="margin:0 0 10px;">Дві долі, що знайшли одна одну, зливаються в одне світло — і на небосхилі спалахує нова зірочка.<span class="intro-shine-star" aria-hidden="true"></span></p>

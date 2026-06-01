@@ -167,6 +167,7 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                         <?php foreach ($guests as $guest): ?>
                             <?php $link = inviteUrl($scheme, $host, $projectPath, (string)$guest->invite_code); ?>
                             <?php $telegramLink = telegramUrl($guest->telegram); ?>
+                            <?php $hasDisplayedPlusOne = (int)$guest->plus_one === 1 || (string)$guest->invitation_type === 'couple'; ?>
                             <tr>
                                 <td>
                                     <?= (int)$guest->id ?>
@@ -180,7 +181,7 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                                 </td>
                                 <td><?= e($guest->name) ?>
                                     <br>
-                                    <?= (int)$guest->plus_one === 1 ?  '🟢+ ' : '🔴Ні' ?> <?= e($guest->plus_one_name) ?>
+                                    <?= $hasDisplayedPlusOne ?  '🟢+ ' : '🔴Ні' ?> <?= e($guest->plus_one_name) ?>
                                 </td>
                                 <td><?= e($guest->phone) ?></td>
 

@@ -3455,6 +3455,51 @@ dd {
     color: #231018;
 }
 
+.pass-edit-response-button {
+    position: relative;
+    overflow: hidden;
+    color: #fff7dc;
+    background:
+        linear-gradient(135deg, rgba(35, 48, 74, .94), rgba(82, 62, 100, .88)),
+        radial-gradient(circle at 12% 20%, rgba(234, 217, 165, .34), transparent 34%);
+    border: 1px solid rgba(234, 217, 165, .66);
+    box-shadow:
+        0 14px 34px rgba(0, 0, 0, .28),
+        0 0 24px rgba(184, 204, 228, .14),
+        inset 0 1px 0 rgba(255, 248, 225, .18);
+}
+
+.pass-edit-response-button::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(120deg, transparent 0 34%, rgba(255, 248, 225, .34) 48%, transparent 64%);
+    transform: translateX(-70%);
+    transition: opacity 180ms ease, transform 420ms ease;
+}
+
+.pass-edit-response-button:hover,
+.pass-edit-response-button:focus-visible {
+    color: #241527;
+    background:
+        linear-gradient(135deg, #fff7dc, #e7c56a 54%, #b98a36),
+        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, .72), transparent 34%);
+    border-color: rgba(255, 248, 225, .9);
+    transform: translateY(-3px);
+    box-shadow:
+        0 20px 44px rgba(0, 0, 0, .34),
+        0 0 30px rgba(234, 217, 165, .34),
+        inset 0 1px 0 rgba(255, 255, 255, .62);
+}
+
+.pass-edit-response-button:hover::after,
+.pass-edit-response-button:focus-visible::after {
+    opacity: 1;
+    transform: translateX(70%);
+}
+
 .pass-copy-button {
     border: 0;
 }

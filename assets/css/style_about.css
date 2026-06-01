@@ -478,8 +478,8 @@ body.about-orbit-page {
         inset: 0 auto auto 0;
         width: 100%;
         display: grid;
-        gap: 18px;
-        padding-top: 38px;
+        gap: 12px;
+        padding-top: 22px;
         visibility: hidden;
     }
 
@@ -496,7 +496,7 @@ body.about-orbit-page {
 
     .about-orbit-controls {
         position: absolute;
-        top: 20px;
+        top: 8px;
         left: 50%;
         z-index: 6;
         display: grid;
@@ -511,8 +511,8 @@ body.about-orbit-page {
     .about-back-link {
         grid-column: 1 / -1;
         grid-row: 1;
-        margin-bottom: -4px;
-        transform: translateY(14px);
+        margin-bottom: -8px;
+        transform: translateY(10px);
     }
 
     .about-nav-btn,
@@ -521,16 +521,16 @@ body.about-orbit-page {
     }
 
     .about-nav-btn {
-        transform: translateY(calc(min(78vw, 420px) + 62px));
+        transform: translateY(calc(min(78vw, 420px) + 54px));
     }
 
     .about-nav-btn:hover,
     .about-nav-btn:focus-visible {
-        transform: translateY(calc(min(78vw, 420px) + 62px));
+        transform: translateY(calc(min(78vw, 420px) + 54px));
     }
 
     .about-orbit-count {
-        transform: translateY(calc(min(78vw, 420px) + 62px));
+        transform: translateY(calc(min(78vw, 420px) + 54px));
     }
 
     .about-orbit__scene {
@@ -543,7 +543,7 @@ body.about-orbit-page {
     }
 
     .about-orbit-card {
-        margin-top: 18px;
+        margin-top: 10px;
     }
 
     .about-orbit-controls {

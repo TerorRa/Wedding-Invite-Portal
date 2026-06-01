@@ -186,16 +186,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <label>
                 Тип запрошення
-                <select name="invitation_type">
+                <select name="invitation_type" data-invitation-type>
                     <?php foreach ($invitationTypes as $value => $label): ?>
                         <option value="<?= e($value) ?>" <?= $form['invitation_type'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
                     <?php endforeach; ?>
                 </select>
             </label>
 
-            <label>
+            <label class="admin-conditional-field<?= $form['invitation_type'] === 'couple' ? '' : ' is-hidden' ?>" data-partner-name-field>
                 Імʼя партнера
-                <input type="text" name="plus_one_name" value="<?= e($form['plus_one_name']) ?>" placeholder="Для сімейної пари">
+                <input type="text" name="plus_one_name" value="<?= e($form['plus_one_name']) ?>" placeholder="Для сімейної пари" <?= $form['invitation_type'] === 'couple' ? 'required' : '' ?> data-partner-name-input>
             </label>
 
             <label>
@@ -215,5 +215,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </form>
     </main>
+    <script>
+        const invitationTypeSelect = document.querySelector('[data-invitation-type]');
+        const partnerNameField = document.querySelector('[data-partner-name-field]');
+        const partnerNameInput = document.querySelector('[data-partner-name-input]');
+
+        function syncPartnerNameField() {
+            const isCouple = invitationTypeSelect?.value === 'couple';
+
+            partnerNameField?.classList.toggle('is-hidden', !isCouple);
+
+            if (partnerNameInput) {
+                partnerNameInput.required = isCouple;
+
+                if (!isCouple) {
+                    partnerNameInput.value = '';
+                }
+            }
+        }
+
+        invitationTypeSelect?.addEventListener('change', syncPartnerNameField);
+        syncPartnerNameField();
+    </script>
 </body>
 </html>

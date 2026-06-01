@@ -59,7 +59,7 @@ $partnerName = $guest !== null ? trim((string)$guest->plus_one_name) : '';
 $inviteDisplayName = $guest !== null
     ? (string)$guest->name . ($isCoupleInvite && $partnerName !== '' ? ' та ' . $partnerName : '')
     : '';
-$hasOptionalPlusOne = $guest !== null && !$isCoupleInvite && (int)$guest->max_plus_one === 1;
+$hasOptionalPlusOne = $guest !== null && $invitationType === 'single_plus_one';
 $mainDrinkLabel = $guest !== null ? 'Який напій обирає ' . (string)$guest->name . '?' : 'Ваш бажаний напій?';
 $rsvpDeadline = new DateTimeImmutable('2026-07-02 23:59:59', new DateTimeZone('Europe/Kiev'));
 $isPastRsvpDeadline = new DateTimeImmutable('now', new DateTimeZone('Europe/Kiev')) > $rsvpDeadline;
@@ -219,7 +219,7 @@ $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/invite.js') ?: time()
                         <h2 class="t-h">До миті, коли народиться наше сузірʼя</h2>
                         <p class="t-sub">1 серпня 2026</p>
                         <div class="moon-divider"><span></span><i></i><span></span></div>
-                        <div class="cd countdown" data-countdown="2026-08-01T15:00:00">
+                        <div class="cd countdown" data-countdown="2026-08-01T14:00:00">
                             <div class="cd__b"><strong class="cd__n" data-days>00</strong><span class="cd__l">днів</span></div>
                             <div class="cd__b"><strong class="cd__n" data-hours>00</strong><span class="cd__l">годин</span></div>
                             <div class="cd__b"><strong class="cd__n" data-minutes>00</strong><span class="cd__l">хвилин</span></div>

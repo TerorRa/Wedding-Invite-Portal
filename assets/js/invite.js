@@ -141,10 +141,19 @@ function buildCosmicEffects(container) {
     }
 
     const isCelestialInvite = document.body.classList.contains('celestial-theme');
-    const starCount = isCelestialInvite ? 18 : 44;
-    const dustCount = isCelestialInvite ? 0 : 38;
-    const cometCount = isCelestialInvite ? 7 : 9;
-    const orbCount = isCelestialInvite ? 4 : 12;
+    const isPassPage = container.classList.contains('cosmic-effects--pass');
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    let starCount = isCelestialInvite ? 18 : 44;
+    let dustCount = isCelestialInvite ? 0 : 38;
+    let cometCount = isCelestialInvite ? 7 : 9;
+    let orbCount = isCelestialInvite ? 4 : 12;
+
+    if (isPassPage && isMobile) {
+        starCount = 18;
+        dustCount = 8;
+        cometCount = 2;
+        orbCount = 3;
+    }
 
     for (let i = 0; i < starCount; i++) {
         const star = document.createElement('span');
@@ -233,7 +242,7 @@ document.querySelectorAll('.starfield').forEach((starfield) => buildStars(starfi
 document.querySelectorAll('.starfield').forEach((starfield) => buildNightCrossStars(starfield, 8));
 document.querySelectorAll('.cosmic-effects').forEach((effects) => buildCosmicEffects(effects));
 
-if (document.querySelector('[data-confetti-on-load]')) {
+if (document.querySelector('[data-confetti-on-load]') && window.matchMedia('(min-width: 769px)').matches) {
     window.setTimeout(confetti, 450);
 }
 

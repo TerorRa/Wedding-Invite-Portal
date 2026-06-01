@@ -464,9 +464,9 @@ html.start-root {
     }
 
     .intro-final {
-        margin-top: 58svh !important;
+        margin-top: 50svh !important;
         width: min(100%, 460px);
-        padding: 20px 16px;
+        padding: 19px 16px;
     }
 
     .intro-copy {
@@ -479,6 +479,22 @@ html.start-root {
         bottom: -18px;
         width: 30px;
         height: 30px;
+    }
+}
+
+@media (max-width: 420px) {
+    .ring-card {
+        top: 27%;
+    }
+
+    .intro-final {
+        margin-top: 48svh !important;
+        padding: 18px 15px;
+    }
+
+    .intro-copy {
+        font-size: 15px;
+        line-height: 1.16;
     }
 }
 

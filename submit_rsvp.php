@@ -27,7 +27,7 @@ $plusOne = (int)($_POST['plus_one'] ?? 0);
 $plusOneName = trim((string)($_POST['plus_one_name'] ?? ''));
 $drink = trim((string)($_POST['drink'] ?? ''));
 $partnerDrink = trim((string)($_POST['partner_drink'] ?? ''));
-echo $drink;
+
 if ($inviteCode === '') {
     renderError('Код запрошення обовʼязковий.', $inviteCode);
 }
@@ -60,6 +60,7 @@ if ((new DateTimeImmutable('now', new DateTimeZone('Europe/Kiev'))) > $rsvpDeadl
 
 $invitationType = (string)($guest->invitation_type ?: ((int)$guest->max_plus_one === 1 ? 'single_plus_one' : 'single'));
 $isCoupleInvite = $invitationType === 'couple';
+$allowsOptionalPlusOne = $invitationType === 'single_plus_one' || (int)$guest->max_plus_one === 1;
 
 if ($willAttend === 0) {
     $plusOne = 0;
@@ -68,7 +69,7 @@ if ($willAttend === 0) {
 } elseif ($isCoupleInvite) {
     $plusOne = 1;
     $plusOneName = trim((string)$guest->plus_one_name);
-} elseif ($plusOne === 1 && (int)$guest->max_plus_one !== 1) {
+} elseif ($plusOne === 1 && !$allowsOptionalPlusOne) {
     $plusOne = 0;
     $plusOneName = '';
     $partnerDrink = '';

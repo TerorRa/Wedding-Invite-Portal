@@ -108,6 +108,10 @@ body::before {
     font-weight: 700;
 }
 
+.admin-conditional-field.is-hidden {
+    display: none;
+}
+
 .admin-full {
     grid-column: 1 / -1;
 }

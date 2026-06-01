@@ -119,24 +119,8 @@ if ($guest !== null && ($guest->status === 'declined' || (int)$guest->will_atten
     }
 }
 
-if (is_dir($photoDirectory)) {
-    $files = glob($photoDirectory . '/*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE) ?: [];
-    sort($files, SORT_NATURAL);
 
-    foreach ($files as $file) {
-        if (is_file($file)) {
-            $photoFiles[] = 'assets/foto/' . basename($file);
-        }
-    }
-}
 $ticketNumber = $guest !== null ? (string)$guest->ticket_number : '';
-$photoGroups = [[], []];
-
-if ($photoFiles !== []) {
-    $splitIndex = (int)ceil(count($photoFiles) / 2);
-    $photoGroups[0] = array_slice($photoFiles, 0, $splitIndex);
-    $photoGroups[1] = array_slice($photoFiles, $splitIndex);
-}
 
 $videoGreetingPath = $guest !== null ? findVideoGreeting($videoGreetingDirectory, $safeInviteCode) : null;
 $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/' . basename($videoGreetingPath) : null;
@@ -193,7 +177,7 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                         </form>
                     <?php endif; ?>
                 </div>
-                <a class="section-action btn-o" href="<?= e($inviteUrl) ?>">Повернутися до запрошення</a>
+                <a class="section-action pass-edit-response-button" href="<?= e($inviteUrl) ?>">Змінити відповідь</a>
             </section>
         <?php else: ?>
             <div class="pass-ticket-layout">
@@ -213,8 +197,8 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                     </section>
                 <?php endif; */ ?>
 
-                <section class="wedding-pass pass-card reveal" data-confetti-on-load>
-                    <span class="pass-glow pass-glow--one" aria-hidden="true"></span>
+                <section class="wedding-pass pass-card reveal" data-confetti-on-load2>
+                    <!--  <span class="pass-glow pass-glow--one" aria-hidden="true"></span>
                     <span class="pass-glow pass-glow--two" aria-hidden="true"></span>
                     <span class="pass-cross-star pass-cross-star--one" aria-hidden="true"></span>
                     <span class="pass-cross-star pass-cross-star--two" aria-hidden="true"></span>
@@ -222,17 +206,17 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                     <span class="pass-cross-star pass-cross-star--four" aria-hidden="true"></span>
                     <span class="pass-cross-star pass-cross-star--five" aria-hidden="true"></span>
                     <img class="pass-symbol pass-symbol--planet" src="assets/img/bck/little_prince_transparent_planet.png" alt="" aria-hidden="true">
-                    <img class="pass-symbol pass-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">
+                    <img class="pass-symbol pass-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">-->
                     <div class="pass-main">
                         <h1><?= e($guest->name) ?> <?php if ((int)$guest->plus_one === 1 && !empty($guest->plus_one_name)): ?>
-                                та <?= e($guest->plus_one_name) ?>
+                                & <?= e($guest->plus_one_name) ?>
                             <?php endif; ?>
                         </h1>
                         <p class="pass-note">Дякуємо, що ви готові поринути разом із нами у цю зоряну подорож любові, музики й теплих спогадів.</p>
 
                         <div class="pass-countdown">
-                            <p>Наша зірка готова засяяти на небосхилі, через:</p>
-                            <div class="pass-countdown__timer" data-countdown="2026-08-01T15:00:00">
+                            <p>Наша зірка готова засяяти на небосхилі 01.08.2026, а це через:</p>
+                            <div class="pass-countdown__timer" data-countdown="2026-08-01T14:00:00">
                                 <div><strong data-days>00</strong><span>днів</span></div>
                                 <div><strong data-hours>00</strong><span>годин</span></div>
                                 <div><strong data-minutes>00</strong><span>хвилин</span></div>
@@ -241,10 +225,10 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                         </div>
 
                         <dl class="pass-details">
-                            <div>
+                            <!--<div>
                                 <dt>Дата</dt>
                                 <dd>01.08.2026</dd>
-                            </div>
+                            </div>-->
                             <div>
                                 <dt>Місце</dt>
                                 <dd>Петрівський Бровар, Київська область</dd>
@@ -266,18 +250,18 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                         <img src="<?= e($qrUrl) ?>" alt="QR-код Wedding Pass">
                         <p>Покажіть цей QR-код при вході.</p>
                     </div>-->
-                    <div class="pass-qr">
+                    <!-- <div class="pass-qr">
 
                         <span class="ticket__stub-label">Покажіть цей код на весіллі.</span>
                         <span class="ticket__barcode" aria-hidden="true"></span>
                         <span class="ticket__barcode-num"><?= e($ticketNumber) ?></span>
 
-                    </div>
+                    </div>-->
 
 
                     <div class="pass-actions">
                         <a class="section-action pass-about-button" href="<?= e($aboutUrl) ?>">Трохи нас</a>
-                        <!--  <a class="section-action" href="<?= e($inviteUrl) ?>">В запрошення</a>-->
+                        <a class="section-action pass-edit-response-button" href="<?= e($inviteUrl) ?>">Змінити відповідь</a>
                         <a class="section-action btn-o" href="<?= e($calendarUrl) ?>" target="_blank" rel="noreferrer">Додати до календаря</a>
 
                     </div>
