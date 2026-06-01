@@ -216,7 +216,7 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                         <p class="pass-note">Дякуємо, що ви готові поринути разом із нами у цю зоряну подорож любові, музики й теплих спогадів.</p>
 
                         <div class="pass-countdown">
-                            <p>Наша зірка готова засяяти на небосхилі 01.08.2026, а це через:</p>
+                            <p>Наша зірка готова засяяти на небосхилі 01.08.2026 з 13:00, а це через:</p>
                             <div class="pass-countdown__timer" data-countdown="2026-08-01T14:00:00">
                                 <div><strong data-days>00</strong><span>днів</span></div>
                                 <div><strong data-hours>00</strong><span>годин</span></div>

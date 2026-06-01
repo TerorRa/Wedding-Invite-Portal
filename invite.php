@@ -61,7 +61,7 @@ $inviteDisplayName = $guest !== null
     : '';
 $hasOptionalPlusOne = $guest !== null && $invitationType === 'single_plus_one';
 $mainDrinkLabel = $guest !== null ? 'Який напій обирає ' . (string)$guest->name . '?' : 'Ваш бажаний напій?';
-$rsvpDeadline = new DateTimeImmutable('2026-07-02 23:59:59', new DateTimeZone('Europe/Kiev'));
+$rsvpDeadline = new DateTimeImmutable('2026-07-17 23:59:59', new DateTimeZone('Europe/Kiev'));
 $isPastRsvpDeadline = new DateTimeImmutable('now', new DateTimeZone('Europe/Kiev')) > $rsvpDeadline;
 $hasGuestAnswered = $guest !== null && (
     trim((string)$guest->answered_at) !== ''
