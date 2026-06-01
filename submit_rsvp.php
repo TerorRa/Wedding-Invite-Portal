@@ -63,15 +63,15 @@ $isCoupleInvite = $invitationType === 'couple';
 $allowsOptionalPlusOne = $invitationType === 'single_plus_one' || (int)$guest->max_plus_one === 1;
 
 if ($willAttend === 0) {
-    $plusOne = 0;
-    $plusOneName = '';
-    $partnerDrink = '';
+    //$plusOne = 0;
+    // $plusOneName = '';
+    //$partnerDrink = '';
 } elseif ($isCoupleInvite) {
     $plusOne = 1;
     $plusOneName = trim((string)$guest->plus_one_name);
 } elseif ($plusOne === 1 && !$allowsOptionalPlusOne) {
     $plusOne = 0;
-    $plusOneName = '';
+    // $plusOneName = '';
     $partnerDrink = '';
 }
 

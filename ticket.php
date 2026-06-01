@@ -121,6 +121,7 @@ if ($guest !== null && ($guest->status === 'declined' || (int)$guest->will_atten
 
 
 $ticketNumber = $guest !== null ? (string)$guest->ticket_number : '';
+$partnerName = $guest !== null ? trim((string)$guest->plus_one_name) : '';
 
 $videoGreetingPath = $guest !== null ? findVideoGreeting($videoGreetingDirectory, $safeInviteCode) : null;
 $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/' . basename($videoGreetingPath) : null;
@@ -147,7 +148,7 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
         <?php elseif ($guest->status === 'declined' || (int)$guest->will_attend === 0): ?>
             <section class="welcome reveal pass-declined-card">
                 <p class="eyebrow">Дякуємо за відповідь</p>
-                <h1><?= e($guest->name) ?>,</h1>
+                <h1><?= e($guest->name) ?><?= $partnerName !== '' ? ' та ' . e($partnerName) : ''  ?></h1>
                 <p>Ми дуже хотіли б, щоб ви були присутні поруч у цей день. Якщо матимете бажання, запишіть коротке відеопривітання для нас або надішліть готове відео з галереї.</p>
                 <div class="pass-video-greeting">
                     <h2>Відеопривітання</h2>
