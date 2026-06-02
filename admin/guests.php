@@ -27,11 +27,20 @@ if ($search !== '') {
 
 $sql = $where === [] ? 'ORDER BY id DESC' : implode(' AND ', $where) . ' ORDER BY id DESC';
 $guests = R::findAll('guests', $sql, $params);
+$drinkOptions = ['Вино', 'Шампанське', 'Віскі', 'Горілка', 'Безалкогольне', 'Інше'];
+$flashMessage = (string)($_SESSION['admin_flash'] ?? '');
+$flashError = (string)($_SESSION['admin_flash_error'] ?? '');
+unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
 
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $projectPath = rtrim(dirname(dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/admin/guests.php'))), '/\\');
 $projectPath = $projectPath === '' ? '' : $projectPath;
+$returnUrl = 'guests.php';
+
+if ((string)($_SERVER['QUERY_STRING'] ?? '') !== '') {
+    $returnUrl .= '?' . (string)$_SERVER['QUERY_STRING'];
+}
 
 function e(?string $value): string
 {
@@ -140,6 +149,14 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
             <a href="guests.php">Скинути</a>
         </form>
 
+        <?php if ($flashMessage !== ''): ?>
+            <div class="admin-alert admin-alert-success"><?= e($flashMessage) ?></div>
+        <?php endif; ?>
+
+        <?php if ($flashError !== ''): ?>
+            <div class="admin-alert"><?= e($flashError) ?></div>
+        <?php endif; ?>
+
         <section class="admin-table-panel">
             <div class="admin-table-wrap">
                 <table class="admin-table">
@@ -150,8 +167,7 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                             <th>Ім'я / +1 Партнер</th>
                             <th>Телефон</th>
                             <th>Напій / Напій партнера</th>
-                            <th>Тост</th>
-                            <th>Стіл</th>
+                            <th>Стіл / Тост</th>
                             <th>Відповідь / Відкриття</th>
                             <th>Статус / Посилання</th>
                             <th>Дії</th>
@@ -168,6 +184,13 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                             <?php $link = inviteUrl($scheme, $host, $projectPath, (string)$guest->invite_code); ?>
                             <?php $telegramLink = telegramUrl($guest->telegram); ?>
                             <?php $hasDisplayedPlusOne = (int)$guest->plus_one === 1 || (string)$guest->invitation_type === 'couple'; ?>
+                            <?php $invitationType = (string)($guest->invitation_type ?: ((int)$guest->max_plus_one === 1 ? 'single_plus_one' : 'single')); ?>
+                            <?php $allowsPlusOne = $invitationType === 'single_plus_one' || $invitationType === 'couple' || (int)$guest->max_plus_one === 1; ?>
+                            <?php $canAdminConfirm = !in_array((string)$guest->status, ['confirmed', 'declined'], true); ?>
+                            <?php $hasAttendanceBreakdown = $guest->primary_attends !== null || $guest->partner_attends !== null; ?>
+                            <?php $primaryAttendanceMark = $hasAttendanceBreakdown ? ((int)$guest->primary_attends === 1 ? '🟢 ' : '🔴 ') : ''; ?>
+                            <?php $partnerAttendanceMark = $hasAttendanceBreakdown ? ((int)$guest->partner_attends === 1 ? '🟢+ ' : '🔴+ ') : ($hasDisplayedPlusOne ? '🟢+ ' : '🔴Ні '); ?>
+                            <?php $statusClass = in_array((string)$guest->status, ['confirmed', 'declined', 'opened'], true) ? ' status-pill--' . (string)$guest->status : ''; ?>
                             <tr>
                                 <td>
                                     <?= (int)$guest->id ?>
@@ -179,22 +202,43 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                                     <br>
                                     <?= e(invitationTypeLabel($guest->invitation_type, (int)$guest->max_plus_one)) ?>
                                 </td>
-                                <td><?= e($guest->name) ?>
+                                <td><?= e($primaryAttendanceMark . (string)$guest->name) ?>
                                     <br>
-                                    <?= $hasDisplayedPlusOne ?  '🟢+ ' : '🔴Ні' ?> <?= e($guest->plus_one_name) ?>
+                                    <?= e($partnerAttendanceMark . (string)$guest->plus_one_name) ?>
                                 </td>
                                 <td><?= e($guest->phone) ?></td>
 
 
                                 <td><?= e($guest->drink) ?><br> <?= e($guest->partner_drink) ?></td>
-                                <td><?= (int)$guest->prepare_toast === 1 ? '🟢Так' : '🔴Ні' ?></td>
-                                <td><?= e($guest->table_number) ?></td>
+                                <td><?= e($guest->table_number) ?>  <br>
+                                     <?= (int)$guest->prepare_toast === 1 ? '🥂Так' : '💤Ні' ?>
+                                </td>
 
-                                <td><?= e($guest->answered_at) ?> <br> <?= e($guest->opened_at) ?></td>
+                                <td>
+                                    <strong class="answered-at"><?= e($guest->answered_at) ?></strong>
+                                    <br>
+                                    <?= e($guest->opened_at) ?>
+                                </td>
                                 <td>
                                     <a class="table-link" href="<?= e($link) ?>" target="_blank" rel="noreferrer">Відкрити</a>
                                     <br>
-                                    <span class="status-pill"><?= e($guest->status) ?></span>
+                                    <span class="status-pill<?= e($statusClass) ?>"><?= e($guest->status) ?></span>
+                                    <?php if ($canAdminConfirm): ?>
+                                        <br>
+                                        <button
+                                            type="button"
+                                            class="table-inline-button confirm-guest-button"
+                                            data-confirm-guest
+                                            data-guest-id="<?= (int)$guest->id ?>"
+                                            data-guest-name="<?= e($guest->name) ?>"
+                                            data-drink="<?= e($guest->drink) ?>"
+                                            data-plus-one="<?= (int)$guest->plus_one ?>"
+                                            data-plus-one-name="<?= e($guest->plus_one_name) ?>"
+                                            data-partner-drink="<?= e($guest->partner_drink) ?>"
+                                            data-allows-plus-one="<?= $allowsPlusOne ? '1' : '0' ?>">
+                                            Підтвердити за гостя
+                                        </button>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <div class="table-actions">
@@ -226,6 +270,58 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                 </table>
             </div>
         </section>
+
+        <div class="admin-modal" data-confirm-guest-modal aria-hidden="true">
+            <div class="admin-modal__backdrop" data-confirm-guest-close></div>
+            <section class="admin-modal__card" role="dialog" aria-modal="true" aria-labelledby="confirmGuestTitle">
+                <button class="admin-modal__close" type="button" data-confirm-guest-close aria-label="Закрити">×</button>
+                <p class="admin-eyebrow">Швидке підтвердження</p>
+                <h2 id="confirmGuestTitle">Підтвердити присутність</h2>
+                <p class="admin-modal__guest" data-confirm-guest-name></p>
+
+                <form class="admin-confirm-form" action="guest_confirm.php" method="post">
+                    <?= csrfField() ?>
+                    <input type="hidden" name="id" data-confirm-guest-id>
+                    <input type="hidden" name="redirect_to" value="<?= e($returnUrl) ?>">
+
+                    <label>
+                        Напій гостя
+                        <select name="drink" data-confirm-drink required>
+                            <option value="">Оберіть напій</option>
+                            <?php foreach ($drinkOptions as $drink): ?>
+                                <option value="<?= e($drink) ?>"><?= e($drink) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+
+                    <label class="admin-checkbox admin-confirm-plus-one-toggle" data-confirm-plus-one-toggle>
+                        <input type="checkbox" name="plus_one" value="1" data-confirm-plus-one>
+                        Додати +1 / партнера
+                    </label>
+
+                    <div class="admin-confirm-plus-one-fields" data-confirm-plus-one-fields>
+                        <label>
+                            Ім'я +1 / партнера
+                            <input type="text" name="plus_one_name" data-confirm-plus-one-name>
+                        </label>
+                        <label>
+                            Напій +1 / партнера
+                            <select name="partner_drink" data-confirm-partner-drink>
+                                <option value="">Оберіть напій</option>
+                                <?php foreach ($drinkOptions as $drink): ?>
+                                    <option value="<?= e($drink) ?>"><?= e($drink) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="admin-form-actions">
+                        <button type="submit">Підтвердити присутність</button>
+                        <button type="button" class="admin-button admin-button-light" data-confirm-guest-close>Скасувати</button>
+                    </div>
+                </form>
+            </section>
+        </div>
     </main>
     <script src="../assets/js/admin.js"></script>
 </body>

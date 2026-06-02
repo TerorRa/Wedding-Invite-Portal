@@ -108,6 +108,23 @@ body::before {
     font-weight: 700;
 }
 
+.admin-form-row {
+    display: grid;
+    gap: 16px;
+}
+
+.admin-form-row-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-form-row-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-form-row label {
+    min-width: 0;
+}
+
 .admin-conditional-field.is-hidden {
     display: none;
 }
@@ -274,6 +291,12 @@ body::before {
     background: var(--danger-bg);
     border: 1px solid rgba(143, 29, 29, 0.18);
     border-radius: 8px;
+}
+
+.admin-alert-success {
+    color: #1f5e36;
+    background: #edf8ef;
+    border-color: rgba(31, 94, 54, 0.18);
 }
 
 .admin-alert p {
@@ -558,6 +581,26 @@ body::before {
     border-radius: 999px;
 }
 
+.status-pill--confirmed {
+    color: #fff;
+    background: #1f8f4d;
+}
+
+.status-pill--declined {
+    color: #fff;
+    background: #7f1d1d;
+}
+
+.status-pill--opened {
+    color: #1f3655;
+    background: #bfe3ff;
+}
+
+.answered-at {
+    color: #20242a;
+    font-weight: 800;
+}
+
 .table-link,
 .table-actions a {
     color: var(--accent);
@@ -589,6 +632,145 @@ body::before {
     color: var(--accent);
 }
 
+.table-inline-button {
+    margin-top: 8px;
+    padding: 0;
+    color: var(--accent);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.admin-form-actions .admin-button-light {
+    color: var(--accent);
+    background: var(--panel);
+    border: 1px solid var(--border);
+}
+
+.confirm-guest-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 9px;
+    color: #1f5e36;
+    background: #edf8ef;
+    border: 1px solid rgba(31, 94, 54, .18);
+    border-radius: 999px;
+    transition: transform 160ms ease, box-shadow 160ms ease, color 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.confirm-guest-button:hover,
+.confirm-guest-button:focus-visible {
+    color: #fff;
+    background: #1f8f4d;
+    border-color: #1f8f4d;
+    box-shadow: 0 8px 20px rgba(31, 143, 77, .24);
+    transform: translateY(-1px);
+}
+
+.admin-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+}
+
+.admin-modal.is-visible {
+    display: flex;
+}
+
+.admin-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(7, 16, 31, .62);
+    backdrop-filter: blur(8px);
+}
+
+.admin-modal__card {
+    position: relative;
+    z-index: 1;
+    width: min(520px, 100%);
+    max-height: calc(100vh - 44px);
+    overflow-y: auto;
+    padding: 24px;
+    background: rgba(245, 248, 251, .97);
+    border: 1px solid rgba(234, 217, 165, .34);
+    border-radius: 10px;
+    box-shadow: 0 28px 80px rgba(0, 0, 0, .34);
+}
+
+.admin-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    color: var(--text);
+    font-size: 24px;
+    line-height: 1;
+    background: rgba(218, 228, 239, .8);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.admin-modal__card h2 {
+    margin: 6px 0 8px;
+    font-size: 24px;
+}
+
+.admin-modal__guest {
+    margin: 0 0 18px;
+    color: #68707c;
+    font-weight: 700;
+}
+
+.admin-confirm-form,
+.admin-confirm-plus-one-fields {
+    display: grid;
+    gap: 14px;
+}
+
+.admin-confirm-form label,
+.admin-confirm-plus-one-fields label {
+    display: grid;
+    gap: 8px;
+    font-weight: 700;
+}
+
+.admin-confirm-form input[type="text"],
+.admin-confirm-form select {
+    min-height: 44px;
+    padding: 10px 12px;
+    color: var(--text);
+    font: inherit;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.admin-confirm-form .admin-checkbox {
+    grid-column: auto;
+}
+
+.admin-confirm-plus-one-fields {
+    padding: 14px;
+    background: rgba(234, 240, 247, .72);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.admin-confirm-plus-one-fields.is-hidden,
+.admin-confirm-plus-one-toggle.is-hidden {
+    display: none !important;
+}
+
 h1 {
     margin: 0;
     font-size: 28px;
@@ -604,6 +786,11 @@ h1 {
     }
 
     .admin-form {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-form-row-two,
+    .admin-form-row-three {
         grid-template-columns: 1fr;
     }
 

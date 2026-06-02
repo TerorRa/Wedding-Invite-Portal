@@ -9,14 +9,38 @@ const bgMusic = document.querySelector('[data-bg-music]');
 let bgMusicPendingGesture = false;
 
 document.querySelectorAll('[data-file-input]').forEach((input) => {
-    const fileName = input.closest('label')?.querySelector('[data-file-name]');
+    const filePicker = input.closest('label');
+    const fileName = filePicker?.querySelector('[data-file-name]');
 
     if (!fileName) {
         return;
     }
 
     input.addEventListener('change', () => {
-        fileName.textContent = input.files?.[0]?.name || 'Файл не обрано';
+        const selectedFile = input.files?.[0] || null;
+
+        filePicker?.classList.toggle('is-selected', Boolean(selectedFile));
+        fileName.textContent = selectedFile ? `Відео обрано: ${selectedFile.name}` : 'Файл не обрано';
+    });
+});
+
+document.querySelectorAll('.pass-video-form').forEach((form) => {
+    const submitButton = form.querySelector('[data-upload-submit]');
+    const submitText = submitButton?.querySelector('[data-submit-text]');
+
+    if (!submitButton || !submitText) {
+        return;
+    }
+
+    form.addEventListener('submit', () => {
+        if (!form.checkValidity()) {
+            return;
+        }
+
+        submitButton.classList.add('is-uploading');
+        submitButton.disabled = true;
+        submitText.textContent = 'Завантажуємо відео...';
+        submitButton.setAttribute('aria-busy', 'true');
     });
 });
 
@@ -447,9 +471,13 @@ const plusOneName = document.querySelector('.plus-one-name');
 const plusOneNameInput = plusOneName?.querySelector('input[name="plus_one_name"]');
 const partnerDrink = document.querySelector('.partner-drink');
 const partnerDrinkSelect = partnerDrink?.querySelector('select[name="partner_drink"]');
+const mainDrinkField = document.querySelector('.main-drink-field');
 const mainDrinkSelect = document.querySelector('select[name="drink"]');
 const partnerDrinkName = document.querySelector('[data-partner-drink-name]');
 const attendanceRadios = document.querySelectorAll('input[name="will_attend"]');
+const coupleAttendanceRadios = document.querySelectorAll('[data-couple-attendance]');
+const coupleWillAttendInput = document.querySelector('[data-couple-will-attend]');
+const couplePlusOneInput = document.querySelector('[data-couple-plus-one]');
 const rsvpExtra = document.querySelector('[data-rsvp-extra]');
 const rsvpSubmit = document.querySelector('[data-rsvp-submit]');
 let rsvpYesConfettiShown = false;
@@ -500,19 +528,69 @@ if (plusOneNameInput) {
 }
 
 
-function syncRsvpVisibility() {
+function getRsvpState() {
+    const selectedCoupleAttendance = document.querySelector('[data-couple-attendance]:checked');
+
+    if (selectedCoupleAttendance) {
+        const value = selectedCoupleAttendance.value;
+        const primaryAttends = value === 'both' || value === 'primary';
+        const partnerAttends = value === 'both' || value === 'partner';
+        const willAttend = primaryAttends || partnerAttends;
+
+        return {
+            hasAnswer: true,
+            isCouple: true,
+            partnerAttends,
+            primaryAttends,
+            willAttend,
+        };
+    }
+
     const selected = document.querySelector('input[name="will_attend"]:checked');
     const willAttend = selected?.value === '1';
-    const hasAnswer = Boolean(selected);
+    const selectedPlusOne = document.querySelector('input[name="plus_one"]:checked');
+
+    return {
+        hasAnswer: Boolean(selected),
+        isCouple: false,
+        partnerAttends: willAttend && selectedPlusOne?.value === '1',
+        primaryAttends: willAttend,
+        willAttend,
+    };
+}
+
+function syncCoupleHiddenFields(state) {
+    if (!state.isCouple) {
+        return;
+    }
+
+    if (coupleWillAttendInput) {
+        coupleWillAttendInput.value = state.willAttend ? '1' : '0';
+    }
+
+    if (couplePlusOneInput) {
+        couplePlusOneInput.value = state.partnerAttends ? '1' : '0';
+    }
+}
+
+function syncRsvpVisibility() {
+    const state = getRsvpState();
+    const { hasAnswer, primaryAttends, willAttend } = state;
+
+    syncCoupleHiddenFields(state);
 
     if (rsvpExtra) {
         rsvpExtra.classList.toggle('is-hidden', !willAttend);
     }
 
-    if (mainDrinkSelect) {
-        mainDrinkSelect.required = willAttend;
+    if (mainDrinkField) {
+        mainDrinkField.classList.toggle('is-hidden', !primaryAttends);
+    }
 
-        if (!willAttend) {
+    if (mainDrinkSelect) {
+        mainDrinkSelect.required = primaryAttends;
+
+        if (!primaryAttends) {
             mainDrinkSelect.value = '';
         }
     }
@@ -539,11 +617,9 @@ function syncRsvpVisibility() {
 }
 
 function syncPlusOneName() {
-    const selectedAttendance = document.querySelector('input[name="will_attend"]:checked');
-    const willAttend = selectedAttendance?.value === '1';
-
+    const state = getRsvpState();
     const selectedPlusOne = document.querySelector('input[name="plus_one"]:checked');
-    const hasPartner = willAttend && selectedPlusOne?.value === '1';
+    const hasPartner = state.isCouple ? state.partnerAttends : state.willAttend && selectedPlusOne?.value === '1';
 
     if (plusOneName) {
         plusOneName.classList.toggle('is-hidden', !hasPartner);
@@ -553,13 +629,12 @@ function syncPlusOneName() {
         plusOneNameInput.required = hasPartner;
     }
 
-    if (partnerDrink && !partnerDrink.dataset.alwaysVisible) {
+    if (partnerDrink) {
         partnerDrink.classList.toggle('is-hidden', !hasPartner);
     }
 
     if (partnerDrinkSelect) {
-        const isAlwaysVisible = Boolean(partnerDrink?.dataset.alwaysVisible);
-        partnerDrinkSelect.required = willAttend && (hasPartner || isAlwaysVisible);
+        partnerDrinkSelect.required = hasPartner;
 
         if (!partnerDrinkSelect.required) {
             partnerDrinkSelect.value = '';
@@ -594,6 +669,17 @@ attendanceRadios.forEach((radio) => {
         syncRsvpVisibility();
 
         if (radio.value === '1' && radio.checked && !rsvpYesConfettiShown) {
+            rsvpYesConfettiShown = true;
+            confetti();
+        }
+    });
+});
+
+coupleAttendanceRadios.forEach((radio) => {
+    radio.addEventListener('change', () => {
+        syncRsvpVisibility();
+
+        if (radio.dataset.rsvpYes !== undefined && radio.checked && !rsvpYesConfettiShown) {
             rsvpYesConfettiShown = true;
             confetti();
         }

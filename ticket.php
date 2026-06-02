@@ -122,6 +122,27 @@ if ($guest !== null && ($guest->status === 'declined' || (int)$guest->will_atten
 
 $ticketNumber = $guest !== null ? (string)$guest->ticket_number : '';
 $partnerName = $guest !== null ? trim((string)$guest->plus_one_name) : '';
+$invitedGuestNames = $guest !== null ? [(string)$guest->name] : [];
+
+if ($partnerName !== '') {
+    $invitedGuestNames[] = $partnerName;
+}
+
+$primaryAttends = $guest !== null && $guest->primary_attends !== null ? (int)$guest->primary_attends : 1;
+$partnerAttends = $guest !== null && $guest->partner_attends !== null ? (int)$guest->partner_attends : (int)$guest->plus_one;
+$ticketGuestNames = [];
+
+if ($guest !== null && $primaryAttends === 1) {
+    $ticketGuestNames[] = (string)$guest->name;
+}
+
+if ($partnerName !== '' && $partnerAttends === 1) {
+    $ticketGuestNames[] = $partnerName;
+}
+
+if ($guest !== null && $ticketGuestNames === []) {
+    $ticketGuestNames[] = (string)$guest->name;
+}
 
 $videoGreetingPath = $guest !== null ? findVideoGreeting($videoGreetingDirectory, $safeInviteCode) : null;
 $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/' . basename($videoGreetingPath) : null;
@@ -148,7 +169,7 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
         <?php elseif ($guest->status === 'declined' || (int)$guest->will_attend === 0): ?>
             <section class="welcome reveal pass-declined-card">
                 <p class="eyebrow">Дякуємо за відповідь</p>
-                <h1><?= e($guest->name) ?><?= $partnerName !== '' ? ' та ' . e($partnerName) : ''  ?></h1>
+                <h1><?= e(implode(' та ', $invitedGuestNames)) ?></h1>
                 <p>Ми дуже хотіли б, щоб ви були присутні поруч у цей день. Якщо матимете бажання, запишіть коротке відеопривітання для нас або надішліть готове відео з галереї.</p>
                 <div class="pass-video-greeting">
                     <h2>Відеопривітання</h2>
@@ -165,11 +186,14 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                         <input type="hidden" name="video_action" value="upload_video">
                         <label class="pass-file-picker">
                             <span class="pass-file-picker__title">Записати або обрати відео</span>
-                            <input class="pass-video-file-input" type="file" name="video_greeting" accept="video/mp4,video/quicktime,video/webm,video/x-m4v" capture="user" data-file-input required>
+                            <input class="pass-video-file-input" type="file" name="video_greeting" accept="video/*,.mp4,.mov,.webm,.m4v" data-file-input required>
                             <span class="pass-file-picker__control">Обрати відео</span>
-                            <span class="pass-file-picker__name" data-file-name>Файл не обрано</span>
+                            <span class="pass-file-picker__name" data-file-name aria-live="polite">Файл не обрано</span>
                         </label>
-                        <button class="section-action pass-about-button" type="submit"><?= $videoGreetingRelative !== null ? 'Замінити відеопривітання' : 'Надіслати відеопривітання' ?></button>
+                        <button class="section-action pass-about-button pass-video-submit" type="submit" data-upload-submit>
+                            <span data-submit-text><?= $videoGreetingRelative !== null ? 'Замінити відеопривітання' : 'Надіслати відеопривітання' ?></span>
+                            <span class="pass-upload-spinner" aria-hidden="true"></span>
+                        </button>
                     </form>
                     <?php if ($videoGreetingRelative !== null): ?>
                         <form action="<?= e($ticketUrl) ?>" method="post">
@@ -209,31 +233,29 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                     <img class="pass-symbol pass-symbol--planet" src="assets/img/bck/little_prince_transparent_planet.png" alt="" aria-hidden="true">
                     <img class="pass-symbol pass-symbol--plane" src="assets/img/bck/airplane.png" alt="" aria-hidden="true">-->
                     <div class="pass-main">
-                        <h1><?= e($guest->name) ?> <?php if ((int)$guest->plus_one === 1 && !empty($guest->plus_one_name)): ?>
-                                & <?= e($guest->plus_one_name) ?>
-                            <?php endif; ?>
-                        </h1>
+                        <h1><?= e(implode(' & ', $ticketGuestNames)) ?></h1>
                         <p class="pass-note">Дякуємо, що ви готові поринути разом із нами у цю зоряну подорож любові, музики й теплих спогадів.</p>
-
-                        <div class="pass-countdown">
-                            <p>Наша зірка готова засяяти на небосхилі 01.08.2026 з 13:00, а це через:</p>
-                            <div class="pass-countdown__timer" data-countdown="2026-08-01T14:00:00">
-                                <div><strong data-days>00</strong><span>днів</span></div>
-                                <div><strong data-hours>00</strong><span>годин</span></div>
-                                <div><strong data-minutes>00</strong><span>хвилин</span></div>
-                                <div><strong data-seconds>00</strong><span>секунд</span></div>
-                            </div>
-                        </div>
-
                         <dl class="pass-details">
-                            <!--<div>
-                                <dt>Дата</dt>
-                                <dd>01.08.2026</dd>
-                            </div>-->
-                            <div>
-                                <dt>Місце</dt>
-                                <dd>Петрівський Бровар, Київська область</dd>
+                            <div class="pass-countdown">
+                                <p>Наша зірка вже майже готова засяяти на небосхилі</p>
+                                <div>
+                                    <dt>Місце</dt>
+                                    <dd>Петрівський Бровар, Київська область</dd>
+                                </div> 
+                                <div>
+                                    <dt>Дата</dt>
+                                    <dd>13:00 01.08.2026</dd>
+                                </div>
+                                <p>Залишилось чекати лише</p>
+                                <div class="pass-countdown__timer" data-countdown="2026-08-01T14:00:00">
+                                    <div><strong data-days>00</strong><span>днів</span></div>
+                                    <div><strong data-hours>00</strong><span>годин</span></div>
+                                    <div><strong data-minutes>00</strong><span>хвилин</span></div>
+                                    <div><strong data-seconds>00</strong><span>секунд</span></div>
+                                </div>                            
                             </div>
+
+                           
                             <!-- <?php if (!empty($guest->table_number)): ?>
                                 <div>
                                     <dt>Стіл</dt>
@@ -267,7 +289,7 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
 
                     </div>
                     <div class="pass-share-block">
-                        <p>Будемо раді, якщо ви додатково зможете зробити фото/відео записи весілля і поділитесь ними з нами в окремій групі Telegram.</p>
+                        <p>Будемо раді, якщо ви додатково зможете зробити фото/відео записи весілля і поділитесь з нами в окремій групі Telegram.</p>
                         <a class="section-action btn-o" href="<?= e($telegramGalleryUrl) ?>" target="_blank" rel="noreferrer">Група в Telegram</a>
                     </div>
                 </section>

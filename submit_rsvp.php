@@ -27,6 +27,7 @@ $plusOne = (int)($_POST['plus_one'] ?? 0);
 $plusOneName = trim((string)($_POST['plus_one_name'] ?? ''));
 $drink = trim((string)($_POST['drink'] ?? ''));
 $partnerDrink = trim((string)($_POST['partner_drink'] ?? ''));
+$coupleAttendance = trim((string)($_POST['couple_attendance'] ?? ''));
 
 if ($inviteCode === '') {
     renderError('Код запрошення обовʼязковий.', $inviteCode);
@@ -38,10 +39,6 @@ if ($willAttendRaw === null || !in_array((string)$willAttendRaw, ['0', '1'], tru
 
 $willAttend = (int)$willAttendRaw;
 $plusOne = $plusOne === 1 ? 1 : 0;
-
-if ($willAttend === 1 && $drink === '') {
-    renderError('Будь ласка, оберіть свій напій.', $inviteCode);
-}
 
 $guest = R::findOne('guests', 'invite_code = ?', [$inviteCode]);
 
@@ -61,33 +58,61 @@ if ((new DateTimeImmutable('now', new DateTimeZone('Europe/Kiev'))) > $rsvpDeadl
 $invitationType = (string)($guest->invitation_type ?: ((int)$guest->max_plus_one === 1 ? 'single_plus_one' : 'single'));
 $isCoupleInvite = $invitationType === 'couple';
 $allowsOptionalPlusOne = $invitationType === 'single_plus_one' || (int)$guest->max_plus_one === 1;
+$primaryAttends = $willAttend;
+$partnerAttends = $willAttend === 1 && $plusOne === 1 ? 1 : 0;
 
-if ($willAttend === 0) {
-    //$plusOne = 0;
-    // $plusOneName = '';
-    //$partnerDrink = '';
-} elseif ($isCoupleInvite) {
-    $plusOne = 1;
+if ($isCoupleInvite) {
+    if (!in_array($coupleAttendance, ['both', 'primary', 'partner', 'none'], true)) {
+        renderError('Оберіть, хто саме буде присутній.', $inviteCode);
+    }
+
+    $primaryAttends = in_array($coupleAttendance, ['both', 'primary'], true) ? 1 : 0;
+    $partnerAttends = in_array($coupleAttendance, ['both', 'partner'], true) ? 1 : 0;
+    $willAttend = ($primaryAttends === 1 || $partnerAttends === 1) ? 1 : 0;
+    $plusOne = $partnerAttends;
     $plusOneName = trim((string)$guest->plus_one_name);
+
+    if ($primaryAttends === 0) {
+        $drink = '';
+    }
+
+    if ($partnerAttends === 0) {
+        $partnerDrink = '';
+    }
 } elseif ($plusOne === 1 && !$allowsOptionalPlusOne) {
     $plusOne = 0;
     // $plusOneName = '';
     $partnerDrink = '';
+    $partnerAttends = 0;
 }
 
-if ($willAttend === 1 && $plusOne === 1 && $plusOneName === '') {
+if ($willAttend === 0) {
+    $plusOne = 0;
+    $primaryAttends = 0;
+    $partnerAttends = 0;
+    $drink = '';
+    $partnerDrink = '';
+}
+
+if ($primaryAttends === 1 && $drink === '') {
+    renderError('Будь ласка, оберіть свій напій.', $inviteCode);
+}
+
+if ($willAttend === 1 && $partnerAttends === 1 && $plusOneName === '') {
     renderError('Будь ласка, вкажіть імʼя супутника або партнера.', $inviteCode);
 }
 
-if ($willAttend === 1 && $plusOne === 1 && $partnerDrink === '') {
+if ($willAttend === 1 && $partnerAttends === 1 && $partnerDrink === '') {
     renderError('Будь ласка, оберіть напій для партнера.', $inviteCode);
 }
 
 $guest->will_attend = $willAttend;
 $guest->plus_one = $plusOne;
-$guest->plus_one_name = $plusOne === 1 ? $plusOneName : null;
-$guest->drink = $drink;
-$guest->partner_drink = $plusOne === 1 ? $partnerDrink : null;
+$guest->plus_one_name = ($isCoupleInvite || $plusOne === 1) ? $plusOneName : null;
+$guest->primary_attends = $primaryAttends;
+$guest->partner_attends = $partnerAttends;
+$guest->drink = $primaryAttends === 1 ? $drink : null;
+$guest->partner_drink = $partnerAttends === 1 ? $partnerDrink : null;
 $guest->food_notes = trim((string)($_POST['food_notes'] ?? ''));
 $guest->need_transfer = isset($_POST['need_transfer']) ? 1 : 0;
 $guest->prepare_toast = $willAttend === 1 && (string)($_POST['prepare_toast'] ?? '0') === '1' ? 1 : 0;

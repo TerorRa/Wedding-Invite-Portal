@@ -2055,7 +2055,7 @@ p {
 .event-details div,
 .timeline article,
 .countdown div,
-.pass-details div {
+.pass-details>div:not(.pass-countdown) {
     background: rgba(255, 255, 255, 0.62);
     border: 1px solid var(--line);
     border-radius: 18px;
@@ -3021,8 +3021,8 @@ dd {
 
 .pass-card {
     grid-template-columns: 1fr;
-    width: min(460px, 100%);
-    padding: 34px;
+    width: min(480px, 100%);
+    padding: 32px;
     text-align: center;
     background-image:
         radial-gradient(circle at 18% 18%, rgba(255, 255, 255, .86) 0 1px, transparent 1.8px),
@@ -3143,24 +3143,24 @@ dd {
 }
 
 .pass-note {
-    margin: 14px auto 0;
+    margin: 12px auto 0;
     color: rgba(248, 240, 223, 0.78);
     font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 20px;
+    font-size: 21px;
     font-style: italic;
-    line-height: 1.45;
+    line-height: 1.5;
 }
 
 .pass-countdown {
     position: relative;
     z-index: 1;
     display: grid;
-    gap: 12px;
-    margin: 18px 0 20px;
-    padding: 16px;
+    gap: 14px;
+    margin: 20px 0 18px;
+    padding: 17px;
     color: rgba(255, 248, 225, .88);
-    background: rgba(255, 255, 255, .07);
-    border: 1px solid rgba(234, 217, 165, .24);
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(234, 217, 165, .3);
     border-radius: 18px;
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, .1),
@@ -3171,9 +3171,18 @@ dd {
     margin: 0;
     color: rgba(255, 248, 225, .82);
     font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 18px;
+    font-size: 19px;
     font-style: italic;
-    line-height: 1.3;
+    line-height: 1.38;
+}
+
+.pass-countdown>div:not(.pass-countdown__timer) {
+    display: grid;
+    gap: 4px;
+    padding: 10px 12px;
+    background: rgba(255, 244, 210, .08);
+    border: 1px solid rgba(234, 217, 165, .2);
+    border-radius: 12px;
 }
 
 .pass-countdown__timer {
@@ -3183,14 +3192,16 @@ dd {
 }
 
 .pass-countdown__timer div {
-    min-height: 64px;
+    min-height: 66px;
     display: grid;
     align-content: center;
     gap: 4px;
-    padding: 8px 6px;
-    background: rgba(255, 244, 210, .1);
-    border: 1px solid rgba(234, 217, 165, .24);
-    border-radius: 14px;
+    padding: 9px 6px;
+    background: rgba(255, 244, 210, .12);
+    border: 1px solid rgba(234, 217, 165, .26);
+    border-radius: 12px;
+    box-shadow: none;
+    animation: none;
 }
 
 .pass-countdown__timer strong {
@@ -3204,7 +3215,7 @@ dd {
 
 .pass-countdown__timer span {
     color: rgba(234, 217, 165, .78);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: .1em;
     text-transform: lowercase;
@@ -3221,7 +3232,7 @@ dd {
     grid-template-columns: 1fr;
 }
 
-.pass-details div {
+.pass-details>div:not(.pass-countdown) {
     padding: 16px 18px;
     background:
         linear-gradient(180deg, rgba(255, 244, 210, 0.12), rgba(255, 255, 255, 0.04));
@@ -3233,15 +3244,15 @@ dd {
     animation: passDetailFloat 5.4s ease-in-out infinite alternate;
 }
 
-.pass-details div:nth-child(2) {
+.pass-details>div:not(.pass-countdown):nth-child(2) {
     animation-delay: .9s;
 }
 
-.pass-details div:nth-child(3) {
+.pass-details>div:not(.pass-countdown):nth-child(3) {
     animation-delay: 1.6s;
 }
 
-.pass-details div:nth-child(4) {
+.pass-details>div:not(.pass-countdown):nth-child(4) {
     animation-delay: 2.2s;
 }
 
@@ -3291,7 +3302,7 @@ dd {
 
 .pass-actions {
     display: grid;
-    gap: 12px;
+    gap: 10px;
 }
 
 .pass-share-block,
@@ -3311,12 +3322,26 @@ dd {
         0 12px 26px rgba(0, 0, 0, .16);
 }
 
+.pass-share-block {
+    gap: 10px;
+    margin-top: 16px;
+    padding: 14px;
+    background: rgba(255, 255, 255, .045);
+    border-color: rgba(234, 217, 165, .16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
 .pass-share-block p,
 .pass-video-greeting p {
     margin: 0;
     color: rgba(255, 248, 225, .84);
     font-size: 14px;
     line-height: 1.65;
+}
+
+.pass-share-block p {
+    font-size: 13px;
+    line-height: 1.55;
 }
 
 .pass-video-greeting h2 {
@@ -3380,12 +3405,25 @@ dd {
     box-shadow: 0 10px 22px rgba(0, 0, 0, .16);
 }
 
+.pass-file-picker.is-selected .pass-file-picker__control {
+    background: linear-gradient(180deg, #e8f4dc, #b9d889);
+}
+
 .pass-file-picker__name {
     min-width: 0;
     padding: 0 14px;
     color: rgba(255, 248, 225, .82);
     background: rgba(255, 255, 255, .08);
     border: 1px solid rgba(234, 217, 165, .24);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pass-file-picker.is-selected .pass-file-picker__name {
+    color: #fff7dc;
+    background: rgba(185, 216, 137, .18);
+    border-color: rgba(185, 216, 137, .56);
 }
 
 .pass-video-preview {
@@ -3408,9 +3446,39 @@ dd {
     background: rgba(143, 29, 29, .72);
 }
 
+.pass-video-submit {
+    gap: 10px;
+}
+
+.pass-video-submit:disabled {
+    cursor: wait;
+    opacity: .86;
+}
+
+.pass-upload-spinner {
+    width: 18px;
+    height: 18px;
+    display: none;
+    border: 2px solid rgba(255, 255, 255, .44);
+    border-top-color: #fff7dc;
+    border-radius: 50%;
+    animation: passUploadSpin .75s linear infinite;
+}
+
+.pass-video-submit.is-uploading .pass-upload-spinner {
+    display: inline-block;
+}
+
+@keyframes passUploadSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .pass-actions .section-action,
 .pass-copy-button {
     width: 100%;
+    min-height: 46px;
     transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease;
     box-shadow:
         0 12px 26px rgba(27, 40, 69, 0.18),
@@ -3427,15 +3495,11 @@ dd {
 }
 
 .pass-actions .btn-o {
-    color: #fff7dc;
-    background:
-        linear-gradient(135deg, rgba(255, 248, 225, 0.16), rgba(201, 168, 93, 0.18)),
-        rgba(18, 8, 22, 0.52);
-    border: 1px solid rgba(255, 232, 178, 0.72);
-    box-shadow:
-        0 12px 30px rgba(0, 0, 0, 0.28),
-        0 0 22px rgba(201, 168, 93, 0.16),
-        inset 0 1px 0 rgba(255, 248, 225, 0.22);
+    min-height: 42px;
+    color: rgba(255, 248, 225, .9);
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 232, 178, 0.46);
+    box-shadow: inset 0 1px 0 rgba(255, 248, 225, 0.14);
 }
 
 .pass-actions .btn-o:hover {
@@ -3458,15 +3522,13 @@ dd {
 .pass-edit-response-button {
     position: relative;
     overflow: hidden;
-    color: #fff7dc;
-    background:
-        linear-gradient(135deg, rgba(35, 48, 74, .94), rgba(82, 62, 100, .88)),
-        radial-gradient(circle at 12% 20%, rgba(234, 217, 165, .34), transparent 34%);
-    border: 1px solid rgba(234, 217, 165, .66);
+    min-height: 44px;
+    color: rgba(255, 248, 225, .92);
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(234, 217, 165, .38);
     box-shadow:
-        0 14px 34px rgba(0, 0, 0, .28),
-        0 0 24px rgba(184, 204, 228, .14),
-        inset 0 1px 0 rgba(255, 248, 225, .18);
+        0 10px 24px rgba(0, 0, 0, .2),
+        inset 0 1px 0 rgba(255, 248, 225, .14);
 }
 
 .pass-edit-response-button::after {
@@ -3484,7 +3546,7 @@ dd {
 .pass-edit-response-button:focus-visible {
     color: #241527;
     background:
-        linear-gradient(135deg, #fff7dc, #e7c56a 54%, #b98a36),
+        linear-gradient(135deg, #fff7dc, #e7c56a 54%, #c8953a),
         radial-gradient(circle at 15% 20%, rgba(255, 255, 255, .72), transparent 34%);
     border-color: rgba(255, 248, 225, .9);
     transform: translateY(-3px);
@@ -3492,6 +3554,29 @@ dd {
         0 20px 44px rgba(0, 0, 0, .34),
         0 0 30px rgba(234, 217, 165, .34),
         inset 0 1px 0 rgba(255, 255, 255, .62);
+}
+
+.pass-share-block .section-action {
+    min-height: 40px;
+    padding-inline: 20px;
+}
+
+.pass-share-block .btn-o {
+    color: rgba(255, 248, 225, .9);
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 232, 178, .38);
+    box-shadow: none;
+}
+
+.pass-share-block .btn-o:hover,
+.pass-share-block .btn-o:focus-visible {
+    color: #2e1720;
+    background: linear-gradient(135deg, #fff7dc, #d2aa54 58%, #f4df9a);
+    border-color: rgba(255, 248, 225, .82);
+    box-shadow:
+        0 12px 28px rgba(0, 0, 0, .22),
+        0 0 18px rgba(201, 168, 93, .18);
+    transform: translateY(-2px);
 }
 
 .pass-edit-response-button:hover::after,
@@ -4409,9 +4494,9 @@ body:has(.pass-shell) {
     }
 
     .pass-card {
-        width: min(100%, calc(100vw - 76px));
-        max-width: calc(100vw - 76px);
-        padding: 24px 16px;
+        width: min(100%, calc(100vw - 38px));
+        max-width: calc(100vw - 38px);
+        padding: 24px 18px;
         border-radius: 22px;
     }
 
@@ -4432,16 +4517,42 @@ body:has(.pass-shell) {
     }
 
     .pass-main h1 {
-        font-size: clamp(42px, 15vw, 64px);
+        font-size: clamp(44px, 14vw, 64px);
         overflow-wrap: anywhere;
     }
 
     .pass-note {
-        font-size: 18px;
+        font-size: 19px;
         overflow-wrap: anywhere;
     }
 
-    .pass-details div {
+    .pass-countdown {
+        padding: 15px 12px;
+    }
+
+    .pass-countdown p {
+        font-size: 18px;
+    }
+
+    .pass-countdown>div:not(.pass-countdown__timer) {
+        padding: 9px 10px;
+    }
+
+    .pass-countdown__timer {
+        gap: 6px;
+    }
+
+    .pass-countdown__timer div {
+        min-height: 62px;
+        padding: 8px 4px;
+    }
+
+    .pass-countdown__timer span {
+        font-size: 10px;
+        letter-spacing: .04em;
+    }
+
+    .pass-details>div:not(.pass-countdown) {
         padding: 13px 12px;
         min-width: 0;
     }
@@ -5334,7 +5445,7 @@ body:has(.pass-shell) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .pass-details div {
+    .pass-details>div {
         animation: none;
     }
 

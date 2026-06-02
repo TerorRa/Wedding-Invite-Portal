@@ -219,42 +219,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="hidden" name="id" value="<?= (int)$guest->id ?>">
 
             <label>
-                Імʼя
-                <input type="text" name="name" value="<?= e($form['name']) ?>" required>
-            </label>
-
-            <label class="admin-full">
-                Персональне звернення
-                <textarea name="personal_greeting" rows="3"><?= e($form['personal_greeting']) ?></textarea>
-            </label>
-
-            <label>
-                Телефон
-                <input type="text" name="phone" value="<?= e($form['phone']) ?>">
-            </label>
-
-            <label>
-                Email
-                <input type="email" name="email" value="<?= e($form['email']) ?>">
-            </label>
-
-            <label>
-                Telegram
-                <input type="text" name="telegram" value="<?= e($form['telegram']) ?>">
-            </label>
-
-            <label>
-                Група
-                <select name="guest_group">
-                    <?php foreach ($guestGroupOptions as $group): ?>
-                        <option value="<?= e($group) ?>" <?= $form['guest_group'] === $group ? 'selected' : '' ?>>
-                            <?= $group === '' ? 'Не вказано' : e($group) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
-
-            <label>
                 Тип запрошення
                 <select name="invitation_type">
                     <?php foreach ($invitationTypes as $value => $label): ?>
@@ -264,10 +228,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="form-hint">Для сімейної пари заповніть поле партнера поруч.</span>
             </label>
 
-            <label>
-                Імʼя партнера
-                <input type="text" name="plus_one_name" value="<?= e($form['plus_one_name']) ?>" placeholder="Для сімейної пари або +1">
+            <div class="admin-form-row admin-form-row-two admin-full">
+                <label>
+                    Імʼя
+                    <input type="text" name="name" value="<?= e($form['name']) ?>" required>
+                </label>
+
+                <label>
+                    Імʼя партнера
+                    <input type="text" name="plus_one_name" value="<?= e($form['plus_one_name']) ?>" placeholder="Для сімейної пари або +1">
+                </label>
+            </div>
+
+            <label class="admin-full">
+                Персональне звернення
+                <textarea name="personal_greeting" rows="3"><?= e($form['personal_greeting']) ?></textarea>
             </label>
+
+            <div class="admin-form-row admin-form-row-three admin-full">
+                <label>
+                    Телефон
+                    <input type="text" name="phone" value="<?= e($form['phone']) ?>">
+                </label>
+
+                <label>
+                    Email
+                    <input type="email" name="email" value="<?= e($form['email']) ?>">
+                </label>
+
+                <label>
+                    Telegram
+                    <input type="text" name="telegram" value="<?= e($form['telegram']) ?>">
+                </label>
+            </div>
+
+            <div class="admin-form-row admin-form-row-two admin-full">
+                <label>
+                    Група
+                    <select name="guest_group">
+                        <?php foreach ($guestGroupOptions as $group): ?>
+                            <option value="<?= e($group) ?>" <?= $form['guest_group'] === $group ? 'selected' : '' ?>>
+                                <?= $group === '' ? 'Не вказано' : e($group) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+
+                <label>
+                    Номер столу
+                    <select name="table_number">
+                        <?php foreach ($tableNumberOptions as $tableNumber): ?>
+                            <option value="<?= e($tableNumber) ?>" <?= $form['table_number'] === $tableNumber ? 'selected' : '' ?>>
+                                <?= $tableNumber === '' ? 'Не вказано' : e($tableNumber) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+            </div>
 
             <label>
                 Статус
@@ -314,17 +331,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php foreach ($drinkOptions as $drink): ?>
                         <option value="<?= e($drink) ?>" <?= $form['partner_drink'] === $drink ? 'selected' : '' ?>>
                             <?= $drink === '' ? 'Не вказано' : e($drink) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
-
-            <label>
-                Номер столу
-                <select name="table_number">
-                    <?php foreach ($tableNumberOptions as $tableNumber): ?>
-                        <option value="<?= e($tableNumber) ?>" <?= $form['table_number'] === $tableNumber ? 'selected' : '' ?>>
-                            <?= $tableNumber === '' ? 'Не вказано' : e($tableNumber) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

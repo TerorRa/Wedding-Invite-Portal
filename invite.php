@@ -216,7 +216,7 @@ $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/invite.js') ?: time()
                 <section class="sec sec--ivory sec--visible countdown-section reveal" id="countdown">
                     <div class="ws countdown-wrap">
                         <p class="t-scr">Зворотний відлік</p>
-                        <h2 class="t-h">До миті, коли народиться наше сузірʼя</h2>
+                        <h2 class="t-h">До миті, коли зародиться наше зірка</h2>
                         <p class="t-sub">1 серпня 2026</p>
                         <div class="moon-divider"><span></span><i></i><span></span></div>
                         <div class="cd countdown" data-countdown="2026-08-01T14:00:00">
@@ -526,7 +526,8 @@ $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/invite.js') ?: time()
                         <form class="rsvp-form" action="submit_rsvp.php" method="post">
                             <input type="hidden" name="invite_code" value="<?= e($guest->invite_code) ?>">
                             <?php if ($isCoupleInvite): ?>
-                                <input type="hidden" name="plus_one" value="1">
+                                <input type="hidden" name="will_attend" value="" data-couple-will-attend>
+                                <input type="hidden" name="plus_one" value="1" data-couple-plus-one>
                                 <input type="hidden" name="plus_one_name" value="<?= e($partnerName) ?>">
                             <?php endif; ?>
 
@@ -535,8 +536,17 @@ $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/invite.js') ?: time()
                                     <p class="form-hint">Запрошення для пари: <?= e($guest->name) ?><?= $partnerName !== '' ? ' та ' . e($partnerName) : '' ?>.</p>
                                 <?php endif; ?>
                                 <legend>Чи будете ви присутні?</legend>
-                                <label><input type="radio" name="will_attend" value="1" required data-rsvp-yes> Звісно</label>
-                                <label><input type="radio" name="will_attend" value="0" required> На жаль, не зможу</label>
+                                <?php if ($isCoupleInvite): ?>
+                                    <label><input type="radio" name="couple_attendance" value="both" required data-rsvp-yes data-couple-attendance> Будемо обоє</label>
+                                    <label><input type="radio" name="couple_attendance" value="primary" required data-rsvp-yes data-couple-attendance> Буде тільки <?= e($guest->name) ?></label>
+                                    <?php if ($partnerName !== ''): ?>
+                                        <label><input type="radio" name="couple_attendance" value="partner" required data-rsvp-yes data-couple-attendance> Буде тільки <?= e($partnerName) ?></label>
+                                    <?php endif; ?>
+                                    <label><input type="radio" name="couple_attendance" value="none" required data-couple-attendance> На жаль, не зможемо</label>
+                                <?php else: ?>
+                                    <label><input type="radio" name="will_attend" value="1" required data-rsvp-yes> Звісно</label>
+                                    <label><input type="radio" name="will_attend" value="0" required> На жаль, не зможу</label>
+                                <?php endif; ?>
                             </fieldset>
 
                             <div class="rsvp-extra-fields is-hidden" data-rsvp-extra>
@@ -556,7 +566,7 @@ $scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/invite.js') ?: time()
                                     <input type="hidden" name="plus_one" value="0">
                                 <?php endif; ?>
 
-                                <label>
+                                <label class="main-drink-field">
                                     <?= e($mainDrinkLabel) ?>
                                     <select name="drink" class="drink-select">
                                         <option value="">❗ Оберіть варіант</option>

@@ -11,7 +11,7 @@ $form = [
     'phone' => '',
     'email' => '',
     'telegram' => '',
-    'guest_group' => '',
+    'guest_group' => 'Друзі',
     'invitation_type' => 'single',
     'plus_one_name' => '',
     'table_number' => '',
@@ -22,7 +22,7 @@ $invitationTypes = [
     'single_plus_one' => 'Одна людина може взяти +1',
     'couple' => 'Сімейна пара',
 ];
-$guestGroupOptions = ['', 'Родичі', 'Друзі', 'Колеги', 'Близькі'];
+$guestGroupOptions = ['Родичі', 'Друзі', 'Колеги', 'Близькі'];
 $tableNumberOptions = array_merge([''], array_map('strval', range(1, 10)));
 
 function e(?string $value): string
@@ -148,16 +148,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form class="admin-form" action="guest_create.php" method="post">
             <?= csrfField() ?>
+
             <label>
-                Імʼя
-                <input type="text" name="name" value="<?= e($form['name']) ?>" required>
+                Тип запрошення
+                <select name="invitation_type" data-invitation-type>
+                    <?php foreach ($invitationTypes as $value => $label): ?>
+                        <option value="<?= e($value) ?>" <?= $form['invitation_type'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                    <?php endforeach; ?>
+                </select>
             </label>
+
+            <div class="admin-form-row admin-form-row-two admin-full">
+                <label>
+                    Імʼя
+                    <input type="text" name="name" value="<?= e($form['name']) ?>" required>
+                </label>
+
+                <label class="admin-conditional-field<?= $form['invitation_type'] === 'couple' ? '' : ' is-hidden' ?>" data-partner-name-field>
+                    Імʼя партнера
+                    <input type="text" name="plus_one_name" value="<?= e($form['plus_one_name']) ?>" placeholder="Для сімейної пари" <?= $form['invitation_type'] === 'couple' ? 'required' : '' ?> data-partner-name-input>
+                </label>
+            </div>
 
             <label class="admin-full">
                 Персональне звернення
                 <textarea name="personal_greeting" rows="3" placeholder="Наприклад: Дорогі друзі, будемо щасливі бачити вас поруч у цей день."><?= e($form['personal_greeting']) ?></textarea>
             </label>
 
+            <div class="admin-form-row admin-form-row-three admin-full">
             <label>
                 Телефон
                 <input type="text" name="phone" value="<?= e($form['phone']) ?>">
@@ -172,7 +190,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Telegram
                 <input type="text" name="telegram" value="<?= e($form['telegram']) ?>">
             </label>
+            </div>
 
+            <div class="admin-form-row admin-form-row-two admin-full">
             <label>
                 Група
                 <select name="guest_group">
@@ -185,20 +205,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </label>
 
             <label>
-                Тип запрошення
-                <select name="invitation_type" data-invitation-type>
-                    <?php foreach ($invitationTypes as $value => $label): ?>
-                        <option value="<?= e($value) ?>" <?= $form['invitation_type'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
-
-            <label class="admin-conditional-field<?= $form['invitation_type'] === 'couple' ? '' : ' is-hidden' ?>" data-partner-name-field>
-                Імʼя партнера
-                <input type="text" name="plus_one_name" value="<?= e($form['plus_one_name']) ?>" placeholder="Для сімейної пари" <?= $form['invitation_type'] === 'couple' ? 'required' : '' ?> data-partner-name-input>
-            </label>
-
-            <label>
                 Номер столу
                 <select name="table_number">
                     <?php foreach ($tableNumberOptions as $tableNumber): ?>
@@ -208,6 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endforeach; ?>
                 </select>
             </label>
+            </div>
 
             <div class="admin-form-actions">
                 <button type="submit">Зберегти гостя</button>

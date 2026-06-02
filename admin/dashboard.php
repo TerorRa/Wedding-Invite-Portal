@@ -4,46 +4,73 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/auth.php';
 
+$guests = R::findAll('guests', 'ORDER BY id ASC');
 $stats = [
-    'totalGuests' => (int)R::count('guests'),
-    'openedInvites' => (int)R::count('guests', 'status IN (?, ?, ?)', ['opened', 'confirmed', 'declined']),
-    'confirmed' => (int)R::count('guests', 'status = ?', ['confirmed']),
-    'declined' => (int)R::count('guests', 'status = ?', ['declined']),
-    'notAnswered' => (int)R::count('guests', 'status IN (?, ?)', ['invited', 'opened']),
-    'plusOnes' => (int)R::count('guests', 'status = ? AND plus_one = ?', ['confirmed', 1]),
+    'totalGuests' => 0,
+    'openedInvites' => 0,
+    'confirmed' => 0,
+    'declined' => 0,
+    'notAnswered' => 0,
+    'plusOnes' => 0,
+    'expectedPeople' => 0,
 ];
+$drinkCounts = [];
 
-$stats['expectedPeople'] = $stats['confirmed'] + $stats['plusOnes'];
-$drinkStatsRows = R::getAll("
-    SELECT drink_name, SUM(drink_count) AS total_count
-    FROM (
-        SELECT drink AS drink_name, COUNT(*) AS drink_count
-        FROM guests
-        WHERE status = 'confirmed'
-          AND drink IS NOT NULL
-          AND drink <> ''
-        GROUP BY drink
+foreach ($guests as $guest) {
+    $status = (string)$guest->status;
+    $invitationType = (string)($guest->invitation_type ?: ((int)$guest->max_plus_one === 1 ? 'single_plus_one' : 'single'));
+    $isCouple = $invitationType === 'couple';
+    $hasPartnerName = trim((string)$guest->plus_one_name) !== '';
+    $invitedPeople = $isCouple && $hasPartnerName ? 2 : 1;
+    $hasAttendanceBreakdown = $guest->primary_attends !== null || $guest->partner_attends !== null;
 
-        UNION ALL
+    $stats['totalGuests'] += $invitedPeople;
 
-        SELECT partner_drink AS drink_name, COUNT(*) AS drink_count
-        FROM guests
-        WHERE status = 'confirmed'
-          AND plus_one = 1
-          AND partner_drink IS NOT NULL
-          AND partner_drink <> ''
-        GROUP BY partner_drink
-    ) AS drinks
-    GROUP BY drink_name
-    ORDER BY total_count DESC, drink_name ASC
-");
+    if (in_array($status, ['opened', 'confirmed', 'declined'], true)) {
+        $stats['openedInvites'] += $invitedPeople;
+    }
 
+    if (in_array($status, ['invited', 'opened'], true)) {
+        $stats['notAnswered'] += $invitedPeople;
+    }
+
+    if ($status === 'confirmed') {
+        $primaryAttends = $hasAttendanceBreakdown ? (int)$guest->primary_attends : 1;
+        $partnerAttends = $hasAttendanceBreakdown ? (int)$guest->partner_attends : (int)$guest->plus_one;
+        $attendingPeople = $primaryAttends + $partnerAttends;
+
+        $stats['confirmed'] += $attendingPeople;
+        $stats['plusOnes'] += $partnerAttends;
+
+        if ($isCouple) {
+            $stats['declined'] += max(0, $invitedPeople - $attendingPeople);
+        }
+
+        $drink = trim((string)$guest->drink);
+        $partnerDrink = trim((string)$guest->partner_drink);
+
+        if ($primaryAttends === 1 && $drink !== '') {
+            $drinkCounts[$drink] = ($drinkCounts[$drink] ?? 0) + 1;
+        }
+
+        if ($partnerAttends === 1 && $partnerDrink !== '') {
+            $drinkCounts[$partnerDrink] = ($drinkCounts[$partnerDrink] ?? 0) + 1;
+        }
+    } elseif ($status === 'declined') {
+        $stats['declined'] += $invitedPeople;
+    }
+}
+
+$stats['expectedPeople'] = $stats['confirmed'];
 $drinkStats = [];
 
-foreach ($drinkStatsRows as $row) {
+ksort($drinkCounts, SORT_NATURAL);
+arsort($drinkCounts, SORT_NUMERIC);
+
+foreach ($drinkCounts as $drinkName => $drinkCount) {
     $drinkStats[] = [
-        'name' => (string)$row['drink_name'],
-        'count' => (int)$row['total_count'],
+        'name' => (string)$drinkName,
+        'count' => (int)$drinkCount,
     ];
 }
 ?>
@@ -76,27 +103,23 @@ foreach ($drinkStatsRows as $row) {
         </div>
 
         <section class="stats-grid" aria-label="Статистика гостей">
-            <article class="stat-card stat-card-wide">
-                <span>Всього гостей</span>
+            <article class="stat-card">
+                <span>Всього запрошено гостей</span>
                 <strong><?= $stats['totalGuests'] ?></strong>
             </article>
-            <article class="stat-card">
-                <span>Підтвердили участь</span>
+             <!--<article class="stat-card">
+                <span>Підтвержено осіб</span>
                 <strong><?= $stats['confirmed'] ?></strong>
-            </article>
+            </article>-->
+
             <article class="stat-card">
                 <span>Відмовились</span>
                 <strong><?= $stats['declined'] ?></strong>
             </article>
-            <article class="stat-card">
-                <span>Кількість +1</span>
+            <!--<article class="stat-card">
+                <span>Запрошень з +1</span>
                 <strong><?= $stats['plusOnes'] ?></strong>
-            </article>
-            <article class="stat-card ">
-                <span>Загальна очікувана кількість людей</span>
-                <strong><?= $stats['expectedPeople'] ?></strong>
-            </article>
-
+            </article>-->
             <article class="stat-card">
                 <span>Відкрили запрошення</span>
                 <strong><?= $stats['openedInvites'] ?></strong>
@@ -106,7 +129,8 @@ foreach ($drinkStatsRows as $row) {
                 <strong><?= $stats['notAnswered'] ?></strong>
             </article>
             <article class="stat-card stat-card-drinks">
-                <span>Кількість осіб по напоям</span>
+                <span>Статистика по напоям:</span>
+                <p class="admin-muted">Підтверджено осіб: <strong><?= $stats['expectedPeople'] ?></strong></p>
                 <?php if ($drinkStats === []): ?>
                     <p class="admin-muted">Поки немає підтверджених відповідей з обраними напоями.</p>
                 <?php else: ?>
