@@ -159,9 +159,16 @@ if ($invitationType === 'couple' && $partnerName !== '') {
     <main class="start-shell" aria-label="Вступ до запрошення">
         <?php if ($guest === null): ?>
             <section class="start-not-found" aria-labelledby="notFoundTitle">
-                <p class="start-eyebrow">Запрошення</p>
-                <h1 id="notFoundTitle">Запрошення не знайдено</h1>
-                <p>Перевірте посилання або зверніться до організаторів.</p>
+                <div class="start-starfield" aria-hidden="true"></div>
+                <div class="start-starbursts" aria-hidden="true"></div>
+                <div class="start-comets" aria-hidden="true"></div>
+                <img class="intro-moon" src="<?= e(assetUrl('assets/img/bck/little_prince_transparent_moon.png')) ?>" alt="" aria-hidden="true">
+                <div class="start-not-found__card">
+                    <p class="start-eyebrow">Запрошення</p>
+                    <h1 id="notFoundTitle">Запрошення не знайдено</h1>
+                    <p>Перевірте посилання або зверніться до організаторів.</p>
+                    <a class="intro-btn intro-btn--primary" href="<?= e(assetUrl('index.php')) ?>">На головну</a>
+                </div>
             </section>
         <?php else: ?>
             <section

@@ -9,18 +9,35 @@ const bgMusic = document.querySelector('[data-bg-music]');
 let bgMusicPendingGesture = false;
 
 document.querySelectorAll('[data-file-input]').forEach((input) => {
-    const filePicker = input.closest('label');
+    const filePicker = input.closest('.pass-file-picker') || input.closest('label');
     const fileName = filePicker?.querySelector('[data-file-name]');
+    const pickButtons = filePicker?.querySelectorAll('[data-video-pick]') || [];
 
     if (!fileName) {
         return;
     }
 
-    input.addEventListener('change', () => {
+    const syncSelectedFileName = () => {
         const selectedFile = input.files?.[0] || null;
+        const selectedName = selectedFile?.name || '';
 
         filePicker?.classList.toggle('is-selected', Boolean(selectedFile));
-        fileName.textContent = selectedFile ? `Відео обрано: ${selectedFile.name}` : 'Файл не обрано';
+        fileName.textContent = selectedFile ? 'Відео обрано' + (selectedName ? ': ' + selectedName : '') : 'Файл не обрано';
+    };
+
+    input.addEventListener('change', syncSelectedFileName);
+    input.addEventListener('input', syncSelectedFileName);
+
+    pickButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            if (button.dataset.videoPick === 'camera') {
+                input.setAttribute('capture', 'user');
+            } else {
+                input.removeAttribute('capture');
+            }
+
+            input.click();
+        });
     });
 });
 
@@ -36,6 +53,10 @@ document.querySelectorAll('.pass-video-form').forEach((form) => {
         if (!form.checkValidity()) {
             return;
         }
+
+        form.querySelectorAll('[data-file-input]').forEach((input) => {
+            input.dispatchEvent(new Event('change'));
+        });
 
         submitButton.classList.add('is-uploading');
         submitButton.disabled = true;

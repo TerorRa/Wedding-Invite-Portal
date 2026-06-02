@@ -65,6 +65,7 @@ $photoFiles = [];
 $photoDirectory = __DIR__ . '/assets/foto';
 $videoGreetingDirectory = __DIR__ . '/assets/video_greetings';
 $styleVersion = (string)(@filemtime(__DIR__ . '/assets/css/style.css') ?: time());
+$scriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/invite.js') ?: time());
 $videoGreetingMessage = '';
 $videoGreetingError = '';
 $safeInviteCode = safeGreetingCode($code);
@@ -184,12 +185,13 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                     <?php endif; ?>
                     <form class="pass-video-form" action="<?= e($ticketUrl) ?>" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="video_action" value="upload_video">
-                        <label class="pass-file-picker">
+                        <div class="pass-file-picker">
                             <span class="pass-file-picker__title">Записати або обрати відео</span>
                             <input class="pass-video-file-input" type="file" name="video_greeting" accept="video/*,.mp4,.mov,.webm,.m4v" data-file-input required>
-                            <span class="pass-file-picker__control">Обрати відео</span>
+                            <button class="pass-file-picker__control" type="button" data-video-pick="gallery">Обрати з галереї</button>
+                            <button class="pass-file-picker__control pass-file-picker__control--secondary" type="button" data-video-pick="camera">Записати відео</button>
                             <span class="pass-file-picker__name" data-file-name aria-live="polite">Файл не обрано</span>
-                        </label>
+                        </div>
                         <button class="section-action pass-about-button pass-video-submit" type="submit" data-upload-submit>
                             <span data-submit-text><?= $videoGreetingRelative !== null ? 'Замінити відеопривітання' : 'Надіслати відеопривітання' ?></span>
                             <span class="pass-upload-spinner" aria-hidden="true"></span>
@@ -310,7 +312,7 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
             </div>
         <?php endif; ?>
     </main>
-    <script src="assets/js/invite.js"></script>
+    <script src="assets/js/invite.js?v=<?= e($scriptVersion) ?>"></script>
 </body>
 
 </html>

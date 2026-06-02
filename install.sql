@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS guests (
     max_plus_one TINYINT DEFAULT 0,
     status VARCHAR(50) DEFAULT 'invited',
     will_attend TINYINT NULL,
+    primary_attends TINYINT NULL,
+    partner_attends TINYINT NULL,
     plus_one TINYINT DEFAULT 0,
     plus_one_name VARCHAR(255) NULL,
     drink VARCHAR(255) NULL,
@@ -48,6 +50,10 @@ ALTER TABLE guests
 
 ALTER TABLE guests
     ADD COLUMN IF NOT EXISTS invitation_type VARCHAR(50) NOT NULL DEFAULT 'single' AFTER guest_group;
+
+ALTER TABLE guests
+    ADD COLUMN IF NOT EXISTS primary_attends TINYINT NULL AFTER will_attend,
+    ADD COLUMN IF NOT EXISTS partner_attends TINYINT NULL AFTER primary_attends;
 
 ALTER TABLE guests
     ADD COLUMN IF NOT EXISTS partner_drink VARCHAR(255) NULL AFTER drink;

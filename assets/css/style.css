@@ -3400,9 +3400,38 @@ dd {
     justify-content: center;
     padding: 0 16px;
     color: #203854;
+    font: inherit;
     font-weight: 700;
     background: linear-gradient(180deg, #fff7dc, #ead184);
+    border: 0;
     box-shadow: 0 10px 22px rgba(0, 0, 0, .16);
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.pass-file-picker__control:hover,
+.pass-file-picker__control:focus-visible {
+    color: #231018;
+    background: linear-gradient(180deg, #ffffff, #f0d47c 46%, #b8862c);
+    box-shadow:
+        0 14px 30px rgba(0, 0, 0, .22),
+        0 0 20px rgba(234, 217, 165, .24);
+    transform: translateY(-2px);
+}
+
+.pass-file-picker__control--secondary {
+    display: none;
+    color: #fff7dc;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(234, 217, 165, .36);
+    box-shadow: inset 0 1px 0 rgba(255, 248, 225, .14);
+}
+
+.pass-file-picker__control--secondary:hover,
+.pass-file-picker__control--secondary:focus-visible {
+    color: #2e1720;
+    background: linear-gradient(135deg, #fff7dc, #d2aa54 58%, #f4df9a);
+    border-color: rgba(255, 248, 225, .82);
 }
 
 .pass-file-picker.is-selected .pass-file-picker__control {
@@ -3410,6 +3439,7 @@ dd {
 }
 
 .pass-file-picker__name {
+    grid-column: 1 / -1;
     min-width: 0;
     padding: 0 14px;
     color: rgba(255, 248, 225, .82);
@@ -3448,6 +3478,18 @@ dd {
 
 .pass-video-submit {
     gap: 10px;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.pass-video-submit:hover,
+.pass-video-submit:focus-visible {
+    color: #231018;
+    background: linear-gradient(135deg, #ffffff, #f0d47c 46%, #b8862c);
+    box-shadow:
+        0 18px 38px rgba(0, 0, 0, .3),
+        0 0 24px rgba(201, 168, 93, .24),
+        inset 0 1px 0 rgba(255, 255, 255, .5);
+    transform: translateY(-2px);
 }
 
 .pass-video-submit:disabled {
@@ -4247,6 +4289,55 @@ body:has(.pass-shell) {
         overflow-x: hidden;
     }
 
+    .pass-shell {
+        min-height: 100svh;
+        justify-content: center;
+        padding: 16px 12px;
+    }
+
+    .pass-declined-card {
+        width: calc(100vw - 24px);
+        max-width: 560px;
+        padding: 26px 16px;
+        border-radius: 22px;
+    }
+
+    .pass-declined-card h1 {
+        font-size: clamp(44px, 13vw, 68px);
+        line-height: .98;
+    }
+
+    .pass-declined-card p {
+        font-size: 16px;
+        line-height: 1.65;
+    }
+
+    .pass-video-greeting {
+        padding: 16px;
+        gap: 14px;
+    }
+
+    .pass-video-greeting h2 {
+        font-size: 28px;
+    }
+
+    .pass-file-picker {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        font-size: 14px;
+    }
+
+    .pass-file-picker__control,
+    .pass-file-picker__name {
+        width: 100%;
+        min-height: 48px;
+    }
+
+    .pass-video-submit {
+        min-height: 52px;
+        font-size: 14px;
+    }
+
     .late-page-shell {
         padding-inline: 14px;
     }
@@ -4519,6 +4610,10 @@ body:has(.pass-shell) {
     .pass-main h1 {
         font-size: clamp(44px, 14vw, 64px);
         overflow-wrap: anywhere;
+    }
+
+    .pass-file-picker__control--secondary {
+        display: inline-flex;
     }
 
     .pass-note {
