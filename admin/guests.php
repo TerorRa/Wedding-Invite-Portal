@@ -206,12 +206,18 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                                     <br>
                                     <?= e($partnerAttendanceMark . (string)$guest->plus_one_name) ?>
                                 </td>
-                                <td><?= e($guest->phone) ?></td>
+                                <td><?= e($guest->phone) ?><br>
+                                    <?php if ((int)$guest->is_send === 0): ?>
+                                        <a class="table-link" href="guest_send.php?id=<?= (int)$guest->id ?>">❗❓</a>
+                                    <?php else: ?>
+                                        💌
+                                    <?php endif; ?>
+                                </td>
 
 
                                 <td><?= e($guest->drink) ?><br> <?= e($guest->partner_drink) ?></td>
-                                <td><?= e($guest->table_number) ?>  <br>
-                                     <?= (int)$guest->prepare_toast === 1 ? '🥂Так' : '💤Ні' ?>
+                                <td><?= e($guest->table_number) ?> <br>
+                                    <?= (int)$guest->prepare_toast === 1 ? '🥂Так' : '💤Ні' ?>
                                 </td>
 
                                 <td>
@@ -226,7 +232,7 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                                     <?php if ($canAdminConfirm): ?>
                                         <br>
                                         <button
-                                            type="button"
+                                            type=" button"
                                             class="table-inline-button confirm-guest-button"
                                             data-confirm-guest
                                             data-guest-id="<?= (int)$guest->id ?>"
