@@ -204,6 +204,7 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                         </form>
                     <?php endif; ?>
                 </div>
+                <a class="section-action pass-about-button" href="<?= e($aboutUrl) ?>">Трохи нас</a>
                 <a class="section-action pass-edit-response-button" href="<?= e($inviteUrl) ?>">Змінити відповідь</a>
             </section>
         <?php else: ?>
@@ -243,7 +244,7 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                                 <div>
                                     <dt>Місце</dt>
                                     <dd>Петрівський Бровар, Київська область</dd>
-                                </div> 
+                                </div>
                                 <div>
                                     <dt>Дата</dt>
                                     <dd>13:00 01.08.2026</dd>
@@ -254,10 +255,10 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
                                     <div><strong data-hours>00</strong><span>годин</span></div>
                                     <div><strong data-minutes>00</strong><span>хвилин</span></div>
                                     <div><strong data-seconds>00</strong><span>секунд</span></div>
-                                </div>                            
+                                </div>
                             </div>
 
-                           
+
                             <!-- <?php if (!empty($guest->table_number)): ?>
                                 <div>
                                     <dt>Стіл</dt>
