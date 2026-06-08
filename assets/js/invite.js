@@ -235,7 +235,7 @@ function tryPlayBgMusic() {
     }
 
     playBgMusic().catch(() => {
-        // Браузер може блокувати звук без дії користувача. Наступний клік/тап повторить запуск.
+        // Браузер може блокувати звук без дії користувача. Наступний клік/тап/скрол повторить запуск.
     });
 }
 
@@ -253,6 +253,9 @@ function bindMusicAutostart() {
     document.addEventListener('pointerdown', startOnce, { once: true, capture: true });
     document.addEventListener('touchstart', startOnce, { once: true, capture: true });
     document.addEventListener('keydown', startOnce, { once: true, capture: true });
+    document.addEventListener('wheel', startOnce, { once: true, passive: true, capture: true });
+    document.addEventListener('scroll', startOnce, { once: true, passive: true, capture: true });
+    window.addEventListener('scroll', startOnce, { once: true, passive: true, capture: true });
 }
 
 bindMusicAutostart();
