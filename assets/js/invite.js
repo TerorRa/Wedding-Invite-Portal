@@ -6,99 +6,388 @@ const inviteContent = document.querySelector('#inviteContent');
 const copyLinkButton = document.querySelector('[data-copy-link]');
 const musicButton = document.querySelector('[data-music-toggle]');
 const bgMusic = document.querySelector('[data-bg-music]');
-let bgMusicPendingGesture = false;
 
-document.querySelectorAll('[data-file-input]').forEach((input) => {
-    const filePicker = input.closest('.pass-file-picker') || input.closest('label');
-    const fileName = filePicker?.querySelector('[data-file-name]');
-    const pickButtons = filePicker?.querySelectorAll('[data-video-pick]') || [];
+const INVITE_NIGHT_BACKGROUND = 'linear-gradient(180deg, #07101f 0%, #111d31 54%, #1b2845 100%)';
 
-    if (!fileName) {
+function installInviteBackgroundGuard() {
+    if (document.querySelector('#inviteBackgroundGuard')) {
         return;
     }
 
-    const syncSelectedFileName = () => {
-        const selectedFile = input.files?.[0] || null;
-        const selectedName = selectedFile?.name || '';
-
-        filePicker?.classList.toggle('is-selected', Boolean(selectedFile));
-        fileName.textContent = selectedFile ? 'Відео обрано' + (selectedName ? ': ' + selectedName : '') : 'Файл не обрано';
-    };
-
-    input.addEventListener('change', syncSelectedFileName);
-    input.addEventListener('input', syncSelectedFileName);
-
-    pickButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-            if (button.dataset.videoPick === 'camera') {
-                input.setAttribute('capture', 'user');
-            } else {
-                input.removeAttribute('capture');
-            }
-
-            input.click();
-        });
-    });
-});
-
-document.querySelectorAll('.pass-video-form').forEach((form) => {
-    const submitButton = form.querySelector('[data-upload-submit]');
-    const submitText = submitButton?.querySelector('[data-submit-text]');
-
-    if (!submitButton || !submitText) {
-        return;
-    }
-
-    form.addEventListener('submit', () => {
-        if (!form.checkValidity()) {
-            return;
+    const style = document.createElement('style');
+    style.id = 'inviteBackgroundGuard';
+    style.textContent = `
+        body.has-invite-gate::before,
+        body.has-inline-photo-intro::before {
+            display: none !important;
+            content: none !important;
         }
 
-        form.querySelectorAll('[data-file-input]').forEach((input) => {
-            input.dispatchEvent(new Event('change'));
-        });
+        body.has-invite-gate,
+        body.has-inline-photo-intro,
+        body.has-invite-gate main,
+        body.has-inline-photo-intro main {
+            background: #07101f !important;
+        }
 
-        submitButton.classList.add('is-uploading');
-        submitButton.disabled = true;
-        submitText.textContent = 'Завантажуємо відео...';
-        submitButton.setAttribute('aria-busy', 'true');
-    });
-});
+        body.has-invite-gate .invite-opening,
+        body.has-invite-gate .invite-content,
+        body.has-invite-gate .invite-photo-opening,
+        body.has-invite-gate .invite-bg-night {
+            background: linear-gradient(180deg, #07101f 0%, #111d31 54%, #1b2845 100%) !important;
+        }
+
+        body.has-invite-gate .invite-content {
+            min-height: 100vh;
+            isolation: isolate;
+        }
+
+        body.has-invite-gate .invite-shared-moon {
+            position: fixed;
+            top: clamp(42px, 12vh, 110px);
+            right: clamp(28px, 10vw, 150px);
+            z-index: 4;
+            width: clamp(74px, 15vw, 156px);
+            aspect-ratio: 1;
+            border-radius: 50%;
+            pointer-events: none;
+            background: radial-gradient(circle at 36% 32%, #ffffff 0 12%, #f5f8fc 28%, #dbe6f2 52%, #9fb6d1 100%);
+            box-shadow: 0 0 28px rgba(255,255,255,.78), 0 0 90px rgba(184,204,228,.52), 0 0 170px rgba(184,204,228,.22);
+            opacity: .92;
+        }
+
+        body.has-invite-gate .invite-shared-moon span {
+            position: absolute;
+            inset: 18% 0 0 24%;
+            width: 76%;
+            height: 76%;
+            border-radius: 50%;
+            background: rgba(27,40,69,.18);
+            filter: blur(1px);
+            transform: rotate(-14deg);
+        }
+
+        body.has-invite-gate .invite-content-stars {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+            overflow: hidden !important;
+            display: none;
+            opacity: .98;
+        }
+
+        body.has-invite-gate.invite-opened .invite-content-stars {
+            display: block !important;
+        }
+
+        body.has-invite-gate .splash__comet,
+        body.has-inline-photo-intro .splash__comet {
+            opacity: 0;
+            animation-fill-mode: both;
+            transform: translate(-320px, -14vh) rotate(var(--a, 25deg));
+        }
+
+        body.has-invite-gate .cosmic-comet,
+        body.has-inline-photo-intro .cosmic-comet {
+            opacity: 0;
+            animation-fill-mode: both;
+            transform: translate3d(-45vw, -12vh, 0) rotate(var(--angle, 28deg));
+        }
+
+        body.has-invite-gate .cosmic-effects {
+            z-index: 1 !important;
+            opacity: .95 !important;
+        }
+
+        body.has-invite-gate .invite-content > section,
+        body.has-invite-gate .invite-content > div:not(.invite-content-stars):not(.cosmic-effects) {
+            position: relative;
+            z-index: 2;
+        }
+
+        .rsvp-section {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            padding-top: clamp(72px, 9vw, 128px) !important;
+            padding-bottom: clamp(78px, 10vw, 142px) !important;
+            color: #fff;
+            background:
+                radial-gradient(circle at 14% 10%, rgba(255, 232, 178, .28), transparent 24%),
+                radial-gradient(circle at 86% 16%, rgba(255, 255, 255, .18), transparent 24%),
+                radial-gradient(circle at 50% 110%, rgba(201, 168, 93, .34), transparent 36%),
+                linear-gradient(180deg, #111d31 0%, #283a5a 48%, #6f86a6 100%) !important;
+            border-top: 2px solid rgba(234, 217, 165, .72);
+            border-bottom: 2px solid rgba(234, 217, 165, .62);
+            box-shadow:
+                inset 0 18px 80px rgba(0, 0, 0, .22),
+                inset 0 -18px 80px rgba(0, 0, 0, .16);
+        }
+
+        .rsvp-section::before {
+            content: "Важливо: будь ласка, заповніть анкету до 17.07.2026";
+            position: relative;
+            z-index: 4;
+            display: block;
+            width: min(760px, calc(100% - 36px));
+            margin: 0 auto 22px;
+            padding: 13px 18px;
+            color: #1f2d44;
+            text-align: center;
+            font-size: clamp(13px, 2.8vw, 16px);
+            font-weight: 700;
+            letter-spacing: .08em;
+            line-height: 1.35;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff6db, #ead9a5 48%, #fff8e8 100%);
+            border: 1px solid rgba(255, 255, 255, .78);
+            border-radius: 999px;
+            box-shadow:
+                0 12px 38px rgba(31, 45, 68, .28),
+                0 0 0 7px rgba(234, 217, 165, .14),
+                0 0 36px rgba(255, 242, 190, .34);
+            animation: rsvpUrgentBadgePulse 1.85s ease-in-out infinite;
+        }
+
+        .rsvp-section::after {
+            content: "";
+            position: absolute;
+            inset: 18px;
+            z-index: 0;
+            pointer-events: none;
+            border: 1px solid rgba(234, 217, 165, .44);
+            border-radius: 28px;
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, .08),
+                0 0 54px rgba(234, 217, 165, .16);
+        }
+
+        .rsvp-section .section-symbol--ticket {
+            opacity: .44 !important;
+            filter:
+                drop-shadow(0 0 18px rgba(255, 255, 255, .7))
+                drop-shadow(0 0 42px rgba(234, 217, 165, .38));
+            animation: rsvpStarShake 2.8s ease-in-out infinite;
+        }
+
+        .rsvp-section .rsvp-wrap {
+            position: relative;
+            z-index: 3;
+            width: min(840px, calc(100% - 28px));
+            padding: clamp(30px, 5vw, 56px);
+            background:
+                radial-gradient(circle at 50% 0%, rgba(255, 255, 255, .20), transparent 38%),
+                linear-gradient(180deg, rgba(7, 16, 31, .78), rgba(17, 29, 49, .66));
+            border: 2px solid rgba(234, 217, 165, .76);
+            border-radius: 30px;
+            box-shadow:
+                0 28px 92px rgba(7, 16, 31, .38),
+                0 0 0 8px rgba(234, 217, 165, .10),
+                inset 0 1px 0 rgba(255, 255, 255, .16);
+            backdrop-filter: blur(16px);
+        }
+
+        .rsvp-section .t-scr {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 14px;
+            color: #1f2d44 !important;
+            background: rgba(255, 246, 219, .95);
+            border-radius: 999px;
+            box-shadow: 0 10px 28px rgba(7, 16, 31, .22);
+        }
+
+        .rsvp-section .t-scr::before,
+        .rsvp-section .t-scr::after {
+            content: "✦";
+            color: #a37b24;
+        }
+
+        .rsvp-section .t-h {
+            color: #fff !important;
+            font-size: clamp(32px, 7vw, 58px) !important;
+            font-weight: 700;
+            line-height: 1.03;
+            text-shadow:
+                0 3px 10px rgba(0, 0, 0, .45),
+                0 0 22px rgba(255, 255, 255, .24),
+                0 0 42px rgba(234, 217, 165, .22);
+        }
+
+        .rsvp-section .rsvp-note {
+            width: min(620px, 100%);
+            margin: 0 auto 26px;
+            padding: 16px 18px;
+            color: rgba(255, 255, 255, .96) !important;
+            font-size: clamp(16px, 3vw, 19px);
+            font-weight: 500;
+            line-height: 1.72;
+            background: rgba(255, 255, 255, .11);
+            border: 1px solid rgba(255, 255, 255, .24);
+            border-radius: 18px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10);
+        }
+
+        .rsvp-section .rsvp-form {
+            padding: clamp(22px, 4vw, 34px) !important;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(255, 246, 219, .18), transparent 28%),
+                linear-gradient(180deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .10)) !important;
+            border: 2px solid rgba(255, 246, 219, .72) !important;
+            border-radius: 24px;
+            box-shadow:
+                0 24px 66px rgba(0, 0, 0, .24),
+                0 0 0 5px rgba(255, 246, 219, .08),
+                inset 0 1px 0 rgba(255, 255, 255, .18) !important;
+        }
+
+        .rsvp-section .rsvp-form legend {
+            color: #fff6db !important;
+            font-size: clamp(17px, 3vw, 22px);
+            font-weight: 700;
+        }
+
+        .rsvp-section .rsvp-form fieldset {
+            background: rgba(7, 16, 31, .30) !important;
+            border-color: rgba(234, 217, 165, .42) !important;
+        }
+
+        .rsvp-section .rsvp-form label,
+        .rsvp-section .rsvp-form .form-hint {
+            color: rgba(255, 255, 255, .94) !important;
+        }
+
+        .rsvp-section .rsvp-toggle-fieldset label,
+        .rsvp-section .rsvp-form fieldset label {
+            border-color: rgba(234, 217, 165, .30) !important;
+            background: rgba(255, 255, 255, .10) !important;
+        }
+
+        .rsvp-section .rsvp-toggle-fieldset label:has(input:checked),
+        .rsvp-section .rsvp-form fieldset label:has(input:checked) {
+            color: #1f2d44 !important;
+            background: linear-gradient(135deg, #fff6db, #ead9a5) !important;
+            border-color: rgba(255, 255, 255, .84) !important;
+            box-shadow: 0 10px 28px rgba(7, 16, 31, .22);
+        }
+
+        .rsvp-section .drink-select,
+        .rsvp-section .rsvp-form input[type="text"],
+        .rsvp-section .rsvp-form textarea {
+            border-width: 2px !important;
+            border-color: rgba(234, 217, 165, .70) !important;
+            box-shadow: 0 10px 22px rgba(7, 16, 31, .16);
+        }
+
+        .rsvp-section .rsvp-submit {
+            min-height: 56px;
+            margin-top: 8px;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, .70);
+            box-shadow:
+                0 16px 44px rgba(7, 16, 31, .30),
+                0 0 0 6px rgba(234, 217, 165, .14),
+                0 0 34px rgba(234, 217, 165, .30);
+            animation: rsvpSubmitPulse 1.6s ease-in-out infinite;
+        }
+
+        .rsvp-section .rsvp-form > p:last-child {
+            color: rgba(255, 255, 255, .76);
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        @keyframes rsvpUrgentBadgePulse {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+                box-shadow:
+                    0 12px 38px rgba(31, 45, 68, .28),
+                    0 0 0 7px rgba(234, 217, 165, .14),
+                    0 0 36px rgba(255, 242, 190, .34);
+            }
+            50% {
+                transform: translateY(-3px) scale(1.018);
+                box-shadow:
+                    0 18px 48px rgba(31, 45, 68, .34),
+                    0 0 0 10px rgba(234, 217, 165, .19),
+                    0 0 52px rgba(255, 242, 190, .46);
+            }
+        }
+
+        @keyframes rsvpSubmitPulse {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes rsvpStarShake {
+            0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+            25% { transform: translate3d(0, -4px, 0) rotate(5deg); }
+            50% { transform: translate3d(0, 0, 0) rotate(-3deg); }
+            75% { transform: translate3d(0, -3px, 0) rotate(4deg); }
+        }
+
+        @media (max-width: 640px) {
+            .rsvp-section {
+                padding-top: 64px !important;
+                padding-bottom: 82px !important;
+            }
+            .rsvp-section::before {
+                width: calc(100% - 22px);
+                border-radius: 18px;
+                font-size: 12px;
+                letter-spacing: .04em;
+            }
+            .rsvp-section::after {
+                inset: 10px;
+                border-radius: 20px;
+            }
+            .rsvp-section .rsvp-wrap {
+                width: calc(100% - 18px);
+                padding: 24px 16px;
+                border-radius: 22px;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+function ensureInviteSharedMoon() {
+    if (document.querySelector('.invite-shared-moon')) {
+        return;
+    }
+
+    const moon = document.createElement('div');
+    const shadow = document.createElement('span');
+
+    moon.className = 'invite-shared-moon';
+    moon.setAttribute('aria-hidden', 'true');
+    shadow.setAttribute('aria-hidden', 'true');
+    moon.appendChild(shadow);
+    document.body.appendChild(moon);
+}
+
+installInviteBackgroundGuard();
+ensureInviteSharedMoon();
 
 function buildStars(container, count) {
     if (!container) {
         return;
     }
 
-    const isCelestialInvite = document.body.classList.contains('celestial-theme');
-    const starCount = isCelestialInvite ? Math.min(count, 44) : count;
-
-    for (let i = 0; i < starCount; i++) {
+    for (let i = 0; i < count; i++) {
         const star = document.createElement('i');
         star.style.left = `${Math.random() * 100}%`;
         star.style.top = `${Math.random() * 100}%`;
-        star.style.setProperty('--size', isCelestialInvite ? `${1 + Math.random() * 2.4}px` : `${1 + Math.random() * 3}px`);
-        star.style.setProperty('--alpha', isCelestialInvite ? `${0.48 + Math.random() * 0.44}` : `${0.35 + Math.random() * 0.65}`);
-        star.style.setProperty('--duration', isCelestialInvite ? `${3.8 + Math.random() * 4.8}s` : `${2 + Math.random() * 4}s`);
-        star.style.setProperty('--delay', `${Math.random() * 5}s`);
-        container.appendChild(star);
-    }
-}
-
-function buildNightCrossStars(container, count) {
-    if (!container) {
-        return;
-    }
-
-    for (let i = 0; i < count; i++) {
-        const star = document.createElement('span');
-        star.className = 'night-cross-star';
-        star.style.left = `${8 + Math.random() * 84}%`;
-        star.style.top = `${6 + Math.random() * 72}%`;
-        star.style.setProperty('--size', `${10 + Math.random() * 7}px`);
-        star.style.setProperty('--alpha', `${0.58 + Math.random() * 0.34}`);
-        star.style.setProperty('--duration', `${3.8 + Math.random() * 3.6}s`);
-        star.style.setProperty('--delay', `${Math.random() * 5}s`);
+        star.style.setProperty('--size', `${1 + Math.random() * 3}px`);
+        star.style.setProperty('--alpha', `${0.35 + Math.random() * 0.65}`);
+        star.style.setProperty('--duration', `${2 + Math.random() * 4}s`);
+        star.style.setProperty('--delay', `${Math.random() * 4}s`);
         container.appendChild(star);
     }
 }
@@ -134,20 +423,6 @@ function buildSplashStarbursts(container, count) {
     }
 }
 
-function randomizeSplashComet(comet) {
-    const width = 50 + Math.random() * 100;
-    const dropVh = 10 + Math.random() * 20;
-    const travelX = window.innerWidth + 300;
-    const travelY = window.innerHeight * (dropVh / 100);
-    const angle = Math.atan2(travelY, travelX) * (180 / Math.PI);
-
-    comet.style.top = `${3 + Math.random() * 50}%`;
-    comet.style.width = `${width}px`;
-    comet.style.setProperty('--cd', `${3 + Math.random() * 4}s`);
-    comet.style.setProperty('--a', `${angle}deg`);
-    comet.style.setProperty('--dy', `${dropVh}vh`);
-}
-
 function buildSplashComets(container, count) {
     if (!container) {
         return;
@@ -155,29 +430,20 @@ function buildSplashComets(container, count) {
 
     for (let i = 0; i < count; i++) {
         const comet = document.createElement('span');
+        const width = 50 + Math.random() * 100;
 
         comet.className = 'splash__comet';
-        comet.style.left = '0';
+        comet.style.left = `${-(width + 180)}px`;
+        comet.style.top = `${-12 + Math.random() * 62}%`;
+        comet.style.width = `${width}px`;
+        comet.style.opacity = '0';
+        comet.style.animationFillMode = 'both';
+        comet.style.setProperty('--cd', `${3 + Math.random() * 4}s`);
         comet.style.setProperty('--cdel', `${i * 1.5 + Math.random() * 2}s`);
-        randomizeSplashComet(comet);
-        comet.addEventListener('animationiteration', () => randomizeSplashComet(comet));
+        comet.style.setProperty('--a', `${20 + Math.random() * 15}deg`);
+        comet.style.setProperty('--dy', `${10 + Math.random() * 20}vh`);
         container.appendChild(comet);
     }
-}
-
-function randomizeCosmicComet(comet, isCelestialInvite) {
-    const dropVh = isCelestialInvite ? 16 + Math.random() * 36 : 18 + Math.random() * 36;
-    const travelVw = 147;
-    const travelX = window.innerWidth * (travelVw / 100);
-    const travelY = window.innerHeight * (dropVh / 100);
-    const angle = Math.atan2(travelY, travelX) * (180 / Math.PI);
-
-    comet.style.left = `${-12 - Math.random() * 18}vw`;
-    comet.style.top = `${4 + Math.random() * 92}%`;
-    comet.style.setProperty('--tail', isCelestialInvite ? `${90 + Math.random() * 130}px` : `${90 + Math.random() * 90}px`);
-    comet.style.setProperty('--angle', `${angle}deg`);
-    comet.style.setProperty('--drop', `${dropVh}vh`);
-    comet.style.setProperty('--duration', isCelestialInvite ? `${6 + Math.random() * 5.5}s` : `${5.5 + Math.random() * 4.5}s`);
 }
 
 function buildCosmicEffects(container) {
@@ -185,37 +451,22 @@ function buildCosmicEffects(container) {
         return;
     }
 
-    const isCelestialInvite = document.body.classList.contains('celestial-theme');
-    const isPassPage = container.classList.contains('cosmic-effects--pass');
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    let starCount = isCelestialInvite ? 18 : 44;
-    let dustCount = isCelestialInvite ? 0 : 38;
-    let cometCount = isCelestialInvite ? 7 : 9;
-    let orbCount = isCelestialInvite ? 4 : 12;
-
-    if (isPassPage && isMobile) {
-        starCount = 18;
-        dustCount = 8;
-        cometCount = 2;
-        orbCount = 3;
-    }
-
-    for (let i = 0; i < starCount; i++) {
+    for (let i = 0; i < 44; i++) {
         const star = document.createElement('span');
         star.className = 'cosmic-star';
         star.style.left = `${Math.random() * 100}%`;
         star.style.top = `${Math.random() * 100}%`;
-        star.style.setProperty('--size', isCelestialInvite ? `${1.1 + Math.random() * 2.5}px` : `${1 + Math.random() * 2.8}px`);
-        star.style.setProperty('--alpha', isCelestialInvite ? `${0.28 + Math.random() * 0.28}` : `${0.35 + Math.random() * 0.55}`);
-        star.style.setProperty('--duration', isCelestialInvite ? `${5.8 + Math.random() * 3.8}s` : `${2.4 + Math.random() * 4.5}s`);
-        star.style.setProperty('--float', isCelestialInvite ? `${13 + Math.random() * 8}s` : `${8 + Math.random() * 11}s`);
+        star.style.setProperty('--size', `${1 + Math.random() * 2.8}px`);
+        star.style.setProperty('--alpha', `${0.35 + Math.random() * 0.55}`);
+        star.style.setProperty('--duration', `${2.4 + Math.random() * 4.5}s`);
+        star.style.setProperty('--float', `${8 + Math.random() * 11}s`);
         star.style.setProperty('--delay', `${Math.random() * 7}s`);
-        star.style.setProperty('--drift-x', isCelestialInvite ? `${-5 + Math.random() * 10}px` : `${-14 + Math.random() * 28}px`);
-        star.style.setProperty('--drift-y', isCelestialInvite ? `${-6 + Math.random() * 8}px` : `${-18 + Math.random() * 12}px`);
+        star.style.setProperty('--drift-x', `${-14 + Math.random() * 28}px`);
+        star.style.setProperty('--drift-y', `${-18 + Math.random() * 12}px`);
         container.appendChild(star);
     }
 
-    for (let i = 0; i < dustCount; i++) {
+    for (let i = 0; i < 38; i++) {
         const dust = document.createElement('span');
         dust.className = 'cosmic-dust';
         dust.style.left = `${Math.random() * 100}%`;
@@ -228,27 +479,32 @@ function buildCosmicEffects(container) {
         container.appendChild(dust);
     }
 
-    for (let i = 0; i < cometCount; i++) {
+    for (let i = 0; i < 7; i++) {
         const comet = document.createElement('span');
-
         comet.className = 'cosmic-comet';
-        comet.style.setProperty('--delay', `${i * (isCelestialInvite ? 3.2 : 2.8) + Math.random() * 5}s`);
-        randomizeCosmicComet(comet, isCelestialInvite);
-        comet.addEventListener('animationiteration', () => randomizeCosmicComet(comet, isCelestialInvite));
+        comet.style.left = `${-35 - Math.random() * 24}vw`;
+        comet.style.top = `${-10 + Math.random() * 112}%`;
+        comet.style.opacity = '0';
+        comet.style.animationFillMode = 'both';
+        comet.style.setProperty('--tail', `${90 + Math.random() * 90}px`);
+        comet.style.setProperty('--angle', `${20 + Math.random() * 16}deg`);
+        comet.style.setProperty('--drop', `${18 + Math.random() * 36}vh`);
+        comet.style.setProperty('--duration', `${5.5 + Math.random() * 4.5}s`);
+        comet.style.setProperty('--delay', `${i * 2.8 + Math.random() * 5}s`);
         container.appendChild(comet);
     }
 
-    for (let i = 0; i < orbCount; i++) {
+    for (let i = 0; i < 12; i++) {
         const orb = document.createElement('span');
         orb.className = 'cosmic-orb';
         orb.style.left = `${Math.random() * 100}%`;
         orb.style.top = `${Math.random() * 100}%`;
-        orb.style.setProperty('--size', isCelestialInvite ? `${4 + Math.random() * 5}px` : `${4 + Math.random() * 9}px`);
-        orb.style.setProperty('--alpha', isCelestialInvite ? `${0.12 + Math.random() * 0.14}` : `${0.16 + Math.random() * 0.3}`);
-        orb.style.setProperty('--duration', isCelestialInvite ? `${14 + Math.random() * 8}s` : `${10 + Math.random() * 12}s`);
+        orb.style.setProperty('--size', `${4 + Math.random() * 9}px`);
+        orb.style.setProperty('--alpha', `${0.16 + Math.random() * 0.3}`);
+        orb.style.setProperty('--duration', `${10 + Math.random() * 12}s`);
         orb.style.setProperty('--delay', `${Math.random() * 8}s`);
-        orb.style.setProperty('--drift-x', isCelestialInvite ? `${-10 + Math.random() * 20}px` : `${-28 + Math.random() * 56}px`);
-        orb.style.setProperty('--drift-y', isCelestialInvite ? `${-12 + Math.random() * 16}px` : `${-34 + Math.random() * 22}px`);
+        orb.style.setProperty('--drift-x', `${-28 + Math.random() * 56}px`);
+        orb.style.setProperty('--drift-y', `${-34 + Math.random() * 22}px`);
         container.appendChild(orb);
     }
 }
@@ -278,51 +534,313 @@ function confetti() {
     }
 }
 
+function getMemoryCardPlacement(index) {
+    const zones = [
+        { left: [4, 18], top: [7, 20] },
+        { left: [68, 82], top: [8, 22] },
+        { left: [6, 20], top: [58, 74] },
+        { left: [68, 82], top: [58, 74] },
+        { left: [22, 36], top: [5, 18] },
+        { left: [54, 68], top: [20, 34] },
+        { left: [24, 38], top: [68, 80] },
+        { left: [54, 68], top: [70, 80] }
+    ];
+
+    const zone = zones[index % zones.length];
+    const left = zone.left[0] + Math.random() * (zone.left[1] - zone.left[0]);
+    const top = zone.top[0] + Math.random() * (zone.top[1] - zone.top[0]);
+    const fromLeft = left < 45;
+    const fromTop = top < 45;
+    const sign = Math.random() > 0.5 ? 1 : -1;
+
+    return {
+        left: left.toFixed(2),
+        top: top.toFixed(2),
+        startX: `${(fromLeft ? -1 : 1) * (34 + Math.random() * 34)}vw`,
+        startY: `${(fromTop ? -1 : 1) * (30 + Math.random() * 32)}vh`,
+        startR: `${sign * (22 + Math.random() * 26)}deg`,
+        endR: `${(Math.random() > 0.5 ? 1 : -1) * (3 + Math.random() * 8)}deg`
+    };
+}
+
+function applyFloatingPhotoStyles(card, placement, index = 0, isRing = false, delayMs = null) {
+    const size = isRing ? 'clamp(260px, 42vw, 500px)' : 'clamp(126px, 20vw, 220px)';
+    const borderWidth = isRing ? '8px' : '6px';
+    const startTransform = isRing
+        ? 'translate(-50%, -50%) scale(0.72) rotateY(-22deg) rotateZ(8deg)'
+        : `translate3d(${placement.startX}, ${placement.startY}, -220px) rotateX(24deg) rotateY(-30deg) rotateZ(${placement.startR}) scale(0.66)`;
+    const endTransform = isRing
+        ? 'translate(-50%, -50%) scale(1) rotateY(0) rotateZ(0)'
+        : `translate3d(0, 0, 0) rotateX(0) rotateY(0) rotateZ(${placement.endR}) scale(1)`;
+    const restTransform = isRing
+        ? endTransform
+        : `translate3d(0, 0, -40px) rotateX(0) rotateY(0) rotateZ(${placement.endR}) scale(0.92)`;
+
+    Object.assign(card.style, {
+        position: 'absolute',
+        zIndex: isRing ? '8' : '2',
+        left: isRing ? '50%' : `${placement.left}%`,
+        top: isRing ? '38%' : `${placement.top}%`,
+        width: size,
+        aspectRatio: '0.78',
+        margin: '0',
+        overflow: 'hidden',
+        backgroundColor: 'rgba(255, 255, 255, 0.34)',
+        border: `${borderWidth} solid rgba(238, 243, 246, 0.76)`,
+        borderRadius: '12px',
+        boxShadow: '0 18px 44px rgba(64, 88, 122, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.24)',
+        opacity: '0',
+        transform: startTransform,
+        transformStyle: 'preserve-3d',
+        pointerEvents: 'none',
+        boxSizing: 'border-box'
+    });
+
+    window.setTimeout(() => {
+        card.animate([
+            { opacity: 0, transform: startTransform },
+            { opacity: 1, offset: 0.32 },
+            { opacity: 1, transform: endTransform, offset: isRing ? 1 : 0.74 },
+            { opacity: isRing ? 1 : 0.34, transform: restTransform }
+        ], {
+            duration: isRing ? 1600 : 7200,
+            easing: 'cubic-bezier(0.2, 0.72, 0.18, 1)',
+            fill: 'forwards'
+        });
+    }, delayMs ?? (isRing ? 0 : 250 + index * 520));
+}
+
+function createPhotoCard(src, index) {
+    const placement = getMemoryCardPlacement(index);
+    const card = document.createElement('figure');
+    const img = document.createElement('img');
+
+    card.className = 'invite-photo-card';
+    img.src = src;
+    img.alt = '';
+    img.loading = index < 2 ? 'eager' : 'lazy';
+    img.decoding = 'async';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    img.style.display = 'block';
+
+    card.appendChild(img);
+    applyFloatingPhotoStyles(card, placement, index, false);
+    return card;
+}
+
+function makeIntroOpenButton(button) {
+    button.className = 'section-action btn-p';
+    button.innerHTML = 'Перейти до запрошення';
+    button.setAttribute('aria-label', 'Перейти до запрошення');
+    button.type = 'button';
+    button.style.marginTop = '26px';
+    return button;
+}
+
+function applyDawnThemeToInvite() {
+    document.body.classList.add('invite-opened');
+}
+
+async function setupIntegratedInviteIntro() {
+    const opening = document.querySelector('.invite-opening');
+
+    if (!opening || !openInviteButton) {
+        return;
+    }
+
+    const code = new URLSearchParams(window.location.search).get('code') || '';
+
+    if (!code) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`intro_assets.php?code=${encodeURIComponent(code)}`, { cache: 'no-store' });
+        const data = await response.json();
+
+        if (!data.ok || ((!Array.isArray(data.photos) || data.photos.length === 0) && !data.ring)) {
+            return;
+        }
+
+        document.body.classList.add('has-inline-photo-intro');
+        if (inviteContent) {
+            inviteContent.style.display = 'none';
+        }
+
+        Object.assign(opening.style, {
+            position: 'relative',
+            inset: 'auto',
+            zIndex: '2',
+            minHeight: '100svh',
+            overflow: 'hidden',
+            opacity: '1',
+            visibility: 'visible',
+            transform: 'none',
+            background: INVITE_NIGHT_BACKGROUND
+        });
+
+        const button = makeIntroOpenButton(openInviteButton);
+        const sky = document.createElement('div');
+        const memoryStage = document.createElement('div');
+        const final = document.createElement('div');
+
+        sky.className = 'splash-stars';
+        sky.setAttribute('aria-hidden', 'true');
+
+        memoryStage.setAttribute('aria-hidden', 'true');
+        Object.assign(memoryStage.style, {
+            position: 'absolute',
+            inset: '0',
+            pointerEvents: 'none',
+            perspective: '1100px',
+            zIndex: '2'
+        });
+
+        (data.photos || []).forEach((photo, index) => {
+            memoryStage.appendChild(createPhotoCard(photo, index));
+        });
+
+        opening.innerHTML = '';
+        opening.appendChild(sky);
+        opening.appendChild(memoryStage);
+        buildStars(sky, 120);
+        buildSplashStarbursts(sky, 24);
+        buildSplashComets(sky, 8);
+
+        if (data.ring) {
+            const ring = document.createElement('figure');
+            const img = document.createElement('img');
+            const placement = { startX: '0vw', startY: '-18vh', startR: '8deg', endR: '0deg' };
+
+            ring.className = 'invite-photo-card invite-photo-card--ring';
+            ring.setAttribute('aria-hidden', 'true');
+            img.src = data.ring;
+            img.alt = '';
+            img.loading = 'eager';
+            img.decoding = 'async';
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.style.display = 'block';
+            ring.appendChild(img);
+            applyFloatingPhotoStyles(ring, placement, 0, true, Number(data.ringDelay || 5.1) * 1000);
+            opening.appendChild(ring);
+        }
+
+        final.className = 'welcome invite-intro-message';
+        Object.assign(final.style, {
+            position: 'relative',
+            zIndex: '12',
+            width: 'min(720px, 100%)',
+            marginTop: 'min(52vh, 410px)',
+            textAlign: 'center',
+            opacity: '0',
+            transform: 'translateY(24px) scale(0.96)',
+            background: 'rgba(255, 255, 255, 0.72)',
+            border: '1px solid var(--line)',
+            borderRadius: 'var(--radius)',
+            boxShadow: 'var(--shadow)',
+            backdropFilter: 'blur(14px)',
+            padding: 'clamp(28px, 5vw, 44px)'
+        });
+        final.innerHTML = `
+            <p style="margin:0 0 18px;color:var(--dusty);font-size:12px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;">${data.guestName ? `${data.guestName},` : 'Дорогий гостю,'}</p>
+            <div style="width:min(620px,100%);margin:0 auto;color:var(--text);font-family:'Cormorant Garamond', Georgia, serif;font-size:clamp(22px,3.6vw,34px);font-weight:500;line-height:1.32;">
+                <p style="margin:0 0 10px;">Здавна люди вірили, що кожна зірка на небі — це чиясь доля.</p>
+                <p style="margin:0 0 10px;">Дві долі, що знайшли одна одну, зливаються в одне світло —</p>
+                <p style="margin:0 0 14px;">і на небосхилі спалахує нова зірочка.</p>
+                <p style="margin:0 0 10px;">Незабаром така з'явиться і в нас.</p>
+                <p style="margin:0;">Хочемо, щоб саме ви були поруч,<br>коли вона засяє вперше. ✨</p>
+            </div>
+        `;
+        final.appendChild(button);
+        opening.appendChild(final);
+
+        window.setTimeout(() => {
+            final.animate([
+                { opacity: 0, transform: 'translateY(24px) scale(0.96)' },
+                { opacity: 1, transform: 'translateY(0) scale(1)' }
+            ], {
+                duration: 1100,
+                easing: 'ease',
+                fill: 'forwards'
+            });
+        }, Number(data.finalDelay || 6.15) * 1000);
+    } catch (error) {
+        // Keep the original ticket opening as a safe fallback.
+    }
+}
+
+setupIntegratedInviteIntro();
+
 const splashStars = document.querySelector('.splash-stars');
 
-buildStars(splashStars, 70);
-buildSplashStarbursts(splashStars, 10);
-buildSplashComets(splashStars, 4);
-document.querySelectorAll('.starfield').forEach((starfield) => buildStars(starfield, 90));
-document.querySelectorAll('.starfield').forEach((starfield) => buildNightCrossStars(starfield, 8));
-document.querySelectorAll('.cosmic-effects').forEach((effects) => buildCosmicEffects(effects));
+buildStars(splashStars, 120);
+buildSplashStarbursts(splashStars, 24);
+buildSplashComets(splashStars, 8);
+buildStars(document.querySelector('.starfield'), 90);
 
-if (document.querySelector('[data-confetti-on-load]') && window.matchMedia('(min-width: 769px)').matches) {
+const contentStars = document.createElement('div');
+contentStars.className = 'splash-stars invite-content-stars';
+contentStars.setAttribute('aria-hidden', 'true');
+document.body.appendChild(contentStars);
+buildStars(contentStars, 120);
+buildSplashStarbursts(contentStars, 24);
+buildSplashComets(contentStars, 8);
+buildCosmicEffects(document.querySelector('.cosmic-effects'));
+
+if (document.querySelector('[data-confetti-on-load]')) {
     window.setTimeout(confetti, 450);
 }
 
 if (openInviteButton && inviteContent) {
     openInviteButton.addEventListener('click', () => {
+        const opening = document.querySelector('.invite-opening');
         document.body.classList.add('invite-opened');
+        applyDawnThemeToInvite();
 
-        startBackgroundMusic();
+        if (bgMusic) {
+            seekMusicToFirstStart();
+            bgMusic.volume = 0.35;
+            bgMusic.play().then(() => {
+                musicButton?.classList.add('is-playing');
+            }).catch(() => { });
+        }
+
+        if (inviteContent) {
+            inviteContent.style.display = '';
+            inviteContent.style.opacity = '1';
+            inviteContent.style.transform = 'none';
+            inviteContent.style.visibility = 'visible';
+        }
+
+        if (opening) {
+            opening.animate([
+                { opacity: 1, transform: 'translateY(0)' },
+                { opacity: 0, transform: 'translateY(-18px)' }
+            ], {
+                duration: 520,
+                easing: 'ease',
+                fill: 'forwards'
+            });
+        }
 
         window.setTimeout(() => {
-            inviteContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 320);
+            if (opening) {
+                opening.style.display = 'none';
+            }
+
+            if (inviteContent) {
+                inviteContent.style.opacity = '1';
+                inviteContent.style.transform = 'none';
+                inviteContent.style.visibility = 'visible';
+            }
+
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        }, 520);
     });
-} else if (inviteContent) {
-    window.addEventListener('load', () => {
-        startBackgroundMusic();
-    }, { once: true });
-}
-
-function armMusicGestureFallback() {
-    if (!bgMusic || bgMusicPendingGesture) {
-        return;
-    }
-
-    bgMusicPendingGesture = true;
-    const options = { once: true, passive: true };
-    const playAfterGesture = () => {
-        bgMusicPendingGesture = false;
-        startBackgroundMusic();
-    };
-
-    window.addEventListener('pointerdown', playAfterGesture, options);
-    window.addEventListener('keydown', playAfterGesture, { once: true });
-    window.addEventListener('touchstart', playAfterGesture, options);
-    window.addEventListener('wheel', playAfterGesture, options);
 }
 
 function seekMusicToFirstStart() {
@@ -336,22 +854,6 @@ function seekMusicToFirstStart() {
     } catch (error) {
         bgMusic.addEventListener('loadedmetadata', seekMusicToFirstStart, { once: true });
     }
-}
-
-function startBackgroundMusic() {
-    if (!bgMusic) {
-        return;
-    }
-
-    seekMusicToFirstStart();
-    bgMusic.volume = 0.35;
-    bgMusic.play().then(() => {
-        bgMusicPendingGesture = false;
-        musicButton?.classList.add('is-playing');
-    }).catch(() => {
-        musicButton?.classList.remove('is-playing');
-        armMusicGestureFallback();
-    });
 }
 
 if (musicButton && bgMusic) {
@@ -433,10 +935,7 @@ if (countdown) {
         const topY = 44 + (1 - p) * 94;
 
         if (p > 0.02) {
-            sandTop.setAttribute(
-                'd',
-                `M20,${topY} Q60,${topY - 4 + wave} 90,${topY + 2 + wave} Q120,${topY - 3 - wave} 160,${topY} L160,140 L20,140Z`
-            );
+            sandTop.setAttribute('d', `M20,${topY} Q60,${topY - 4 + wave} 90,${topY + 2 + wave} Q120,${topY - 3 - wave} 160,${topY} L160,140 L20,140Z`);
         } else {
             sandTop.setAttribute('d', '');
         }
@@ -445,10 +944,7 @@ if (countdown) {
         const bWave = Math.sin(Date.now() / 900 + 1) * 2;
 
         if (p < 0.98) {
-            sandBot.setAttribute(
-                'd',
-                `M20,${botY} Q60,${botY - 3 + bWave} 90,${botY + 1 + bWave} Q120,${botY - 2 - bWave} 160,${botY} L160,240 L20,240Z`
-            );
+            sandBot.setAttribute('d', `M20,${botY} Q60,${botY - 3 + bWave} 90,${botY + 1 + bWave} Q120,${botY - 2 - bWave} 160,${botY} L160,240 L20,240Z`);
         } else {
             sandBot.setAttribute('d', '');
         }
@@ -469,7 +965,7 @@ if (countdown) {
         labels[0].textContent = plural(days, 'день', 'дні', 'днів');
         labels[1].textContent = plural(hours, 'година', 'години', 'годин');
         labels[2].textContent = plural(minutes, 'хвилина', 'хвилини', 'хвилин');
-        labels[3].textContent = plural(seconds, 'секунда', 'секунди', 'секунд');
+        labels[3].textContent = plural(seconds, 'секунда', 'секунд');
         updateSand(diff);
     }
 
@@ -492,17 +988,12 @@ const plusOneName = document.querySelector('.plus-one-name');
 const plusOneNameInput = plusOneName?.querySelector('input[name="plus_one_name"]');
 const partnerDrink = document.querySelector('.partner-drink');
 const partnerDrinkSelect = partnerDrink?.querySelector('select[name="partner_drink"]');
-const mainDrinkField = document.querySelector('.main-drink-field');
 const mainDrinkSelect = document.querySelector('select[name="drink"]');
 const partnerDrinkName = document.querySelector('[data-partner-drink-name]');
 const attendanceRadios = document.querySelectorAll('input[name="will_attend"]');
-const coupleAttendanceRadios = document.querySelectorAll('[data-couple-attendance]');
-const coupleWillAttendInput = document.querySelector('[data-couple-will-attend]');
-const couplePlusOneInput = document.querySelector('[data-couple-plus-one]');
 const rsvpExtra = document.querySelector('[data-rsvp-extra]');
 const rsvpSubmit = document.querySelector('[data-rsvp-submit]');
 let rsvpYesConfettiShown = false;
-
 
 if (mainDrinkSelect) {
     mainDrinkSelect.addEventListener('invalid', () => {
@@ -511,13 +1002,8 @@ if (mainDrinkSelect) {
         }
     });
 
-    mainDrinkSelect.addEventListener('change', () => {
-        mainDrinkSelect.setCustomValidity('');
-    });
-
-    mainDrinkSelect.addEventListener('input', () => {
-        mainDrinkSelect.setCustomValidity('');
-    });
+    mainDrinkSelect.addEventListener('change', () => mainDrinkSelect.setCustomValidity(''));
+    mainDrinkSelect.addEventListener('input', () => mainDrinkSelect.setCustomValidity(''));
 }
 
 if (partnerDrinkSelect) {
@@ -527,13 +1013,8 @@ if (partnerDrinkSelect) {
         }
     });
 
-    partnerDrinkSelect.addEventListener('change', () => {
-        partnerDrinkSelect.setCustomValidity('');
-    });
-
-    partnerDrinkSelect.addEventListener('input', () => {
-        partnerDrinkSelect.setCustomValidity('');
-    });
+    partnerDrinkSelect.addEventListener('change', () => partnerDrinkSelect.setCustomValidity(''));
+    partnerDrinkSelect.addEventListener('input', () => partnerDrinkSelect.setCustomValidity(''));
 }
 
 if (plusOneNameInput) {
@@ -543,75 +1024,22 @@ if (plusOneNameInput) {
         }
     });
 
-    plusOneNameInput.addEventListener('input', () => {
-        plusOneNameInput.setCustomValidity('');
-    });
-}
-
-
-function getRsvpState() {
-    const selectedCoupleAttendance = document.querySelector('[data-couple-attendance]:checked');
-
-    if (selectedCoupleAttendance) {
-        const value = selectedCoupleAttendance.value;
-        const primaryAttends = value === 'both' || value === 'primary';
-        const partnerAttends = value === 'both' || value === 'partner';
-        const willAttend = primaryAttends || partnerAttends;
-
-        return {
-            hasAnswer: true,
-            isCouple: true,
-            partnerAttends,
-            primaryAttends,
-            willAttend,
-        };
-    }
-
-    const selected = document.querySelector('input[name="will_attend"]:checked');
-    const willAttend = selected?.value === '1';
-    const selectedPlusOne = document.querySelector('input[name="plus_one"]:checked');
-
-    return {
-        hasAnswer: Boolean(selected),
-        isCouple: false,
-        partnerAttends: willAttend && selectedPlusOne?.value === '1',
-        primaryAttends: willAttend,
-        willAttend,
-    };
-}
-
-function syncCoupleHiddenFields(state) {
-    if (!state.isCouple) {
-        return;
-    }
-
-    if (coupleWillAttendInput) {
-        coupleWillAttendInput.value = state.willAttend ? '1' : '0';
-    }
-
-    if (couplePlusOneInput) {
-        couplePlusOneInput.value = state.partnerAttends ? '1' : '0';
-    }
+    plusOneNameInput.addEventListener('input', () => plusOneNameInput.setCustomValidity(''));
 }
 
 function syncRsvpVisibility() {
-    const state = getRsvpState();
-    const { hasAnswer, primaryAttends, willAttend } = state;
-
-    syncCoupleHiddenFields(state);
+    const selected = document.querySelector('input[name="will_attend"]:checked');
+    const willAttend = selected?.value === '1';
+    const hasAnswer = Boolean(selected);
 
     if (rsvpExtra) {
         rsvpExtra.classList.toggle('is-hidden', !willAttend);
     }
 
-    if (mainDrinkField) {
-        mainDrinkField.classList.toggle('is-hidden', !primaryAttends);
-    }
-
     if (mainDrinkSelect) {
-        mainDrinkSelect.required = primaryAttends;
+        mainDrinkSelect.required = willAttend;
 
-        if (!primaryAttends) {
+        if (!willAttend) {
             mainDrinkSelect.value = '';
         }
     }
@@ -629,18 +1057,17 @@ function syncRsvpVisibility() {
 
     if (rsvpSubmit) {
         rsvpSubmit.classList.toggle('is-hidden', !hasAnswer);
-        rsvpSubmit.textContent = willAttend
-            ? 'Підтвердити подорож'
-            : 'Шкода, але життя вносить свої корективи';
+        rsvpSubmit.textContent = willAttend ? 'Підтвердити подорож' : 'Шкода, але життя вносить свої корективи';
     }
 
     syncPlusOneName();
 }
 
 function syncPlusOneName() {
-    const state = getRsvpState();
+    const selectedAttendance = document.querySelector('input[name="will_attend"]:checked');
+    const willAttend = selectedAttendance?.value === '1';
     const selectedPlusOne = document.querySelector('input[name="plus_one"]:checked');
-    const hasPartner = state.isCouple ? state.partnerAttends : state.willAttend && selectedPlusOne?.value === '1';
+    const hasPartner = willAttend && selectedPlusOne?.value === '1';
 
     if (plusOneName) {
         plusOneName.classList.toggle('is-hidden', !hasPartner);
@@ -650,12 +1077,13 @@ function syncPlusOneName() {
         plusOneNameInput.required = hasPartner;
     }
 
-    if (partnerDrink) {
+    if (partnerDrink && !partnerDrink.dataset.alwaysVisible) {
         partnerDrink.classList.toggle('is-hidden', !hasPartner);
     }
 
     if (partnerDrinkSelect) {
-        partnerDrinkSelect.required = hasPartner;
+        const isAlwaysVisible = Boolean(partnerDrink?.dataset.alwaysVisible);
+        partnerDrinkSelect.required = willAttend && (hasPartner || isAlwaysVisible);
 
         if (!partnerDrinkSelect.required) {
             partnerDrinkSelect.value = '';
@@ -679,10 +1107,7 @@ if (rsvpForm) {
     });
 }
 
-plusOneRadios.forEach((radio) => {
-    radio.addEventListener('change', syncPlusOneName);
-});
-
+plusOneRadios.forEach((radio) => radio.addEventListener('change', syncPlusOneName));
 plusOneNameInput?.addEventListener('input', syncPlusOneName);
 
 attendanceRadios.forEach((radio) => {
@@ -696,22 +1121,10 @@ attendanceRadios.forEach((radio) => {
     });
 });
 
-coupleAttendanceRadios.forEach((radio) => {
-    radio.addEventListener('change', () => {
-        syncRsvpVisibility();
-
-        if (radio.dataset.rsvpYes !== undefined && radio.checked && !rsvpYesConfettiShown) {
-            rsvpYesConfettiShown = true;
-            confetti();
-        }
-    });
-});
-
 syncPlusOneName();
 syncRsvpVisibility();
 
 const revealItems = document.querySelectorAll('.reveal');
-revealItems[0]?.classList.add('is-visible');
 
 if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
