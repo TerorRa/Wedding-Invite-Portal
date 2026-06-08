@@ -164,8 +164,8 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                         <tr>
                             <th>ID / Квиток</th>
                             <th>Група / Тип</th>
+                            <th>Прізвище / Телефон</th>
                             <th>Ім'я / +1 Партнер</th>
-                            <th>Телефон</th>
                             <th>Напій / Напій партнера</th>
                             <th>Стіл / Тост</th>
                             <th>Відповідь / Відкриття</th>
@@ -202,19 +202,21 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                                     <br>
                                     <?= e(invitationTypeLabel($guest->invitation_type, (int)$guest->max_plus_one)) ?>
                                 </td>
-                                <td><?= e($primaryAttendanceMark . (string)$guest->name) ?>
-                                    <br>
-                                    <?= e($partnerAttendanceMark . (string)$guest->plus_one_name) ?>
-                                </td>
-                                <td><?= e($guest->phone) ?><br>
+                                     
+                                <td><?= e($guest->fullname) ?><br> 
+                                    <?= e($guest->phone) ?><br>
                                     <?php if ((int)$guest->is_send === 0): ?>
                                         <a class="table-link" href="guest_send.php?id=<?= (int)$guest->id ?>">❗❓</a>
                                     <?php else: ?>
                                         💌
                                     <?php endif; ?>
                                 </td>
-
-
+                                
+                                <td><?= e($primaryAttendanceMark . (string)$guest->name) ?>
+                                    <br>
+                                    <?= e($partnerAttendanceMark . (string)$guest->plus_one_name) ?>
+                                </td>
+                                
                                 <td><?= e($guest->drink) ?><br> <?= e($guest->partner_drink) ?></td>
                                 <td><?= e($guest->table_number) ?> <br>
                                     <?= (int)$guest->prepare_toast === 1 ? '🥂Так' : '💤Ні' ?>
