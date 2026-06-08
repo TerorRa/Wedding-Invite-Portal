@@ -53,7 +53,7 @@ foreach ($guests as $guest) {
         }
         if ($toast === 1) {
             $toastList[] = [
-                            'name' => (string)$guest->fullname. ' (' .(string)$guest->name. ' ' . (string)$guest->partner_name . ')'
+                            'name' => (string)$guest->fullname. ' (' .(string)$guest->name. ' ' . ((string)$guest->plus_one_name ? ' & ' . (string)$guest->plus_one_name : '' ). ')'
                         ];
         }
 
@@ -165,12 +165,9 @@ foreach ($drinkCounts as $drinkName => $drinkCount) {
                 <?php if ($toastList === []): ?>
                     <p class="admin-muted">Поки немає підтверджених відповідей з обраними тостами.</p>
                 <?php else: ?>
-
                         <?php foreach ($toastList as $toast): ?>
-                        <span><?= htmlspecialchars($toast['name'], ENT_QUOTES, 'UTF-8') ?></span>
-                            <br>
+                         <span class="song-name" style="color: #000000;"><?= htmlspecialchars($toast['name'], ENT_QUOTES, 'UTF-8') ?></span>
                         <?php endforeach; ?>
-
                 <?php endif; ?>
             </article>
 
@@ -179,12 +176,9 @@ foreach ($drinkCounts as $drinkName => $drinkCount) {
                 <?php if ($songList === []): ?>
                     <p class="admin-muted">Поки немає підтверджених відповідей з обраними піснями.</p>
                 <?php else: ?>
-
                         <?php foreach ($songList as $song): ?>
-                        <span><?= htmlspecialchars($song['name'], ENT_QUOTES, 'UTF-8') ?></span>
-                            <br>
+                        <span class="song-name" style="color: #000000;"> <?= htmlspecialchars($song['name'], ENT_QUOTES, 'UTF-8') ?></span>
                         <?php endforeach; ?>
-
                 <?php endif; ?>
         </section>
 
