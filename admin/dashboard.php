@@ -15,6 +15,8 @@ $stats = [
     'expectedPeople' => 0,
 ];
 $drinkCounts = [];
+$toastList = [];
+$songList = [];
 
 foreach ($guests as $guest) {
     $status = (string)$guest->status;
@@ -23,6 +25,8 @@ foreach ($guests as $guest) {
     $hasPartnerName = trim((string)$guest->plus_one_name) !== '';
     $invitedPeople = $isCouple && $hasPartnerName ? 2 : 1;
     $hasAttendanceBreakdown = $guest->primary_attends !== null || $guest->partner_attends !== null;
+    $song = trim((string)$guest->song_request);
+    $toast = ((int)$guest->prepare_toast);
 
     $stats['totalGuests'] += $invitedPeople;
 
@@ -41,6 +45,17 @@ foreach ($guests as $guest) {
 
         $stats['confirmed'] += $attendingPeople;
         $stats['plusOnes'] += $partnerAttends;
+
+        if ($song !== '') {
+            $songList[] = [
+                            'name' => (string)$song
+                        ];
+        }
+        if ($toast === 1) {
+            $toastList[] = [
+                            'name' => (string)$guest->fullname. ' (' .(string)$guest->name. ' ' . (string)$guest->partner_name . ')'
+                        ];
+        }
 
         if ($isCouple) {
             $stats['declined'] += max(0, $invitedPeople - $attendingPeople);
@@ -144,6 +159,33 @@ foreach ($drinkCounts as $drinkName => $drinkCount) {
                     </div>
                 <?php endif; ?>
             </article>
+
+            <article class="stat-card">
+                <span>Обіцяли підготувати тост:</span>
+                <?php if ($toastList === []): ?>
+                    <p class="admin-muted">Поки немає підтверджених відповідей з обраними тостами.</p>
+                <?php else: ?>
+
+                        <?php foreach ($toastList as $toast): ?>
+                        <span><?= htmlspecialchars($toast['name'], ENT_QUOTES, 'UTF-8') ?></span>
+                            <br>
+                        <?php endforeach; ?>
+
+                <?php endif; ?>
+            </article>
+
+             <article class="stat-card">
+                <span>Пісні, які хочуть почути:</span>
+                <?php if ($songList === []): ?>
+                    <p class="admin-muted">Поки немає підтверджених відповідей з обраними піснями.</p>
+                <?php else: ?>
+
+                        <?php foreach ($songList as $song): ?>
+                        <span><?= htmlspecialchars($song['name'], ENT_QUOTES, 'UTF-8') ?></span>
+                            <br>
+                        <?php endforeach; ?>
+
+                <?php endif; ?>
         </section>
 
     </main>
