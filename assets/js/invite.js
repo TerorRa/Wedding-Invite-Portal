@@ -216,11 +216,51 @@ function seekMusicToFirstStart() {
     }
 }
 
+function playBgMusic() {
+    if (!bgMusic) {
+        return Promise.reject(new Error('Music element not found'));
+    }
+
+    seekMusicToFirstStart();
+    bgMusic.volume = 0.35;
+
+    return bgMusic.play().then(() => {
+        musicButton?.classList.add('is-playing');
+    });
+}
+
+function tryPlayBgMusic() {
+    if (!bgMusic || !bgMusic.paused) {
+        return;
+    }
+
+    playBgMusic().catch(() => {
+        // Браузер може блокувати звук без дії користувача. Наступний клік/тап повторить запуск.
+    });
+}
+
+function bindMusicAutostart() {
+    if (!bgMusic || bgMusic.dataset.autostartBound === '1') {
+        return;
+    }
+
+    bgMusic.dataset.autostartBound = '1';
+
+    const startOnce = () => {
+        tryPlayBgMusic();
+    };
+
+    document.addEventListener('pointerdown', startOnce, { once: true, capture: true });
+    document.addEventListener('touchstart', startOnce, { once: true, capture: true });
+    document.addEventListener('keydown', startOnce, { once: true, capture: true });
+}
+
+bindMusicAutostart();
+
 if (musicButton && bgMusic) {
     musicButton.addEventListener('click', () => {
         if (bgMusic.paused) {
-            seekMusicToFirstStart();
-            bgMusic.play().then(() => musicButton.classList.add('is-playing')).catch(() => { });
+            playBgMusic().catch(() => { });
         } else {
             bgMusic.pause();
             musicButton.classList.remove('is-playing');
@@ -229,24 +269,19 @@ if (musicButton && bgMusic) {
 
     bgMusic.addEventListener('ended', () => {
         bgMusic.currentTime = 0;
-        bgMusic.play().then(() => musicButton.classList.add('is-playing')).catch(() => {
+        playBgMusic().catch(() => {
             musicButton.classList.remove('is-playing');
         });
     });
 }
 
 if (openInviteButton && inviteContent) {
+    openInviteButton.addEventListener('pointerdown', tryPlayBgMusic, { capture: true });
+
     openInviteButton.addEventListener('click', () => {
         const opening = document.querySelector('.invite-opening');
         document.body.classList.add('invite-opened');
-
-        if (bgMusic) {
-            seekMusicToFirstStart();
-            bgMusic.volume = 0.35;
-            bgMusic.play().then(() => {
-                musicButton?.classList.add('is-playing');
-            }).catch(() => { });
-        }
+        tryPlayBgMusic();
 
         inviteContent.style.display = '';
         inviteContent.style.opacity = '1';
