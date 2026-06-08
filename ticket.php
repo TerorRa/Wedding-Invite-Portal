@@ -314,6 +314,66 @@ $videoGreetingRelative = $videoGreetingPath !== null ? 'assets/video_greetings/'
         <?php endif; ?>
     </main>
     <script src="assets/js/invite.js?v=<?= e($scriptVersion) ?>"></script>
+    <script>
+        (() => {
+            const forms = document.querySelectorAll('.pass-video-form');
+
+            forms.forEach((form) => {
+                const fileInput = form.querySelector('[data-file-input]');
+                const fileName = form.querySelector('[data-file-name]');
+                const submitButton = form.querySelector('[data-upload-submit]');
+                const submitText = form.querySelector('[data-submit-text]');
+                const pickButtons = form.querySelectorAll('[data-video-pick]');
+
+                if (!fileInput) {
+                    return;
+                }
+
+                pickButtons.forEach((button) => {
+                    button.addEventListener('click', () => {
+                        fileInput.value = '';
+
+                        if (button.dataset.videoPick === 'camera') {
+                            fileInput.setAttribute('accept', 'video/*');
+                            fileInput.setAttribute('capture', 'user');
+                        } else {
+                            fileInput.setAttribute('accept', 'video/*,.mp4,.mov,.webm,.m4v');
+                            fileInput.removeAttribute('capture');
+                        }
+
+                        fileInput.click();
+                    });
+                });
+
+                fileInput.addEventListener('change', () => {
+                    const file = fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+
+                    if (!fileName) {
+                        return;
+                    }
+
+                    if (!file) {
+                        fileName.textContent = 'Файл не обрано';
+                        return;
+                    }
+
+                    const sizeMb = file.size ? ` (${(file.size / 1024 / 1024).toFixed(1)} МБ)` : '';
+                    fileName.textContent = `${file.name}${sizeMb}`;
+                });
+
+                form.addEventListener('submit', () => {
+                    if (submitButton) {
+                        submitButton.disabled = true;
+                        submitButton.classList.add('is-loading');
+                    }
+
+                    if (submitText) {
+                        submitText.textContent = 'Завантажуємо відео...';
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 
 </html>
