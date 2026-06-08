@@ -52,9 +52,9 @@ function inviteUrl(string $scheme, string $host, string $projectPath, string $co
     return $scheme . '://' . $host . $projectPath . '/start.php?code=' . urlencode($code);
 }
 
-function invitationMessage(string $name, string $link): string
+function invitationMessage(string $name, string $plusOneName, string $link): string
 {
-    return "Привіт, {$name}! ❤️\n"
+    return "Привіт, {$name}{$plusOneName}! ❤️\n"
         . "Ми підготували для тебе особисте запрошення на наше весілля.\n"
         . "Будемо дуже раді бачити тебе поруч у цей день.\n\n"
         . "Відкрити запрошення:\n"
@@ -254,7 +254,7 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                                         <button
                                             type="button"
                                             class="copy-message-button"
-                                            data-copy-message="<?= e(invitationMessage((string)$guest->name, $link)) ?>">
+                                            data-copy-message="<?= e(invitationMessage((string)$guest->name , ((string)$guest->plus_one_name !== '') ? ' та ' . e($guest->plus_one_name) : '', $link)) ?>">
                                             Копіювати запрошення
                                         </button>
                                         <?php if ($telegramLink !== null): ?>
