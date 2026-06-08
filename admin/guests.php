@@ -25,7 +25,7 @@ if ($search !== '') {
     $params[] = $searchLike;
 }
 
-$sql = $where === [] ? 'ORDER BY id DESC' : implode(' AND ', $where) . ' ORDER BY id DESC';
+$sql = $where === [] ? 'ORDER BY is_send, answered_at, opened_at, updated_at, id DESC' : implode(' AND ', $where) . ' ORDER BY is_send, answered_at, opened_at, updated_at, id DESC';
 $guests = R::findAll('guests', $sql, $params);
 $drinkOptions = ['Вино', 'Шампанське', 'Віскі', 'Горілка', 'Безалкогольне', 'Інше'];
 $flashMessage = (string)($_SESSION['admin_flash'] ?? '');
@@ -188,8 +188,8 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                             <?php $allowsPlusOne = $invitationType === 'single_plus_one' || $invitationType === 'couple' || (int)$guest->max_plus_one === 1; ?>
                             <?php $canAdminConfirm = !in_array((string)$guest->status, ['confirmed', 'declined'], true); ?>
                             <?php $hasAttendanceBreakdown = $guest->primary_attends !== null || $guest->partner_attends !== null; ?>
-                            <?php $primaryAttendanceMark = $hasAttendanceBreakdown ? ((int)$guest->primary_attends === 1 ? '🟢 ' : '🔴 ') : ''; ?>
-                            <?php $partnerAttendanceMark = $hasAttendanceBreakdown ? ((int)$guest->partner_attends === 1 ? '🟢+ ' : '🔴+ ') : ($hasDisplayedPlusOne ? '🟢+ ' : '🔴Ні '); ?>
+                            <?php $primaryAttendanceMark = $hasAttendanceBreakdown ? ((int)$guest->primary_attends === 1 ? '🟢 ' : '🔴 ') : '❓'; ?>
+                            <?php $partnerAttendanceMark = $hasAttendanceBreakdown ? ((int)$guest->partner_attends === 1 ? '🟢+ ' : '🔴+ ') : ($hasDisplayedPlusOne ? '❓' : ''); ?>
                             <?php $statusClass = in_array((string)$guest->status, ['confirmed', 'declined', 'opened'], true) ? ' status-pill--' . (string)$guest->status : ''; ?>
                             <tr>
                                 <td>
@@ -206,9 +206,9 @@ function invitationTypeLabel(?string $type, int $maxPlusOne): string
                                 <td><?= e($guest->fullname) ?><br> 
                                     <?= e($guest->phone) ?><br>
                                     <?php if ((int)$guest->is_send === 0): ?>
-                                        <a class="table-link" href="guest_send.php?id=<?= (int)$guest->id ?>">❗❓</a>
+                                        <a class="table-link" href="guest_send.php?id=<?= (int)$guest->id ?>">💌</a>
                                     <?php else: ?>
-                                        💌
+                                        ✅
                                     <?php endif; ?>
                                 </td>
                                 
