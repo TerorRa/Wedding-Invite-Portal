@@ -54,8 +54,8 @@ function inviteUrl(string $scheme, string $host, string $projectPath, string $co
 
 function invitationMessage(string $name, string $plusOneName, string $link): string
 {
-    return "Привіт, {$name}{$plusOneName}! ❤️\n"
-        . "Ми підготували для тебе особисте запрошення на наше весілля.\n"
+    return "{$name}{$plusOneName}! ❤️\n"
+        . "Для вас ми підготували особисте запрошення на наше весілля.\n"
         . "Будемо дуже раді бачити тебе поруч у цей день.\n\n"
         . "Відкрити запрошення:\n"
         . $link . "\n\n"
