@@ -61,8 +61,10 @@ $inviteDisplayName = $guest !== null
     : '';
 $hasOptionalPlusOne = $guest !== null && $invitationType === 'single_plus_one';
 $mainDrinkLabel = $guest !== null ? 'Який напій обирає ' . (string)$guest->name . '?' : 'Ваш бажаний напій?';
-$rsvpDeadline = new DateTimeImmutable('2026-07-17 23:59:59', new DateTimeZone('Europe/Kiev'));
-$isPastRsvpDeadline = new DateTimeImmutable('now', new DateTimeZone('Europe/Kiev')) > $rsvpDeadline;
+$appConfig = is_file(__DIR__ . '/config/app.php') ? require __DIR__ . '/config/app.php' : [];
+$appTimezone = new DateTimeZone((string)($appConfig['timezone'] ?? 'Europe/Kiev'));
+$rsvpDeadline = new DateTimeImmutable((string)($appConfig['rsvp_deadline'] ?? '2026-07-17 23:59:59'), $appTimezone);
+$isPastRsvpDeadline = new DateTimeImmutable('now', $appTimezone) > $rsvpDeadline;
 $hasGuestAnswered = $guest !== null && (
     trim((string)$guest->answered_at) !== ''
     || in_array((string)$guest->status, ['confirmed', 'declined'], true)
