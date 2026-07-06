@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/bootstrap.php';
 
+$appConfig = is_file(__DIR__ . '/config/app.php') ? require __DIR__ . '/config/app.php' : [];
+$appTimezone = new DateTimeZone((string)($appConfig['timezone'] ?? 'Europe/Kiev'));
+$rsvpDeadline = new DateTimeImmutable((string)($appConfig['rsvp_deadline'] ?? '2026-07-17 23:59:59'), $appTimezone);
+
 function renderError(string $message, ?string $inviteCode = null): void
 {
     $_SESSION['rsvp_error'] = $message;
@@ -42,7 +46,6 @@ $plusOne = $plusOne === 1 ? 1 : 0;
 
 $guest = R::findOne('guests', 'invite_code = ?', [$inviteCode]);
 if ($guest === null) { renderError('Запрошення не знайдено.', $inviteCode); }
-$rsvpDeadline = new DateTimeImmutable('2026-07-17 23:59:59', new DateTimeZone('Europe/Kiev'));
 $hasGuestAnswered = trim((string)$guest->answered_at) !== '' || in_array((string)$guest->status, ['confirmed', 'declined'], true) || trim((string)$guest->will_attend) !== '';
-if ((new DateTimeImmutable('now', new DateTimeZone('Europe/Kiev'))) > $rsvpDeadline && !$hasGuestAnswered) { renderError('Ми чекали на вашу відповідь, але, на жаль, не отримали її вчасно. Звʼяжіться з нами, якщо ви все ж бажаєте бути присутніми на нашому святі.', $inviteCode); }
+if ((new DateTimeImmutable('now', $appTimezone)) > $rsvpDeadline && !$hasGuestAnswered) { renderError('Ми чекали на вашу відповідь, але, на жаль, не отримали її вчасно. Звʼяжіться з нами, якщо ви все ж бажаєте бути присутніми на нашому святі.', $inviteCode); }
 $invitationType=(string)($guest->invitation_type?:((int)$guest->max_plus_one===1?'single_plus_one':'single'));$isCoupleInvite=$invitationType==='couple';$allowsOptionalPlusOne=$invitationType==='single_plus_one'||(int)$guest->max_plus_one===1;$primaryAttends=$willAttend;$partnerAttends=$willAttend===1&&$plusOne===1?1:0;if($isCoupleInvite){if(!in_array($coupleAttendance,['both','primary','partner','none'],true)){renderError('Оберіть, хто саме буде присутній.',$inviteCode);} $primaryAttends=in_array($coupleAttendance,['both','primary'],true)?1:0;$partnerAttends=in_array($coupleAttendance,['both','partner'],true)?1:0;$willAttend=($primaryAttends===1||$partnerAttends===1)?1:0;$plusOne=$partnerAttends;$plusOneName=trim((string)$guest->plus_one_name);if($primaryAttends===0){$drink='';}if($partnerAttends===0){$partnerDrink='';}} elseif($plusOne===1&&!$allowsOptionalPlusOne){$plusOne=0;$partnerDrink='';$partnerAttends=0;} if($willAttend===0){$plusOne=0;$primaryAttends=0;$partnerAttends=0;$drink='';$partnerDrink='';} if($primaryAttends===1&&$drink===''){renderError('Будь ласка, оберіть свій напій.',$inviteCode);} if($willAttend===1&&$partnerAttends===1&&$plusOneName===''){renderError('Будь ласка, вкажіть імʼя супутника або партнера.',$inviteCode);} if($willAttend===1&&$partnerAttends===1&&$partnerDrink===''){renderError('Будь ласка, оберіть напій для партнера.',$inviteCode);} $guest->will_attend=$willAttend;$guest->plus_one=$plusOne;$guest->plus_one_name=($isCoupleInvite||$plusOne===1)?$plusOneName:null;$guest->primary_attends=$primaryAttends;$guest->partner_attends=$partnerAttends;$guest->drink=$primaryAttends===1?$drink:null;$guest->partner_drink=$partnerAttends===1?$partnerDrink:null;$guest->food_notes=trim((string)($_POST['food_notes']??''));$guest->need_transfer=isset($_POST['need_transfer'])?1:0;$guest->prepare_toast=$willAttend===1&&(string)($_POST['prepare_toast']??'0')==='1'?1:0;$guest->song_request=trim((string)($_POST['song_request']??''));$guest->wish=trim((string)($_POST['wish']??''));$guest->answered_at=date('Y-m-d H:i:s');$guest->status=$willAttend===1?'confirmed':'declined';R::store($guest);logInviteAction((int)$guest->id,'submitted_rsvp');header('Location: ticket.php?code='.urlencode($inviteCode));exit;
