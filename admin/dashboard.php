@@ -104,6 +104,7 @@ foreach ($drinkCounts as $drinkName => $drinkCount) {
         <nav class="admin-nav" aria-label="Адмін-меню">
             <a class="is-active" href="dashboard.php">Dashboard</a>
             <a href="guests.php">Гості</a>
+            <a href="seating.php">Розсадка</a>
             <a href="program.php">Програма</a>
             <a href="import.php">Імпорт</a>
             <a href="export.php">Експорт</a>
@@ -114,6 +115,9 @@ foreach ($drinkCounts as $drinkName => $drinkCount) {
             <div>
                 <p class="admin-eyebrow">Wedding Invite Portal</p>
                 <h1>Панель керування</h1>
+            </div>
+            <div class="admin-actions">
+                <a class="admin-button admin-button-light" href="seating.php">Налаштувати розсадку</a>
             </div>
         </div>
 
@@ -180,6 +184,7 @@ foreach ($drinkCounts as $drinkName => $drinkCount) {
                         <span class="song-name" style="color: #000000;"> <?= htmlspecialchars($song['name'], ENT_QUOTES, 'UTF-8') ?></span>
                         <?php endforeach; ?>
                 <?php endif; ?>
+            </article>
         </section>
 
     </main>
