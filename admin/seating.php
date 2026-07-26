@@ -191,7 +191,7 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
                                 data-guest-id="<?= (int)$guest->id ?>"
                                 data-table-number=""
                                 data-person-count="<?= $card['people_count'] ?>"
-                                data-guest-search="<?= e(mb_strtolower(implode(' ', [implode(' ', $card['names']), (string)$guest->fullname, (string)$guest->guest_group, (string)$guest->ticket_number]), 'UTF-8')) ?>">
+                                data-guest-search="<?= e(implode(' ', [implode(' ', $card['names']), (string)$guest->fullname, (string)$guest->guest_group, (string)$guest->ticket_number])) ?>">
                                 <?= csrfField() ?>
                                 <input type="hidden" name="id" value="<?= (int)$guest->id ?>">
                                 <div class="seating-guest-card__main">
@@ -246,7 +246,7 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
                                     data-guest-id="<?= (int)$guest->id ?>"
                                     data-table-number="<?= $tableNumber ?>"
                                     data-person-count="<?= $card['people_count'] ?>"
-                                    data-guest-search="<?= e(mb_strtolower(implode(' ', [implode(' ', $card['names']), (string)$guest->fullname, (string)$guest->guest_group, (string)$guest->ticket_number]), 'UTF-8')) ?>">
+                                    data-guest-search="<?= e(implode(' ', [implode(' ', $card['names']), (string)$guest->fullname, (string)$guest->guest_group, (string)$guest->ticket_number])) ?>">
                                     <?= csrfField() ?>
                                     <input type="hidden" name="id" value="<?= (int)$guest->id ?>">
                                     <div class="seating-guest-card__main">
