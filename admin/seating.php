@@ -145,6 +145,7 @@ foreach ($confirmedGuests as $guest) {
                 (string)$guest->fullname,
                 (string)$guest->guest_group,
                 (string)$guest->ticket_number,
+                (string)$guest->plus_one_name,
             ]),
             'UTF-8'
         ),
@@ -249,7 +250,12 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
 
                             <div class="hall-table__list" data-table-list>
                                 <?php foreach ($cards as $card): ?>
-                                    <?php $guest = $card['guest']; ?>
+                                    <?php
+                                    $guest = $card['guest'];
+                                    $primaryName = trim((string)$guest->name) !== '' ? trim((string)$guest->name) : '—';
+                                    $plusOneName = trim((string)$guest->plus_one_name) !== '' ? trim((string)$guest->plus_one_name) : '—';
+                                    $fullName = trim((string)$guest->fullname) !== '' ? trim((string)$guest->fullname) : '—';
+                                    ?>
                                     <form
                                         class="seating-guest-card"
                                         action="seating_update.php"
@@ -263,19 +269,30 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
                                         <?= csrfField() ?>
                                         <input type="hidden" name="id" value="<?= (int)$guest->id ?>">
                                         <div class="seating-guest-card__main">
-                                            <strong><?= e(implode(' та ', $card['names'])) ?></strong>
-                                            <span><?= e((string)$guest->fullname) ?></span>
-                                            <small><?= e((string)$guest->guest_group) ?><?= trim((string)$guest->ticket_number) !== '' ? ' · ' . e((string)$guest->ticket_number) : '' ?></small>
+                                            <div class="seating-guest-card__row">
+                                                <span class="seating-guest-card__label">Fullname</span>
+                                                <strong class="seating-guest-card__value seating-guest-card__value--headline"><?= e($fullName) ?></strong>
+                                            </div>
+                                            <div class="seating-guest-card__row">
+                                                <span class="seating-guest-card__label">Name</span>
+                                                <span class="seating-guest-card__value"><?= e($primaryName) ?></span>
+                                            </div>
+                                            <div class="seating-guest-card__row">
+                                                <span class="seating-guest-card__label">Plus_one_name</span>
+                                                <span class="seating-guest-card__value"><?= e($plusOneName) ?></span>
+                                            </div>
                                         </div>
-                                        <div class="seating-guest-card__actions seating-print-hide">
+                                        <div class="seating-guest-card__footer">
                                             <span class="seating-party-size"><?= e(peopleLabel($card['people_count'])) ?></span>
-                                            <select name="table_number" data-seating-select aria-label="Стіл для <?= e(implode(' та ', $card['names'])) ?>">
-                                                <option value="">Без столу</option>
-                                                <?php foreach ($tableNumbers as $optionTableNumber): ?>
-                                                    <option value="<?= $optionTableNumber ?>" <?= $optionTableNumber === $tableNumber ? 'selected' : '' ?>>Стіл <?= $optionTableNumber ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <button type="submit">Зберегти</button>
+                                            <div class="seating-guest-card__actions seating-print-hide">
+                                                <select name="table_number" data-seating-select aria-label="Стіл для <?= e($primaryName) ?><?= $plusOneName !== '—' ? ' та ' . e($plusOneName) : '' ?>">
+                                                    <option value="">Без столу</option>
+                                                    <?php foreach ($tableNumbers as $optionTableNumber): ?>
+                                                        <option value="<?= $optionTableNumber ?>" <?= $optionTableNumber === $tableNumber ? 'selected' : '' ?>>Стіл <?= $optionTableNumber ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <button type="submit">Змінити стіл</button>
+                                            </div>
                                         </div>
                                         <span class="seating-save-status seating-print-hide" data-save-status aria-live="polite"></span>
                                     </form>
@@ -299,7 +316,12 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
                 <div class="unassigned-panel__list" data-table-zone data-table-number="">
                     <div class="unassigned-panel__cards" data-table-list>
                         <?php foreach ($tableAssignments[''] as $card): ?>
-                            <?php $guest = $card['guest']; ?>
+                            <?php
+                            $guest = $card['guest'];
+                            $primaryName = trim((string)$guest->name) !== '' ? trim((string)$guest->name) : '—';
+                            $plusOneName = trim((string)$guest->plus_one_name) !== '' ? trim((string)$guest->plus_one_name) : '—';
+                            $fullName = trim((string)$guest->fullname) !== '' ? trim((string)$guest->fullname) : '—';
+                            ?>
                             <form
                                 class="seating-guest-card"
                                 action="seating_update.php"
@@ -313,19 +335,30 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
                                 <?= csrfField() ?>
                                 <input type="hidden" name="id" value="<?= (int)$guest->id ?>">
                                 <div class="seating-guest-card__main">
-                                    <strong><?= e(implode(' та ', $card['names'])) ?></strong>
-                                    <span><?= e((string)$guest->fullname) ?></span>
-                                    <small><?= e((string)$guest->guest_group) ?><?= trim((string)$guest->ticket_number) !== '' ? ' · ' . e((string)$guest->ticket_number) : '' ?></small>
+                                    <div class="seating-guest-card__row">
+                                        <span class="seating-guest-card__label">Fullname</span>
+                                        <strong class="seating-guest-card__value seating-guest-card__value--headline"><?= e($fullName) ?></strong>
+                                    </div>
+                                    <div class="seating-guest-card__row">
+                                        <span class="seating-guest-card__label">Name</span>
+                                        <span class="seating-guest-card__value"><?= e($primaryName) ?></span>
+                                    </div>
+                                    <div class="seating-guest-card__row">
+                                        <span class="seating-guest-card__label">Plus_one_name</span>
+                                        <span class="seating-guest-card__value"><?= e($plusOneName) ?></span>
+                                    </div>
                                 </div>
-                                <div class="seating-guest-card__actions">
+                                <div class="seating-guest-card__footer">
                                     <span class="seating-party-size"><?= e(peopleLabel($card['people_count'])) ?></span>
-                                    <select name="table_number" data-seating-select aria-label="Стіл для <?= e(implode(' та ', $card['names'])) ?>">
-                                        <option value="" selected>Без столу</option>
-                                        <?php foreach ($tableNumbers as $optionTableNumber): ?>
-                                            <option value="<?= $optionTableNumber ?>">Стіл <?= $optionTableNumber ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <button type="submit">Зберегти</button>
+                                    <div class="seating-guest-card__actions">
+                                        <select name="table_number" data-seating-select aria-label="Стіл для <?= e($primaryName) ?><?= $plusOneName !== '—' ? ' та ' . e($plusOneName) : '' ?>">
+                                            <option value="" selected>Без столу</option>
+                                            <?php foreach ($tableNumbers as $optionTableNumber): ?>
+                                                <option value="<?= $optionTableNumber ?>">Стіл <?= $optionTableNumber ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <button type="submit">Змінити стіл</button>
+                                    </div>
                                 </div>
                                 <span class="seating-save-status" data-save-status aria-live="polite"></span>
                             </form>
