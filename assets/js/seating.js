@@ -2,6 +2,15 @@
     const board = document.querySelector('[data-seating-board]');
     const searchInput = document.querySelector('[data-seating-search]');
     const printButton = document.querySelector('[data-print-seating]');
+    const drinkStatsUrl = 'seating_drinks.php';
+
+    if (!document.querySelector('link[data-seating-drinks-styles]')) {
+        const styles = document.createElement('link');
+        styles.rel = 'stylesheet';
+        styles.href = '../assets/css/seating-drinks.css';
+        styles.dataset.seatingDrinksStyles = '1';
+        document.head.appendChild(styles);
+    }
 
     const peopleLabel = (count) => {
         const lastTwo = count % 100;
@@ -28,6 +37,105 @@
     let draggedCard = null;
 
     const findZone = (tableNumber) => zones.find((zone) => zone.dataset.tableNumber === tableNumber) || null;
+
+    const ensureDrinkContainers = () => {
+        zones.forEach((zone) => {
+            if (zone.dataset.tableNumber === '') {
+                return;
+            }
+
+            const surface = zone.querySelector('.hall-table__surface');
+
+            if (!surface || surface.querySelector('[data-table-drinks]')) {
+                return;
+            }
+
+            const title = document.createElement('small');
+            title.className = 'hall-table__drinks-title';
+            title.textContent = 'Напої';
+
+            const drinks = document.createElement('div');
+            drinks.className = 'hall-table__drinks';
+            drinks.dataset.tableDrinks = '1';
+
+            const loading = document.createElement('span');
+            loading.className = 'hall-table__drinks-empty';
+            loading.textContent = 'Завантаження…';
+            drinks.appendChild(loading);
+
+            surface.append(title, drinks);
+        });
+    };
+
+    const renderDrinkStats = (tables) => {
+        zones.forEach((zone) => {
+            const tableNumber = zone.dataset.tableNumber || '';
+            const container = zone.querySelector('[data-table-drinks]');
+
+            if (!container || tableNumber === '') {
+                return;
+            }
+
+            const drinks = tables && typeof tables[tableNumber] === 'object' ? tables[tableNumber] : {};
+            const entries = Object.entries(drinks).sort((left, right) => {
+                const countDifference = Number(right[1]) - Number(left[1]);
+                return countDifference !== 0 ? countDifference : left[0].localeCompare(right[0], 'uk-UA');
+            });
+
+            container.replaceChildren();
+
+            if (entries.length === 0) {
+                const empty = document.createElement('span');
+                empty.className = 'hall-table__drinks-empty';
+                empty.textContent = 'Не вказано';
+                container.appendChild(empty);
+                return;
+            }
+
+            entries.forEach(([drinkName, drinkCount]) => {
+                const item = document.createElement('span');
+                const name = document.createElement('b');
+                const count = document.createElement('em');
+                name.textContent = drinkName;
+                count.textContent = String(drinkCount);
+                item.append(name, count);
+                container.appendChild(item);
+            });
+        });
+    };
+
+    const refreshDrinkStats = async () => {
+        try {
+            const response = await fetch(drinkStatsUrl, {
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                cache: 'no-store',
+            });
+            const payload = await response.json();
+
+            if (!response.ok || !payload.success) {
+                throw new Error(payload.message || 'Не вдалося завантажити статистику напоїв.');
+            }
+
+            renderDrinkStats(payload.tables || {});
+        } catch (error) {
+            zones.forEach((zone) => {
+                const container = zone.querySelector('[data-table-drinks]');
+
+                if (!container) {
+                    return;
+                }
+
+                container.replaceChildren();
+                const message = document.createElement('span');
+                message.className = 'hall-table__drinks-empty';
+                message.textContent = 'Помилка';
+                container.appendChild(message);
+            });
+        }
+    };
 
     const refreshCounts = () => {
         let seatedPeople = 0;
@@ -125,6 +233,7 @@
             }
 
             moveCard(card, String(payload.table_number ?? tableNumber));
+            await refreshDrinkStats();
             setStatus(card, 'Збережено', 'success');
             window.setTimeout(() => setStatus(card, '', ''), 1800);
             return true;
@@ -221,5 +330,7 @@
     }
 
     printButton?.addEventListener('click', () => window.print());
+    ensureDrinkContainers();
     refreshCounts();
+    refreshDrinkStats();
 })();
