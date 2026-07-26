@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/auth.php';
 
-const MAX_TABLE_NUMBER = 20;
+const MAX_TABLE_NUMBER = 7;
 
 function wantsJsonResponse(): bool
 {
