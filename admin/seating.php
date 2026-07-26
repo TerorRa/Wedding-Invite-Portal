@@ -167,6 +167,7 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
 ?>
 <!doctype html>
 <html lang="uk">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -174,6 +175,7 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/seating.css">
 </head>
+
 <body>
     <main class="admin-shell">
         <nav class="admin-nav" aria-label="Адмін-меню">
@@ -243,7 +245,6 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
                         <?php $cards = $tableAssignments[(string)$tableNumber]; ?>
                         <article class="hall-table seating-table <?= e($tableDefinition['area_class']) ?>" data-table-zone data-table-number="<?= $tableNumber ?>">
                             <div class="hall-table__surface">
-                                <p class="admin-eyebrow"><?= e($tableDefinition['subtitle']) ?></p>
                                 <h2><?= e($tableDefinition['title']) ?></h2>
                                 <strong data-table-count><?= peopleLabel($tablePeople[(string)$tableNumber]) ?></strong>
                             </div>
@@ -270,20 +271,16 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
                                         <input type="hidden" name="id" value="<?= (int)$guest->id ?>">
                                         <div class="seating-guest-card__main">
                                             <div class="seating-guest-card__row">
-                                                <span class="seating-guest-card__label">Fullname</span>
-                                                <strong class="seating-guest-card__value seating-guest-card__value--headline"><?= e($fullName) ?></strong>
+                                                <strong class="seating-guest-card__value seating-guest-card__value--headline"><?= e($fullName) ?> <span class="seating-party-size"><?= e(peopleLabel($card['people_count'])) ?></span></strong>
+
                                             </div>
                                             <div class="seating-guest-card__row">
-                                                <span class="seating-guest-card__label">Name</span>
-                                                <span class="seating-guest-card__value"><?= e($primaryName) ?></span>
+                                                <span class="seating-guest-card__value"><?= e($primaryName) ?> <?= $plusOneName !== '—' ? ' та ' . e($plusOneName) : '' ?></span>
                                             </div>
-                                            <div class="seating-guest-card__row">
-                                                <span class="seating-guest-card__label">Plus_one_name</span>
-                                                <span class="seating-guest-card__value"><?= e($plusOneName) ?></span>
-                                            </div>
+
                                         </div>
                                         <div class="seating-guest-card__footer">
-                                            <span class="seating-party-size"><?= e(peopleLabel($card['people_count'])) ?></span>
+
                                             <div class="seating-guest-card__actions seating-print-hide">
                                                 <select name="table_number" data-seating-select aria-label="Стіл для <?= e($primaryName) ?><?= $plusOneName !== '—' ? ' та ' . e($plusOneName) : '' ?>">
                                                     <option value="">Без столу</option>
@@ -372,4 +369,5 @@ unset($_SESSION['admin_flash'], $_SESSION['admin_flash_error']);
 
     <script src="../assets/js/seating.js"></script>
 </body>
+
 </html>
