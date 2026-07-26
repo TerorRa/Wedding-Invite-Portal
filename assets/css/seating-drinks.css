@@ -1,0 +1,13 @@
+.hall-table__surface { width: 218px; min-height: 218px; gap: 4px; padding: 14px; }
+.hall-table--head .hall-table__surface { width: min(100%, 390px); min-height: 146px; }
+.hall-table__surface h2 { font-size: 25px; }
+.hall-table--head .hall-table__surface h2 { font-size: 30px; }
+.hall-table__drinks-title { margin-top: 3px; color: #68707c; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.hall-table__drinks { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 8px; font-size: 10px; line-height: 1.15; }
+.hall-table--head .hall-table__drinks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.hall-table__drinks span { min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 3px 5px; color: #39424f; background: rgba(255,255,255,.58); border-radius: 6px; }
+.hall-table__drinks b { min-width: 0; overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.hall-table__drinks em { flex: 0 0 auto; color: var(--accent); font-style: normal; font-weight: 800; }
+.hall-table__drinks .hall-table__drinks-empty { grid-column: 1 / -1; justify-content: center; color: #7c8795; }
+@media (max-width: 640px) { .hall-table__surface, .hall-table--head .hall-table__surface { width: min(100%, 340px); } .hall-table__surface { min-height: 200px; } .hall-table--head .hall-table__surface { min-height: 142px; } }
+@media print { .hall-table__surface { width: 100%; min-height: 0; } .hall-table__drinks { font-size: 9px; } }
