@@ -14,7 +14,7 @@ function wantsJsonResponse(): bool
     return str_contains($accept, 'application/json') || $requestedWith === 'xmlhttprequest';
 }
 
-function respond(bool $success, string $message, int $statusCode = 200, array $data = []): never
+function respond(bool $success, string $message, int $statusCode = 200, array $data = []): void
 {
     if (wantsJsonResponse()) {
         http_response_code($statusCode);
