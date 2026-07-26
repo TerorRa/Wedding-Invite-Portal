@@ -1,3 +1,19 @@
+const adminNav = document.querySelector('.admin-nav');
+
+if (adminNav && !adminNav.querySelector('a[href="seating.php"]')) {
+    const seatingLink = document.createElement('a');
+    const guestsLink = adminNav.querySelector('a[href="guests.php"]');
+
+    seatingLink.href = 'seating.php';
+    seatingLink.textContent = 'Розсадка';
+
+    if (guestsLink) {
+        guestsLink.insertAdjacentElement('afterend', seatingLink);
+    } else {
+        adminNav.appendChild(seatingLink);
+    }
+}
+
 const copyMessageButtons = document.querySelectorAll('[data-copy-message]');
 const copyPhoneButtons = document.querySelectorAll('[data-copy-phone]');
 const copySelectInputs = document.querySelectorAll('.copy-select-input');
